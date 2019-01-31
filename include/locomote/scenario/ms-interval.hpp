@@ -44,9 +44,9 @@ namespace locomote
       
       typedef _TimeVector TimeVector;
       typedef _StateVector StateVector;
-      typedef se3::container::aligned_vector<StateVector> StateVectorTrajectory;
+      typedef pinocchio::container::aligned_vector<StateVector> StateVectorTrajectory;
       typedef _ControlVector ControlVector;
-      typedef se3::container::aligned_vector<ControlVector> ControlVectorTrajectory;
+      typedef pinocchio::container::aligned_vector<ControlVector> ControlVectorTrajectory;
       
       
       /// \brief Default constructor

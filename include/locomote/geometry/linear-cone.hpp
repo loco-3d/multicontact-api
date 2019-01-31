@@ -161,7 +161,7 @@ namespace locomote
       
       typedef LinearCone<_Scalar,3,_Options> Base;
       typedef WrenchConeTpl<_Scalar,_Options> WrenchCone;
-      typedef se3::SE3Tpl<_Scalar,_Options> SE3;
+      typedef pinocchio::SE3Tpl<_Scalar,_Options> SE3;
       using typename Base::Scalar;
       enum { dim = Base::dim };
       using typename Base::MatrixDx;
@@ -259,7 +259,7 @@ namespace locomote
       
       typedef LinearCone<_Scalar,6,_Options> Base;
       typedef ForceConeTpl<_Scalar,_Options> ForceCone;
-      typedef se3::SE3Tpl<_Scalar,_Options> SE3;
+      typedef pinocchio::SE3Tpl<_Scalar,_Options> SE3;
       using typename Base::Scalar;
       enum { dim = Base::dim };
       using typename Base::MatrixDx;
