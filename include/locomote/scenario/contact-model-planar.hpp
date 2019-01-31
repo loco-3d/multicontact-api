@@ -43,13 +43,13 @@ namespace locomote
       
       typedef _Scalar Scalar;
       
-      /// \brief Default constructor.
+      /// \brief Default constructor.
       ContactModelPlanarTpl()
-      : m_mu(NAN)
-      , m_ZMP_radius(NAN)
+      : m_mu(-1.)
+      , m_ZMP_radius(-1.)
       {}
       
-      /// \brief Default constructor.
+      /// \brief Default constructor.
       ContactModelPlanarTpl(const Scalar mu, const Scalar ZMP_radius)
       : m_mu(mu)
       , m_ZMP_radius(ZMP_radius)
