@@ -52,9 +52,9 @@ namespace locomote
       typedef typename ContactPhase::ConfigurationVector ConfigurationVector;
       
       typedef MSIntervalDataTpl<TimeVector,StateVector,ConfigurationVector> MSIntervalData;
-      typedef se3::container::aligned_vector<MSIntervalData> MSIntervalDataVector;
+      typedef pinocchio::container::aligned_vector<MSIntervalData> MSIntervalDataVector;
       
-      typedef se3::container::aligned_vector<ContactPhase> ContactPhaseVector;
+      typedef pinocchio::container::aligned_vector<ContactPhase> ContactPhaseVector;
 //      typedef std::vector<ContactPhase, Eigen::aligned_allocator<ContactPhase> > ContactPhaseVector;
       
       ContactSequenceTpl(const size_t size = 0)

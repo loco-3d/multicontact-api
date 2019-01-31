@@ -37,7 +37,7 @@ using namespace locomote::scenario;
 template<typename Scalar>
 struct ATpl
 {
-  typedef se3::SE3Tpl<Scalar> SE3;
+  typedef pinocchio::SE3Tpl<Scalar> SE3;
   
   explicit ATpl() : data() {}
   explicit ATpl(const ATpl & other) : data(other.data) {};

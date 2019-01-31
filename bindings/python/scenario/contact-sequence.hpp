@@ -79,7 +79,7 @@ namespace locomote
         
         // Expose related vector
         VectorPythonVisitor<ContactPhaseVector>::expose("ContactPhaseVector");
-        se3::python::StdAlignedVectorPythonVisitor<MSIntervalData,true>::expose("MSIntervalDataVector");
+        pinocchio::python::StdAlignedVectorPythonVisitor<MSIntervalData,true>::expose("MSIntervalDataVector");
         
       }
     };

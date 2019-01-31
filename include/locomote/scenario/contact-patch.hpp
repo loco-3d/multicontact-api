@@ -44,7 +44,7 @@ namespace locomote
     {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
       typedef _Scalar Scalar;
-      typedef se3::SE3Tpl<Scalar,0> SE3;
+      typedef pinocchio::SE3Tpl<Scalar,0> SE3;
       typedef geometry::WrenchConeTpl<Scalar> LinearWrenchCone;
       typedef ContactModelPlanarTpl<Scalar> ContactModel;
       

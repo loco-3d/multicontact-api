@@ -53,7 +53,7 @@ namespace locomote
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
       typedef ContactPhaseTpl<_Scalar,4> Base;
       typedef _Scalar Scalar;
-      typedef se3::ForceTpl<Scalar> Force;
+      typedef pinocchio::ForceTpl<Scalar> Force;
       enum {
         state_dim = 9,
         control_dim = 6,
@@ -73,15 +73,15 @@ namespace locomote
       typedef Eigen::Map<StateVector> MapStateVector;
       typedef Eigen::Map<ControlVector> MapControlVector;
 
-      typedef se3::container::aligned_vector<StateVector> VectorStateVector;
+      typedef pinocchio::container::aligned_vector<StateVector> VectorStateVector;
       
-//      typedef se3::container::aligned_vector<Force> VectorForce;
+//      typedef pinocchio::container::aligned_vector<Force> VectorForce;
       typedef std::vector<Force, Eigen::aligned_allocator<Force> > VectorForce;
-      typedef se3::container::aligned_vector<ControlVector> VectorControlVector;
+      typedef pinocchio::container::aligned_vector<ControlVector> VectorControlVector;
       typedef std::vector<Scalar> VectorScalar;
       typedef VectorScalar TimeVector;
       typedef Eigen::Matrix<_Scalar,Eigen::Dynamic,1> ConfigurationVector;
-      typedef se3::container::aligned_vector<ConfigurationVector> VectorConfigurationVector;
+      typedef pinocchio::container::aligned_vector<ConfigurationVector> VectorConfigurationVector;
       
       typedef boost::array<VectorForce,4> ForceVectorArray;
       

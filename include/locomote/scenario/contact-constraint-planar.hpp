@@ -38,7 +38,7 @@ namespace locomote
     struct traits< ContactConstraintPlanarTpl<_Scalar> >
     {
       typedef _Scalar Scalar;
-      typedef se3::ForceTpl<Scalar,0> Force;
+      typedef pinocchio::ForceTpl<Scalar,0> Force;
       typedef ContactModelPlanarTpl<Scalar> ContactModel;
       
       enum
