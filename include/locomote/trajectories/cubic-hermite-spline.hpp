@@ -116,6 +116,26 @@ namespace locomote
         && m_ds == other.m_ds
         ;
       }
+
+      template<typename OtherScalar>
+      CubicHermiteSplineTpl operator+(const CubicHermiteSplineTpl<OtherScalar,dim> & other) const
+      {
+        assert(dimension() == other.dimension());
+        assert(m_absicca.isApprox(other.m_absicca));
+        return CubicHermiteSplineTpl(m_absicca, m_points+other.m_points,
+                                     m_derivatives+other.m_derivatives);
+      }
+
+
+      template<typename OtherScalar>
+      CubicHermiteSplineTpl operator-(const CubicHermiteSplineTpl<OtherScalar,dim> & other) const
+      {
+        assert(dimension() == other.dimension());
+        assert(m_absicca.isApprox(other.m_absicca));
+        return CubicHermiteSplineTpl(m_absicca, m_points-other.m_points,
+                                     m_derivatives-other.m_derivatives);
+      }
+
       
       template<typename OtherScalar>
       bool operator!=(const CubicHermiteSplineTpl<OtherScalar,dim> & other) const

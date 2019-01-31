@@ -54,7 +54,7 @@ namespace locomote
       {
         cl
         .def(bp::init<Index>(bp::arg("size"),"Init the hermite spline with a given size."))
-        .def(bp::init<VectorX,MatrixDx,MatrixDx>(bp::args("points","derivatives","absicca"),"Init from a given set of points and derivatives, together with a vector of absicca."))
+          .def(bp::init<VectorX,MatrixDx,MatrixDx>(bp::args("abcissa", "points","derivatives"),"Init from a given set of points and derivatives, together with a vector of absicca."))
         .def(bp::init<CubicHermiteSpline>(bp::args("other"),"Copy contructor."))
         
         .add_property("absicca",
@@ -79,7 +79,8 @@ namespace locomote
         .def("numIntervals",&CubicHermiteSpline::numIntervals,"Returns the number of intervals contained in the spline.")
         
         .def("eval",&eval,bp::arg("t"),"Eval the spline at a given abscicca t.")
-        
+        .def("__add__",&__add__)
+        .def("__sub__",&__sub__)
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
         .def("copy",&copy,"Returns a copy of *this.")
@@ -118,6 +119,15 @@ namespace locomote
       }
       
       static CubicHermiteSpline copy(const CubicHermiteSpline & self) { return CubicHermiteSpline(self); }
+
+    private:
+      static CubicHermiteSpline __add__(const CubicHermiteSpline & self,
+                                        const CubicHermiteSpline & other)
+      { return self+other; }
+      static CubicHermiteSpline __sub__(const CubicHermiteSpline & self,
+                                        const CubicHermiteSpline & other)
+      { return self-other; }
+
     };
   }
 }
