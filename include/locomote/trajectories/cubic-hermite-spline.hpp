@@ -25,7 +25,6 @@
 #ifndef __locomote_trajectories_cubic_hermite_spline_hpp__
 #define __locomote_trajectories_cubic_hermite_spline_hpp__
 
-#include <boost/operators.hpp>
 #include "locomote/trajectories/fwd.hpp"
 #include "locomote/serialization/eigen-matrix.hpp"
 #include "locomote/serialization/archive.hpp"
@@ -43,8 +42,7 @@ namespace locomote
     
     template<typename _Scalar, int _dim>
     struct CubicHermiteSplineTpl
-      : public serialization::Serializable< CubicHermiteSplineTpl<_Scalar,_dim> >
-      , public boost::additive< CubicHermiteSplineTpl<_Scalar,_dim> >
+    : public serialization::Serializable< CubicHermiteSplineTpl<_Scalar,_dim> >
     {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
       
@@ -117,6 +115,25 @@ namespace locomote
         && m_derivatives == other.m_derivatives
         && m_ds == other.m_ds
         ;
+      }
+
+      template<typename OtherScalar>
+      CubicHermiteSplineTpl operator+(const CubicHermiteSplineTpl<OtherScalar,dim> & other) const
+      {
+        assert(dimension() == other.dimension());
+        assert(m_absicca.isApprox(other.m_absicca));
+        return CubicHermiteSplineTpl(m_absicca, m_points+other.m_points,
+                                     m_derivatives+other.m_derivatives);
+      }
+
+
+      template<typename OtherScalar>
+      CubicHermiteSplineTpl operator-(const CubicHermiteSplineTpl<OtherScalar,dim> & other) const
+      {
+        assert(dimension() == other.dimension());
+        assert(m_absicca.isApprox(other.m_absicca));
+        return CubicHermiteSplineTpl(m_absicca, m_points-other.m_points,
+                                     m_derivatives-other.m_derivatives);
       }
 
       template<typename OtherScalar>

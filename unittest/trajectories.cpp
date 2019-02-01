@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(HermiteSpline)
     evalPoints.array() += 1.0;     evalPoints /=2.0;   // Move evaluation points to [0.,1.]
     for(int i=0;i<size;i++)
     {
-      double t = evalPoints[size];
+      double t = evalPoints[i];
       spline1.eval(t,p1,m1);
       spline2.eval(t,p2,m2);
       spline_res_a.eval(t,p_res_a,m_res_a);
