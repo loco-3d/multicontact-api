@@ -79,8 +79,10 @@ namespace locomote
         .def("numIntervals",&CubicHermiteSpline::numIntervals,"Returns the number of intervals contained in the spline.")
         
         .def("eval",&eval,bp::arg("t"),"Eval the spline at a given abscicca t.")
-        .def("__add__",&__add__)
-        .def("__sub__",&__sub__)
+        .def(bp::self+bp::self)
+        .def(bp::self-bp::self)
+        .def(bp::self+=bp::self)
+        .def(bp::self-=bp::self)
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
         .def("copy",&copy,"Returns a copy of *this.")
