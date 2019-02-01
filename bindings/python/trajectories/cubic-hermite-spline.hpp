@@ -122,14 +122,6 @@ namespace locomote
       
       static CubicHermiteSpline copy(const CubicHermiteSpline & self) { return CubicHermiteSpline(self); }
 
-    private:
-      static CubicHermiteSpline __add__(const CubicHermiteSpline & self,
-                                        const CubicHermiteSpline & other)
-      { return self+other; }
-      static CubicHermiteSpline __sub__(const CubicHermiteSpline & self,
-                                        const CubicHermiteSpline & other)
-      { return self-other; }
-
     };
   }
 }
