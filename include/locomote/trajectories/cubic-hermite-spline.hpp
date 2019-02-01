@@ -25,6 +25,7 @@
 #ifndef __locomote_trajectories_cubic_hermite_spline_hpp__
 #define __locomote_trajectories_cubic_hermite_spline_hpp__
 
+#include <boost/operators.hpp>
 #include "locomote/trajectories/fwd.hpp"
 #include "locomote/serialization/eigen-matrix.hpp"
 #include "locomote/serialization/archive.hpp"
@@ -42,7 +43,8 @@ namespace locomote
     
     template<typename _Scalar, int _dim>
     struct CubicHermiteSplineTpl
-    : public serialization::Serializable< CubicHermiteSplineTpl<_Scalar,_dim> >
+      : public serialization::Serializable< CubicHermiteSplineTpl<_Scalar,_dim> >
+      , public boost::additive< CubicHermiteSplineTpl<_Scalar,_dim> >
     {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
       
@@ -80,8 +82,8 @@ namespace locomote
         //EIGEN_STATIC_ASSERT_SAME_MATRIX_SIZE(MatrixDerived,MatrixDx);
         //EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(VectorDerived,VectorX);
         
-        assert(points.cols() == derivatives.cols() && "Points and derivatives may have the same number of columns.");
-        assert(points.cols() == absicca.size() && "Points and times may have the same dimension.");
+        assert(points.cols() == derivatives.cols() && "Points and derivatives must have the same number of columns.");
+        assert(points.cols() == absicca.size() && "Points and times must have the same dimension.");
         
         compute();
         assert(check());
@@ -118,25 +120,26 @@ namespace locomote
       }
 
       template<typename OtherScalar>
-      CubicHermiteSplineTpl operator+(const CubicHermiteSplineTpl<OtherScalar,dim> & other) const
+      CubicHermiteSplineTpl& operator+=(const CubicHermiteSplineTpl<OtherScalar,dim> & other)
       {
         assert(dimension() == other.dimension());
         assert(m_absicca.isApprox(other.m_absicca));
-        return CubicHermiteSplineTpl(m_absicca, m_points+other.m_points,
-                                     m_derivatives+other.m_derivatives);
+        m_points += other.m_points;
+        m_derivatives += other.m_derivatives;
+        return *this;
       }
 
 
       template<typename OtherScalar>
-      CubicHermiteSplineTpl operator-(const CubicHermiteSplineTpl<OtherScalar,dim> & other) const
+      CubicHermiteSplineTpl& operator-=(const CubicHermiteSplineTpl<OtherScalar,dim> & other)
       {
         assert(dimension() == other.dimension());
         assert(m_absicca.isApprox(other.m_absicca));
-        return CubicHermiteSplineTpl(m_absicca, m_points-other.m_points,
-                                     m_derivatives-other.m_derivatives);
+        m_points-=other.m_points;
+        m_derivatives-=other.m_derivatives;
+        return *this;
       }
 
-      
       template<typename OtherScalar>
       bool operator!=(const CubicHermiteSplineTpl<OtherScalar,dim> & other) const
       { return !(*this != other); }
