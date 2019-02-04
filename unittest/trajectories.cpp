@@ -148,6 +148,32 @@ BOOST_AUTO_TEST_CASE(HermiteSpline)
       BOOST_CHECK(m_res_s.isApprox(m1-m2));
     }
   }
+    // Test spline recomputation at a different abscissa
+  {
+    const int size = 20;
+    const int size2 = 33;
+    const int neval = 100;
+    const MatrixDx points(MatrixDx::Random(3,size));
+    const MatrixDx derivatives(MatrixDx::Random(3,size));
+
+    const VectorX absicca(VectorX::LinSpaced(size,0.,1.));
+    VectorX absicca2(VectorX::LinSpaced(size2,0.,1.));
+  
+    CubicHermiteSpline3 spline1(absicca, points, derivatives);
+    
+    CubicHermiteSpline3 spline2 = createHermiteSplineAtAbsicca(spline1, absicca2);
+    VectorX p1,m1, p2, m2;
+    VectorX evalPoints(VectorX::Random(neval));  //Random Evaluation points in range[-1., 1.]
+    evalPoints.array() += 1.0;     evalPoints /=2.0;   // Move evaluation points to [0.,1.]
+    for(int i=0;i<size2;i++)
+    {
+      double t = absicca2[i];
+      spline1.eval(t,p1,m1);
+      spline2.eval(t,p2,m2);
+      BOOST_CHECK(p1.isApprox(p2));
+      BOOST_CHECK(m1.isApprox(m2));
+    }
+  } 
 }
 
 BOOST_AUTO_TEST_SUITE_END()

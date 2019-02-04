@@ -348,6 +348,36 @@ namespace locomote
       BOOST_SERIALIZATION_SPLIT_MEMBER()
       
     };
+
+    template<typename Scalar, int dim> CubicHermiteSplineTpl<Scalar,dim>
+    createHermiteSplineAtAbsicca(const CubicHermiteSplineTpl<Scalar,dim>& spline,
+                                    const typename
+                                    CubicHermiteSplineTpl<Scalar,dim>::VectorX& absicca)
+    {
+      typedef CubicHermiteSplineTpl<Scalar,dim> SplineType;
+      typedef typename SplineType::VectorX VectorX;
+      typedef typename SplineType::MatrixDx MatrixDx;
+      const VectorX& t0 = spline.absicca();
+
+      //Assert that the final and initial point is the same
+      assert(absicca[0] == t0[0]);
+      assert(absicca[absicca.size()-1] == t0[t0.size()-1]);
+      //Assert that the new resolution is higher.
+      //Otherwise, there might be loss of information.
+      assert(absicca.size() >= spline.size());
+
+      MatrixDx p_new(dim, absicca.size());
+      MatrixDx m_new(dim, absicca.size());
+
+      for (int k=0;k<absicca.size();k++)
+      {
+        typename MatrixDx::ColXpr p = p_new.col(k);
+        typename MatrixDx::ColXpr m = m_new.col(k);
+        spline.eval(absicca[k], p, m);
+      }
+      
+      return SplineType(absicca, p_new, m_new);
+    }
   }
 }
 
