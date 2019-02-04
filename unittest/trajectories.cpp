@@ -112,6 +112,42 @@ BOOST_AUTO_TEST_CASE(HermiteSpline)
     BOOST_CHECK(value.isApprox(CubicHermiteSpline3::VectorD::Zero()));
     BOOST_CHECK(dvalue.isApprox(CubicHermiteSpline3::VectorD::Zero()));
   }
+
+  // Test the addition and subtraction operators
+  {
+    const int size = 20;
+  
+    const MatrixDx points1(MatrixDx::Random(3,size));
+    const MatrixDx derivatives1(MatrixDx::Random(3,size));
+    const MatrixDx points2(MatrixDx::Random(3,size));
+    const MatrixDx derivatives2(MatrixDx::Random(3,size));
+
+    const VectorX absicca(VectorX::LinSpaced(size,0.,1.));
+  
+    CubicHermiteSpline3 spline1(absicca, points1, derivatives1);
+    CubicHermiteSpline3 spline2(absicca, points2, derivatives2);
+
+    const CubicHermiteSpline3 spline_res_a = spline1+spline2;
+    const CubicHermiteSpline3 spline_res_s = spline1-spline2;
+
+    
+    VectorX p1,m1, p2, m2, p_res_a, m_res_a, p_res_s, m_res_s;
+    VectorX evalPoints(VectorX::Random(size));  //Random Evaluation points in range[-1., 1.]
+    evalPoints.array() += 1.0;     evalPoints /=2.0;   // Move evaluation points to [0.,1.]
+    for(int i=0;i<size;i++)
+    {
+      double t = evalPoints[i];
+      spline1.eval(t,p1,m1);
+      spline2.eval(t,p2,m2);
+      spline_res_a.eval(t,p_res_a,m_res_a);
+      spline_res_s.eval(t,p_res_s,m_res_s);
+
+      BOOST_CHECK(p_res_a.isApprox(p1+p2));
+      BOOST_CHECK(m_res_a.isApprox(m1+m2));
+      BOOST_CHECK(p_res_s.isApprox(p1-p2));
+      BOOST_CHECK(m_res_s.isApprox(m1-m2));
+    }
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
