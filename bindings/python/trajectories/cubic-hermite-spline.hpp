@@ -123,6 +123,16 @@ namespace locomote
       static CubicHermiteSpline copy(const CubicHermiteSpline & self) { return CubicHermiteSpline(self); }
 
     };
+
+    void exposeSplineAlgos()
+    {
+      bp::def("createHermiteSplineAtAbsicca",
+              &locomote::trajectories::createHermiteSplineAtAbsicca<double, 3>,
+              bp::args("Spline", "New Abscissa"),
+              "create and return a new spline at the points of the new abscissa."
+              "The size of the new abscissa needs to be higher so that there is no information loss.");
+    }
+    
   }
 }
 

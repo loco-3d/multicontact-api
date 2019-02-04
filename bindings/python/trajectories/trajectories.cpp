@@ -36,6 +36,7 @@ namespace locomote
       
       CubicHermiteSplinePythonVisitor<CubicHermiteSpline3>::expose("CubicHermiteSpline3");
       CubicHermiteSplinePythonVisitor<CubicHermiteSpline>::expose("CubicHermiteSpline");
+      exposeSplineAlgos();  
     }
   }
 }
