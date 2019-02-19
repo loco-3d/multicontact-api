@@ -27,7 +27,6 @@
 
 #include "locomote/scenario/contact-phase.hpp"
 #include "locomote/scenario/contact-sequence.hpp"
-#include "locomote/model/humanoid-robot.hpp"
 #include "locomote/serialization/spatial.hpp"
 #include "locomote/serialization/aligned-vector.hpp"
 
@@ -66,9 +65,8 @@ namespace locomote
         linear_control_id = 0,
         angular_control_id = 3
       };
-      typedef model::HumanoidRobot HumanoidRobot;
-      typedef HumanoidRobot::StateVector StateVector;
-      typedef HumanoidRobot::ControlVector ControlVector;
+      typedef Eigen::Matrix<Scalar,state_dim,1> StateVector;
+      typedef Eigen::Matrix<Scalar,control_dim,1> ControlVector;
       typedef Eigen::Matrix<Scalar,3,1> Vector3;
       typedef Eigen::Map<Vector3> MapVector3;
 
