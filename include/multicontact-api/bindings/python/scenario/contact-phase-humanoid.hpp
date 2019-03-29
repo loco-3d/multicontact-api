@@ -79,9 +79,7 @@ namespace multicontact_api
         .def_readwrite("reference_configurations",&ContactPhase::m_reference_configurations)
         .def_readwrite("raw_control_trajectory",&ContactPhase::m_raw_control_trajectory)
         .def_readwrite("angular_momentum_ref",&ContactPhase::m_angular_momentum_ref)
-        .def_readwrite("com_ref",&ContactPhase::m_com_ref)
-        .def_readwrite("vcom_ref",&ContactPhase::m_vcom_ref)
-        .def_readwrite("forces_ref",&ContactPhase::m_forces_ref)
+
         .add_property("contact_forces_trajectories", bp::make_array(&ContactPhase::m_contact_forces_trajectories))
 
         .def(bp::self == bp::self)
