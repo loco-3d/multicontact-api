@@ -66,7 +66,8 @@ namespace multicontact_api
       typedef boost::array<VectorForce,4> ForceVectorArray;
 
       typedef trajectories::CubicHermiteSplineTpl<Scalar,3> CubicHermiteSpline3;
-
+      typedef trajectories::CubicHermiteSplineTpl<Scalar,24> CubicHermiteSpline24;
+      
       using Base::dim;
       using Base::operator==;
       using typename Base::ContactPatch;
@@ -88,6 +89,9 @@ namespace multicontact_api
       , m_objective_trajectory(0)
       , m_raw_control_trajectory(0)
       , m_angular_momentum_ref(CubicHermiteSpline3::Constant(CubicHermiteSpline3::VectorD::Zero()))
+      , m_com_ref(CubicHermiteSpline3::Constant(CubicHermiteSpline3::VectorD::Zero()))
+      , m_vcom_ref(CubicHermiteSpline3::Constant(CubicHermiteSpline3::VectorD::Zero()))
+      , m_forces_ref(CubicHermiteSpline24::Constant(CubicHermiteSpline24::VectorD::Zero()))
       , m_reference_configurations(0)
       {}
 
@@ -108,6 +112,9 @@ namespace multicontact_api
       , m_contact_forces_trajectories(other.m_contact_forces_trajectories)
       , m_raw_control_trajectory(other.m_raw_control_trajectory)
       , m_angular_momentum_ref(other.m_angular_momentum_ref)
+      , m_com_ref(other.m_com_ref)
+      , m_vcom_ref(other.m_vcom_ref)
+      , m_forces_ref(other.m_forces_ref)
       , m_reference_configurations(other.m_reference_configurations)
       {}
 
@@ -126,6 +133,9 @@ namespace multicontact_api
         m_contact_forces_trajectories = other.m_contact_forces_trajectories;
         m_raw_control_trajectory = other.m_raw_control_trajectory;
         m_angular_momentum_ref = other.m_angular_momentum_ref;
+        m_com_ref = other.m_com_ref;
+        m_vcom_ref = other.m_vcom_ref;
+        m_forces_ref = other.m_forces_ref;
         m_reference_configurations = other.m_reference_configurations;
         return *this;
       }
@@ -147,7 +157,9 @@ namespace multicontact_api
       ForceVectorArray m_contact_forces_trajectories;
       VectorConfigurationVector m_raw_control_trajectory;
       CubicHermiteSpline3 m_angular_momentum_ref;
-
+      CubicHermiteSpline3 m_com_ref;
+      CubicHermiteSpline3 m_vcom_ref;
+      CubicHermiteSpline24 m_forces_ref;
 
     private:
 
@@ -180,6 +192,9 @@ namespace multicontact_api
 //        static_cast<const typename VectorConfigurationVector::vector_base&> (m_raw_control_trajectory);
         ar & boost::serialization::make_nvp("raw_control",m_raw_control_trajectory);
         ar & boost::serialization::make_nvp("angular_momentum_ref",m_angular_momentum_ref);
+        ar & boost::serialization::make_nvp("com_ref",m_com_ref);
+        ar & boost::serialization::make_nvp("vcom_ref",m_vcom_ref);
+        ar & boost::serialization::make_nvp("forces_ref",m_forces_ref);        
       }
 
       template<class Archive>
@@ -209,6 +224,9 @@ namespace multicontact_api
 //        static_cast<typename VectorConfigurationVector::vector_base&> (m_raw_control_trajectory);
         ar >> boost::serialization::make_nvp("raw_control",m_raw_control_trajectory);
         ar >> boost::serialization::make_nvp("angular_momentum_ref",m_angular_momentum_ref);
+        ar >> boost::serialization::make_nvp("com_ref",m_com_ref);
+        ar >> boost::serialization::make_nvp("vcom_ref",m_vcom_ref);
+        ar >> boost::serialization::make_nvp("forces_ref",m_forces_ref);
       }
 
       BOOST_SERIALIZATION_SPLIT_MEMBER()
