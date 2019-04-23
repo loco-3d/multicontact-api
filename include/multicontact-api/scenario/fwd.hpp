@@ -37,6 +37,8 @@ namespace multicontact_api
     template<typename Scalar> struct ContactConstraintPlanarTpl;
     typedef ContactConstraintPlanarTpl<double> ContactConstraintPlanar;
 
+    template<class GMM> struct ContactConstraintGMM;
+
     enum HumanoidPhaseType
     {
       SINGLE_SUPPORT,
