@@ -29,7 +29,7 @@ namespace multicontact_api
 
       /// \brief Default constructor.
       ContactPatchTpl()
-      : m_placement()
+      : m_placement(SE3::Identity())
       , m_active(false)
       , m_contact_model_placement(SE3::Identity())
       , m_lwc(0)
