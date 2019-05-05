@@ -45,6 +45,7 @@ namespace multicontact_api
       DOUBLE_SUPPORT,
       TRIPLE_SUPPORT,
       QUADRUPLE_SUPPORT,
+      NO_SUPPORT,
       HUMANOID_PHASE_UNDEFINED
     };
 

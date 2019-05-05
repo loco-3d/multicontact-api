@@ -22,6 +22,7 @@ namespace multicontact_api
       .value("DOUBLE_SUPPORT",DOUBLE_SUPPORT)
       .value("TRIPLE_SUPPORT",TRIPLE_SUPPORT)
       .value("QUADRUPLE_SUPPORT",QUADRUPLE_SUPPORT)
+      .value("NO_SUPPORT",NO_SUPPORT)
       .value("HUMANOID_PHASE_UNDEFINED",HUMANOID_PHASE_UNDEFINED)
       ;
     }
