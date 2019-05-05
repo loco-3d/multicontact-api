@@ -328,12 +328,13 @@ namespace multicontact_api
 
     };
 
-    template<typename Scalar, int dim> CubicHermiteSplineTpl<Scalar,dim>
-    createHermiteSplineAtAbsicca(const CubicHermiteSplineTpl<Scalar,dim>& spline,
-                                    const typename
-                                    CubicHermiteSplineTpl<Scalar,dim>::VectorX& absicca)
+    template<typename Scalar, int _dim> CubicHermiteSplineTpl<Scalar,_dim>
+    createHermiteSplineAtAbsicca(const CubicHermiteSplineTpl<Scalar,_dim>& spline,
+                                 const typename
+                                 CubicHermiteSplineTpl<Scalar,_dim>::VectorX& absicca)
     {
-      typedef CubicHermiteSplineTpl<Scalar,dim> SplineType;
+      int dim = spline.dimension();
+      typedef CubicHermiteSplineTpl<Scalar,_dim> SplineType;
       typedef typename SplineType::VectorX VectorX;
       typedef typename SplineType::MatrixDx MatrixDx;
       const VectorX& t0 = spline.absicca();
@@ -345,6 +346,7 @@ namespace multicontact_api
       //Otherwise, there might be loss of information.
       assert(absicca.size() >= spline.size());
 
+     
       MatrixDx p_new(dim, absicca.size());
       MatrixDx m_new(dim, absicca.size());
 

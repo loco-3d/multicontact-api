@@ -110,6 +110,11 @@ namespace multicontact_api
               bp::args("Spline", "New Abscissa"),
               "create and return a new spline at the points of the new abscissa."
               "The size of the new abscissa needs to be higher so that there is no information loss.");
+      bp::def("createHermiteSplineAtAbsicca",
+              &multicontact_api::trajectories::createHermiteSplineAtAbsicca<double, Eigen::Dynamic>,
+              bp::args("Spline", "New Abscissa"),
+              "create and return a new spline at the points of the new abscissa."
+              "The size of the new abscissa needs to be higher so that there is no information loss.");
     }
 
   }

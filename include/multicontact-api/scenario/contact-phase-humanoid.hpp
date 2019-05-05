@@ -66,7 +66,7 @@ namespace multicontact_api
       typedef boost::array<VectorForce,4> ForceVectorArray;
 
       typedef trajectories::CubicHermiteSplineTpl<Scalar,3> CubicHermiteSpline3;
-      typedef trajectories::CubicHermiteSplineTpl<Scalar,24> CubicHermiteSpline24;
+      typedef trajectories::CubicHermiteSplineTpl<Scalar,Eigen::Dynamic> CubicHermiteSpline;
       
       using Base::dim;
       using Base::operator==;
@@ -91,7 +91,7 @@ namespace multicontact_api
       , m_angular_momentum_ref(CubicHermiteSpline3::Constant(CubicHermiteSpline3::VectorD::Zero()))
       , m_com_ref(CubicHermiteSpline3::Constant(CubicHermiteSpline3::VectorD::Zero()))
       , m_vcom_ref(CubicHermiteSpline3::Constant(CubicHermiteSpline3::VectorD::Zero()))
-      , m_forces_ref(CubicHermiteSpline24::Constant(CubicHermiteSpline24::VectorD::Zero()))
+      , m_forces_ref(CubicHermiteSpline::Constant(CubicHermiteSpline::VectorX::Zero(24)))
       , m_reference_configurations(0)
       {}
 
@@ -159,7 +159,7 @@ namespace multicontact_api
       CubicHermiteSpline3 m_angular_momentum_ref;
       CubicHermiteSpline3 m_com_ref;
       CubicHermiteSpline3 m_vcom_ref;
-      CubicHermiteSpline24 m_forces_ref;
+      CubicHermiteSpline m_forces_ref;
 
     private:
 
