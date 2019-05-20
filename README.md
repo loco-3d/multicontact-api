@@ -15,11 +15,12 @@ Basic usage of the ContactSequence object is to initialize either an empty seque
 cs = ContactSequenceHumanoid(num_contact_phases)
 ```
 
-Or load it from a xml file : 
+Or load it from file : 
 
 ``` Python
 cs = ContactSequenceHumanoid(0)
-cs.loadFromXML(filename, "ContactSequence") 
+cs.loadFromXML(filename, "ContactSequence") # From an XML file
+cs.loadFromBinary(filename) # From a binary file (with .cs extension)
 ```
 
 This ContactSequence object store a sequence of ContactPhases, defining a set of active contact with their placement. 
