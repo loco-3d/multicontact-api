@@ -6,7 +6,6 @@
 
 #include "multicontact-api/bindings/python/geometry/expose-geometry.hpp"
 #include "multicontact-api/bindings/python/scenario/expose-scenario.hpp"
-#include "multicontact-api/bindings/python/trajectories/expose-trajectories.hpp"
 
 namespace bp = boost::python;
 
@@ -16,5 +15,4 @@ BOOST_PYTHON_MODULE(libmulticontact_api) {
   using namespace multicontact_api::python;
   exposeGeometry();
   exposeScenario();
-  exposeTrajectories();
 }

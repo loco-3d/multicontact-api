@@ -36,12 +36,6 @@ SET(${PROJECT_NAME}_SCENARIO_HEADERS
   scenario/ms-interval.hpp
   )
 
-
-SET(${PROJECT_NAME}_TRAJECTORIES_HEADERS
-  trajectories/cubic-hermite-spline.hpp
-  trajectories/fwd.hpp
-  )
-
 SET(${PROJECT_NAME}_CONTAINER_HEADERS
   container/ref.hpp
   )
@@ -64,8 +58,6 @@ SET(${PROJECT_NAME}_PYTHON_HEADERS
   bindings/python/scenario/enums.hpp
   bindings/python/scenario/expose-scenario.hpp
   bindings/python/scenario/ms-interval.hpp
-  bindings/python/trajectories/cubic-hermite-spline.hpp
-  bindings/python/trajectories/expose-trajectories.hpp
   bindings/python/utils/base.hpp
   bindings/python/utils/printable.hpp
   )
@@ -75,7 +67,6 @@ SET(${PROJECT_NAME}_HEADERS
   ${${PROJECT_NAME}_GEOMETRY_HEADERS}
   ${${PROJECT_NAME}_SERIALIZATION_HEADERS}
   ${${PROJECT_NAME}_SCENARIO_HEADERS}
-  ${${PROJECT_NAME}_TRAJECTORIES_HEADERS}
   ${${PROJECT_NAME}_CONTAINER_HEADERS}
   ${${PROJECT_NAME}_PYTHON_HEADERS}
   )

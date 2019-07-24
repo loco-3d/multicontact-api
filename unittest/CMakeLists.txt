@@ -6,7 +6,6 @@ ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK)
 SET(${PROJECT_NAME}_TESTS
   geometry
   scenario
-  trajectories
   )
 
 FOREACH(TEST ${${PROJECT_NAME}_TESTS})

@@ -11,7 +11,6 @@ SET(${PROJECT_NAME}_PYTHON_SOURCES
   scenario/contact-phase.cpp
   scenario/contact-sequence.cpp
   scenario/enums.cpp
-  trajectories/trajectories.cpp
   )
 
 ADD_LIBRARY(${PY_NAME} SHARED ${${PROJECT_NAME}_PYTHON_SOURCES} ${${PROJECT_NAME}_PYTHON_HEADERS})
