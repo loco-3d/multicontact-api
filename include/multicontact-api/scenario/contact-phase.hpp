@@ -20,7 +20,7 @@
 #include <map>
 #include <string>
 
-#include <boost/array.hpp>
+//#include <boost/array.hpp>
 #include <boost/serialization/map.hpp>
 
 namespace multicontact_api
@@ -34,20 +34,20 @@ namespace multicontact_api
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
       typedef _Scalar Scalar;
+      typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> point_t;
+      typedef curves::curve_abc<Scalar, Scalar, true, point_t> curve_abc_t;
+
       typedef ContactPatchTpl<Scalar> ContactPatch;
-      typedef boost::array<ContactPatch,_dim> ContactPatchArray;
-      typedef std::map<std::string, ContactPatch> ContactPatchArrayTest;
+      typedef std::map< std::string, ContactPatch > ContactPatchMap;
+      typedef std::map< std::string, curve_abc_t* > CurveMap;
       typedef std::vector< container::comparable_reference_wrapper<ContactPatch> > ContactPatchVector;
-      typedef std::vector< container::comparable_reference_wrapper<ContactPatch const> > ConstContactPatchVector;
+      //typedef std::vector< container::comparable_reference_wrapper<ContactPatch const> > ConstContactPatchVector; //???
       typedef geometry::SecondOrderCone<_Scalar,6> SOC6;
       typedef geometry::WrenchConeTpl<_Scalar> WrenchCone;
       typedef Eigen::DenseIndex Index;
       typedef typename ContactPatch::SE3 SE3;
       typedef Eigen::Matrix<double,6,Eigen::Dynamic> Matrix6x;
       typedef Eigen::Matrix<_Scalar,Eigen::Dynamic,1> ConfigurationVector;
-
-      typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> point_t;
-      typedef curves::curve_abc<Scalar, Scalar, true, point_t> curve_abc_t;
 
       typedef curves::cubic_hermite_spline<Scalar,Scalar,3,true> CubicHermiteSpline3;
       typedef curves::cubic_hermite_spline<Scalar,Scalar,24,true> CubicHermiteSpline24;
@@ -59,8 +59,7 @@ namespace multicontact_api
 
       /*Variables*/
       std::vector<std::string> m_effector_names_;
-      ContactPatchArray m_contact_patches; // TODO: set protected
-      std::map< std::string, ContactPatch > m_contact_patches_test;
+      ContactPatchMap m_contact_patches;
       std::pair<double,double> m_time_interval;
       ConfigurationVector m_reference_configuration;
 
@@ -76,9 +75,9 @@ namespace multicontact_api
       curve_abc_t* m_wrench_t;
       curve_abc_t* m_zmp_t;
 
-      // ContactPatchArray m_contact_forces;
-      // ContactPatchArray m_contact_normal_force;
-      // ContactPatchArray m_effector_trajectories;
+      CurveMap m_contact_forces;
+      CurveMap m_contact_normal_force;
+      CurveMap m_effector_trajectories;
 
       StateVector m_init_state;
       StateVector m_final_state;
@@ -104,8 +103,8 @@ namespace multicontact_api
       , m_lwc(other.m_lwc)
       {}
 
-      const ContactPatchArray & contact_patches() const { return m_contact_patches; }
-      ContactPatchArray & contact_patches() { return m_contact_patches; }
+      const ContactPatchMap & contact_patches() const { return m_contact_patches; }
+      ContactPatchMap & contact_patches() { return m_contact_patches; }
 
       /// \Returns a reference of the second order wrench cone
       const SOC6 & sowc() const { return m_sowc; }
@@ -124,9 +123,9 @@ namespace multicontact_api
       Index numActivePatches() const
       {
         Index num_active = 0;
-        for(typename ContactPatchArray::const_iterator it = m_contact_patches.begin();
+        for(typename ContactPatchMap::const_iterator it = m_contact_patches.begin();
             it != m_contact_patches.end(); ++it)
-          if(it->active()) num_active++;
+          if(it->second.active()) num_active++;
 
         return num_active;
       }
@@ -159,7 +158,7 @@ namespace multicontact_api
       ///
       const ContactPatch & getActivePatch() const
       {
-        for(typename ContactPatchArray::const_iterator it = m_contact_patches.begin();
+        for(typename ContactPatchMap::iterator it = m_contact_patches.begin();
             it != m_contact_patches.end(); ++it)
         {
           if(it->active()) return *it;
@@ -171,10 +170,10 @@ namespace multicontact_api
       ContactPatchVector getActivePatches()
       {
         ContactPatchVector res; res.reserve((size_t)dim);
-        for(typename ContactPatchArray::iterator it = m_contact_patches.begin();
+        for(typename ContactPatchMap::iterator it = m_contact_patches.begin();
             it != m_contact_patches.end(); ++it)
         {
-          if(it->active()) res.push_back(typename ContactPatchVector::value_type(*it));
+          if(it->second.active()) res.push_back(typename ContactPatchVector::value_type(it->second));
         }
         return res;
       }
@@ -199,9 +198,11 @@ namespace multicontact_api
       template<class Archive>
       void save(Archive & ar, const unsigned int /*version*/) const
       {
-        for(typename ContactPatchArray::const_iterator it = m_contact_patches.begin();
+        for(typename ContactPatchMap::const_iterator it = m_contact_patches.begin();
             it != m_contact_patches.end(); ++it)
           ar & boost::serialization::make_nvp("contact_patch",*it);
+
+        ar & boost::serialization::make_nvp("contact_patch_map", m_contact_patches); // ???
 
         ar & boost::serialization::make_nvp("lwc",m_lwc);
         ar & boost::serialization::make_nvp("sowc",m_sowc);
@@ -212,9 +213,11 @@ namespace multicontact_api
       template<class Archive>
       void load(Archive & ar, const unsigned int /*version*/)
       {
-        for(typename ContactPatchArray::iterator it = m_contact_patches.begin();
+        for(typename ContactPatchMap::iterator it = m_contact_patches.begin();
             it != m_contact_patches.end(); ++it)
           ar >> boost::serialization::make_nvp("contact_patch",*it);
+
+        ar >> boost::serialization::make_nvp("contact_patch_map", m_contact_patches); /// ???
 
         ar >> boost::serialization::make_nvp("lwc",m_lwc);
         ar >> boost::serialization::make_nvp("sowc",m_sowc);

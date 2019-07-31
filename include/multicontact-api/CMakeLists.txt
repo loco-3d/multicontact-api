@@ -30,7 +30,6 @@ SET(${PROJECT_NAME}_SCENARIO_HEADERS
   scenario/contact-model-planar.hpp
   scenario/contact-patch.hpp
   scenario/contact-phase.hpp
-  scenario/contact-phase-humanoid.hpp
   scenario/contact-sequence.hpp
   scenario/fwd.hpp
   scenario/ms-interval.hpp

@@ -3,7 +3,6 @@
 //
 #include "multicontact-api/bindings/python/scenario/expose-scenario.hpp"
 #include "multicontact-api/bindings/python/scenario/contact-sequence.hpp"
-#include "multicontact-api/bindings/python/scenario/contact-phase-humanoid.hpp"
 #include "multicontact-api/bindings/python/scenario/ms-interval.hpp"
 
 namespace multicontact_api {
