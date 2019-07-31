@@ -19,120 +19,6 @@
 #include <vector>
 #include <Eigen/StdVector>
 
-<<<<<<< da33ebd1d70a7d950c6b559b6bb925784873a25e
-namespace multicontact_api {
-namespace scenario {
-
-template <typename _Scalar>
-struct ContactPhaseHumanoidTpl : public ContactPhaseTpl<_Scalar, 4>,
-                                 public serialization::Serializable<ContactPhaseHumanoidTpl<_Scalar> > {
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  typedef ContactPhaseTpl<_Scalar, 4> Base;
-  typedef _Scalar Scalar;
-  typedef pinocchio::ForceTpl<Scalar> Force;
-  enum {
-    state_dim = 9,
-    control_dim = 6,
-    com_position_id = 0,
-    com_velocity_id = 3,
-    com_acceleration_id = 3,
-    am_id = 6,
-    am_variations_id = 6,
-    linear_control_id = 0,
-    angular_control_id = 3
-  };
-
-  typedef Eigen::Matrix<Scalar, state_dim, 1> StateVector;
-  typedef Eigen::Matrix<Scalar, control_dim, 1> ControlVector;
-  typedef Eigen::Matrix<Scalar, 3, 1> Vector3;
-  typedef Eigen::Map<Vector3> MapVector3;
-
-  typedef Eigen::Map<StateVector> MapStateVector;
-  typedef Eigen::Map<ControlVector> MapControlVector;
-
-  typedef pinocchio::container::aligned_vector<StateVector> VectorStateVector;
-
-  //      typedef pinocchio::container::aligned_vector<Force> VectorForce;
-  typedef std::vector<Force, Eigen::aligned_allocator<Force> > VectorForce;
-  typedef pinocchio::container::aligned_vector<ControlVector> VectorControlVector;
-  typedef std::vector<Scalar> VectorScalar;
-  typedef VectorScalar TimeVector;
-  typedef Eigen::Matrix<_Scalar, Eigen::Dynamic, 1> ConfigurationVector;
-  typedef pinocchio::container::aligned_vector<ConfigurationVector> VectorConfigurationVector;
-
-  typedef boost::array<VectorForce, 4> ForceVectorArray;
-
-  typedef trajectories::CubicHermiteSplineTpl<Scalar, 3> CubicHermiteSpline3;
-  typedef trajectories::CubicHermiteSplineTpl<Scalar, Eigen::Dynamic> CubicHermiteSpline;
-
-  using Base::dim;
-  using Base::operator==;
-  using Base::m_contact_patches;
-  using typename Base::ContactPatch;
-
-  /// \brief default constructor
-  ContactPhaseHumanoidTpl()
-      : Base(),
-        RF_patch(m_contact_patches[0]),
-        LF_patch(m_contact_patches[1]),
-        RH_patch(m_contact_patches[2]),
-        LH_patch(m_contact_patches[3]),
-        m_init_state(),
-        m_final_state(),
-        m_state_trajectory(0),
-        m_dot_state_trajectory(0),
-        m_control_trajectory(0),
-        m_time_trajectory(0),
-        m_objective_trajectory(0),
-        m_raw_control_trajectory(0),
-        m_angular_momentum_ref(CubicHermiteSpline3::Constant(CubicHermiteSpline3::VectorD::Zero())),
-        m_com_ref(CubicHermiteSpline3::Constant(CubicHermiteSpline3::VectorD::Zero())),
-        m_vcom_ref(CubicHermiteSpline3::Constant(CubicHermiteSpline3::VectorD::Zero())),
-        m_forces_ref(CubicHermiteSpline::Constant(CubicHermiteSpline::VectorX::Zero(24))),
-        m_reference_configurations(0) {}
-
-  /// \brief copy constructor
-  ContactPhaseHumanoidTpl(const ContactPhaseHumanoidTpl& other)
-      : Base(other),
-        RF_patch(m_contact_patches[0]),
-        LF_patch(m_contact_patches[1]),
-        RH_patch(m_contact_patches[2]),
-        LH_patch(m_contact_patches[3]),
-        m_init_state(other.m_init_state),
-        m_final_state(other.m_final_state),
-        m_state_trajectory(other.m_state_trajectory),
-        m_dot_state_trajectory(other.m_dot_state_trajectory),
-        m_control_trajectory(other.m_control_trajectory),
-        m_time_trajectory(other.m_time_trajectory),
-        m_objective_trajectory(other.m_objective_trajectory),
-        m_contact_forces_trajectories(other.m_contact_forces_trajectories),
-        m_raw_control_trajectory(other.m_raw_control_trajectory),
-        m_angular_momentum_ref(other.m_angular_momentum_ref),
-        m_com_ref(other.m_com_ref),
-        m_vcom_ref(other.m_vcom_ref),
-        m_forces_ref(other.m_forces_ref),
-        m_reference_configurations(other.m_reference_configurations) {}
-
-  /// \brief copy operator
-  //      template<typename S2>
-  ContactPhaseHumanoidTpl& operator=(const ContactPhaseHumanoidTpl& other) {
-    Base::operator=(other);
-    m_init_state = other.m_init_state;
-    m_final_state = other.m_final_state;
-    m_state_trajectory = other.m_state_trajectory;
-    m_dot_state_trajectory = other.m_dot_state_trajectory;
-    m_control_trajectory = other.m_control_trajectory;
-    m_time_trajectory = other.m_time_trajectory;
-    m_objective_trajectory = other.m_objective_trajectory;
-    m_contact_forces_trajectories = other.m_contact_forces_trajectories;
-    m_raw_control_trajectory = other.m_raw_control_trajectory;
-    m_angular_momentum_ref = other.m_angular_momentum_ref;
-    m_com_ref = other.m_com_ref;
-    m_vcom_ref = other.m_vcom_ref;
-    m_forces_ref = other.m_forces_ref;
-    m_reference_configurations = other.m_reference_configurations;
-    return *this;
-=======
 namespace multicontact_api
 {
   namespace scenario
@@ -384,7 +270,6 @@ namespace multicontact_api
       BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     };
->>>>>>> [all] Use cubic_hermite_spline from curves packages
   }
 
   ContactPatch& RF_patch;
