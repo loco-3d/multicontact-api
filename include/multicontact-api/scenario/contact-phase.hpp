@@ -21,6 +21,7 @@
 #include <string>
 
 #include <boost/array.hpp>
+#include <boost/serialization/map.hpp>
 
 namespace multicontact_api
 {
@@ -35,7 +36,7 @@ namespace multicontact_api
       typedef _Scalar Scalar;
       typedef ContactPatchTpl<Scalar> ContactPatch;
       typedef boost::array<ContactPatch,_dim> ContactPatchArray;
-      //typedef std::map<std::string, ContactPatch> ContactPatchArray;
+      typedef std::map<std::string, ContactPatch> ContactPatchArrayTest;
       typedef std::vector< container::comparable_reference_wrapper<ContactPatch> > ContactPatchVector;
       typedef std::vector< container::comparable_reference_wrapper<ContactPatch const> > ConstContactPatchVector;
       typedef geometry::SecondOrderCone<_Scalar,6> SOC6;
@@ -59,7 +60,7 @@ namespace multicontact_api
       /*Variables*/
       std::vector<std::string> m_effector_names_;
       ContactPatchArray m_contact_patches; // TODO: set protected
-      // std::map< std::string, ContactPatch > m_contact_patches;
+      std::map< std::string, ContactPatch > m_contact_patches_test;
       std::pair<double,double> m_time_interval;
       ConfigurationVector m_reference_configuration;
 
