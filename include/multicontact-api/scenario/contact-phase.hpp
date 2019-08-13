@@ -63,17 +63,17 @@ namespace multicontact_api
       std::pair<double,double> m_time_interval;
       ConfigurationVector m_reference_configuration;
 
-      curve_abc_t* m_q_t;
-      curve_abc_t* m_dq_t;
-      curve_abc_t* m_ddq_t;
-      curve_abc_t* m_tau_t;
-      curve_abc_t* m_c_t;
-      curve_abc_t* m_dc_t;
-      curve_abc_t* m_ddc_t;
-      curve_abc_t* m_L_t;
-      curve_abc_t* m_dL_t;   
-      curve_abc_t* m_wrench_t;
-      curve_abc_t* m_zmp_t;
+      curve_abc_t* m_q;
+      curve_abc_t* m_dq;
+      curve_abc_t* m_ddq;
+      curve_abc_t* m_tau;
+      curve_abc_t* m_c;
+      curve_abc_t* m_dc;
+      curve_abc_t* m_ddc;
+      curve_abc_t* m_L;
+      curve_abc_t* m_dL;
+      curve_abc_t* m_wrench;
+      curve_abc_t* m_zmp;
 
       CurveMap m_contact_forces;
       CurveMap m_contact_normal_force;
@@ -183,10 +183,7 @@ namespace multicontact_api
       /// \brief Second Order Wrench Cone (SOWC) representing the Minkoski sum of the patch linear wrench cone.
       SOC6 m_sowc;
       SE3 m_sowc_placement;
-
       Matrix6x m_double_description;
-
-
       /// \brief Linear Wrench Cone (LWC) representing the Minkoski sum of the patch linear wrench cone.
       WrenchCone m_lwc;
 
@@ -198,11 +195,34 @@ namespace multicontact_api
       template<class Archive>
       void save(Archive & ar, const unsigned int /*version*/) const
       {
-        for(typename ContactPatchMap::const_iterator it = m_contact_patches.begin();
-            it != m_contact_patches.end(); ++it)
-          ar & boost::serialization::make_nvp("contact_patch",*it);
+        ar & boost::serialization::make_nvp("effector_names",m_effector_names_);
+        ar & boost::serialization::make_nvp("contact_patches",m_contact_patches);
+        ar & boost::serialization::make_nvp("time_interval",m_time_interval);
+        ar & boost::serialization::make_nvp("reference_configuration",m_reference_configuration);
 
-        ar & boost::serialization::make_nvp("contact_patch_map", m_contact_patches); // ???
+        ar & boost::serialization::make_nvp("m_q",m_q);
+        ar & boost::serialization::make_nvp("m_dq",m_dq);
+        ar & boost::serialization::make_nvp("m_ddq",m_ddq);
+        ar & boost::serialization::make_nvp("m_tau",m_tau);
+        ar & boost::serialization::make_nvp("m_c",m_c);
+        ar & boost::serialization::make_nvp("m_dc",m_dc);
+        ar & boost::serialization::make_nvp("m_ddc",m_ddc);
+        ar & boost::serialization::make_nvp("m_L",m_L);
+        ar & boost::serialization::make_nvp("m_dL",m_dL);
+        ar & boost::serialization::make_nvp("m_wrench",m_wrench);
+
+        ar & boost::serialization::make_nvp("contact_forces",m_contact_forces);
+        ar & boost::serialization::make_nvp("contact_normal_force",m_contact_normal_force);
+        ar & boost::serialization::make_nvp("effector_trajectories",m_effector_trajectories);
+
+        ar & boost::serialization::make_nvp("init_state",m_init_state);
+        ar & boost::serialization::make_nvp("final_state",m_final_state);
+
+        ar & boost::serialization::make_nvp("m_angular_momentum_ref",m_angular_momentum_ref);
+        ar & boost::serialization::make_nvp("m_com_ref",m_com_ref);
+        ar & boost::serialization::make_nvp("m_vcom_ref",m_vcom_ref);
+        ar & boost::serialization::make_nvp("m_forces_ref",m_forces_ref);
+
 
         ar & boost::serialization::make_nvp("lwc",m_lwc);
         ar & boost::serialization::make_nvp("sowc",m_sowc);
@@ -213,11 +233,34 @@ namespace multicontact_api
       template<class Archive>
       void load(Archive & ar, const unsigned int /*version*/)
       {
-        for(typename ContactPatchMap::iterator it = m_contact_patches.begin();
-            it != m_contact_patches.end(); ++it)
-          ar >> boost::serialization::make_nvp("contact_patch",*it);
+        ar >> boost::serialization::make_nvp("effector_names",m_effector_names_);
+        ar >> boost::serialization::make_nvp("contact_patches",m_contact_patches);
+        ar >> boost::serialization::make_nvp("time_interval",m_time_interval);
+        ar >> boost::serialization::make_nvp("reference_configuration",m_reference_configuration);
 
-        ar >> boost::serialization::make_nvp("contact_patch_map", m_contact_patches); /// ???
+        ar >> boost::serialization::make_nvp("m_q",m_q);
+        ar >> boost::serialization::make_nvp("m_dq",m_dq);
+        ar >> boost::serialization::make_nvp("m_ddq",m_ddq);
+        ar >> boost::serialization::make_nvp("m_tau",m_tau);
+        ar >> boost::serialization::make_nvp("m_c",m_c);
+        ar >> boost::serialization::make_nvp("m_dc",m_dc);
+        ar >> boost::serialization::make_nvp("m_ddc",m_ddc);
+        ar >> boost::serialization::make_nvp("m_L",m_L);
+        ar >> boost::serialization::make_nvp("m_dL",m_dL);
+        ar >> boost::serialization::make_nvp("m_wrench",m_wrench);
+
+        ar >> boost::serialization::make_nvp("contact_forces",m_contact_forces);
+        ar >> boost::serialization::make_nvp("contact_normal_force",m_contact_normal_force);
+        ar >> boost::serialization::make_nvp("effector_trajectories",m_effector_trajectories);
+
+        ar >> boost::serialization::make_nvp("init_state",m_init_state);
+        ar >> boost::serialization::make_nvp("final_state",m_final_state);
+
+        ar >> boost::serialization::make_nvp("m_angular_momentum_ref",m_angular_momentum_ref);
+        ar >> boost::serialization::make_nvp("m_com_ref",m_com_ref);
+        ar >> boost::serialization::make_nvp("m_vcom_ref",m_vcom_ref);
+        ar >> boost::serialization::make_nvp("m_forces_ref",m_forces_ref);
+
 
         ar >> boost::serialization::make_nvp("lwc",m_lwc);
         ar >> boost::serialization::make_nvp("sowc",m_sowc);

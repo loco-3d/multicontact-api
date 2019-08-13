@@ -6,7 +6,6 @@
 
 #include <eigenpy/eigenpy.hpp>
 
-#include "multicontact-api/scenario/contact-phase-humanoid.hpp"
 #include "multicontact-api/scenario/contact-phase.hpp"
 #include "multicontact-api/bindings/python/container/visitor.hpp"
 #include "multicontact-api/bindings/python/container/array.hpp"

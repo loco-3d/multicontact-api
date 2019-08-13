@@ -8,7 +8,6 @@
 #include <boost/utility/binary.hpp>
 
 #include "multicontact-api/scenario/contact-phase.hpp"
-#include "multicontact-api/scenario/contact-phase-humanoid.hpp"
 #include "multicontact-api/scenario/contact-patch.hpp"
 
 using namespace multicontact_api::scenario;
