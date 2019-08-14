@@ -21,6 +21,7 @@
 
 #include <map>
 #include <string>
+#include <sstream>
 
 //#include <boost/array.hpp>
 #include <boost/serialization/map.hpp>
@@ -184,8 +185,25 @@ namespace multicontact_api
         return res;
       }
 
-    protected:
+      /// \brief Check (assert) if all names used as key in all maps (CurveMap and ContactPatchMap) are in m_effector_names.
+      ///
+      void checkNameAllMaps()
+      {
+        checkNamesMapAndVector<std::string, ContactPatchMap, std::vector<std::string> >(
+            m_contact_patches, m_effector_names
+          );
+        checkNamesMapAndVector<std::string, CurveMap, std::vector<std::string> >(
+            m_contact_forces, m_effector_names
+          );
+        checkNamesMapAndVector<std::string, CurveMap, std::vector<std::string> >(
+            m_contact_normal_force, m_effector_names
+          );
+        checkNamesMapAndVector<std::string, CurveMap, std::vector<std::string> >(
+            m_effector_trajectories, m_effector_names
+          );
+      }
 
+    protected:
       /*Attributes 2*/
       /// \brief Second Order Wrench Cone (SOWC) representing the Minkoski sum of the patch linear wrench cone.
       SOC6 m_sowc;
@@ -194,6 +212,38 @@ namespace multicontact_api
       /// \brief Linear Wrench Cone (LWC) representing the Minkoski sum of the patch linear wrench cone.
       WrenchCone m_lwc;
       /*Attributes 2*/
+
+      template <typename KeyType, typename MapType, typename VectorType>
+      void checkNamesMapAndVector(const MapType m, const VectorType v)
+      {
+        bool haveName = true;
+        KeyType keyNotFound;
+        for(typename MapType::iterator it=m.begin(); it!=m.end(); ++it)
+        {
+          if(!isInList<std::string, std::vector<std::string> >(it->first,v))
+          {
+            haveName = false;
+            keyNotFound = it->first;
+            break;
+          }
+        }
+        std::string msg;
+        msg = std::string("Map contains a name not found => ") + to_string<KeyType>(keyNotFound);
+        assert(haveName && msg.c_str());
+      }
+
+      template <typename ValueType, typename VectorType>
+      bool isInList(const ValueType value, const VectorType v) {
+        return std::find(v.begin(), v.end(), value) != v.end();
+      }
+
+      template <typename T>
+      std::string to_string(T value)
+      {
+        std::ostringstream os;
+        os << value;
+        return os.str();
+      }
 
     private:
 
