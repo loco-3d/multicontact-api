@@ -8,6 +8,7 @@
 #include <boost/utility/binary.hpp>
 
 #include "multicontact-api/scenario/contact-phase.hpp"
+#include "multicontact-api/scenario/contact-sequence.hpp"
 #include "multicontact-api/scenario/contact-patch.hpp"
 
 using namespace multicontact_api::scenario;
@@ -48,10 +49,8 @@ BOOST_AUTO_TEST_CASE(contact_patch) {
   cp.worldContactModelPlacement().setRandom();
   ContactPatch cp2(cp);
   ContactPatch cp3 = cp2;
-
   BOOST_CHECK(cp == cp);
   BOOST_CHECK(cp == cp2);
-
   Ad a1;
   Ad a2(a1);
 }
@@ -69,15 +68,26 @@ BOOST_AUTO_TEST_CASE(contact_phase)
     it->second.worldContactModelPlacement().setRandom();
   }
   ContactPhase4 cp2(cp);
-
   BOOST_CHECK(cp == cp);
   BOOST_CHECK(cp == cp2);
-  
   // test serialization
   cp.saveAsText("serialization_cp_test.test");
   cp_test.loadFromText("serialization_cp_test.test");
   remove("serialization_cp_test.test");
   BOOST_CHECK(cp == cp_test);
+}
+
+BOOST_AUTO_TEST_CASE(contact_sequence)
+{
+  ContactPhase4 cp;
+  ContactSequence4 cs(1);
+  ContactSequence4 cs_test(0);
+  cs.m_contact_phases[0] = cp;
+  // test serialization
+  cs.saveAsText("serialization_cs_test.test");
+  cs_test.loadFromText("serialization_cs_test.test");
+  remove("serialization_cp_test.test");
+  BOOST_CHECK(cs == cs_test);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

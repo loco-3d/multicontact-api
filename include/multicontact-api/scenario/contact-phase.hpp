@@ -60,7 +60,7 @@ namespace multicontact_api
 
 
       /*Variables*/
-      std::vector<std::string> m_effector_names_;
+      std::vector<std::string> m_effector_names;
       ContactPatchMap m_contact_patches;
       std::pair<double,double> m_time_interval;
       ConfigurationVector m_reference_configuration;
@@ -186,12 +186,14 @@ namespace multicontact_api
 
     protected:
 
+      /*Attributes 2*/
       /// \brief Second Order Wrench Cone (SOWC) representing the Minkoski sum of the patch linear wrench cone.
       SOC6 m_sowc;
       SE3 m_sowc_placement;
       Matrix6x m_double_description;
       /// \brief Linear Wrench Cone (LWC) representing the Minkoski sum of the patch linear wrench cone.
       WrenchCone m_lwc;
+      /*Attributes 2*/
 
     private:
 
@@ -244,7 +246,7 @@ namespace multicontact_api
       template<class Archive>
       void save(Archive & ar, const unsigned int /*version*/) const
       {
-        ar & boost::serialization::make_nvp("effector_names",m_effector_names_);
+        ar & boost::serialization::make_nvp("effector_names",m_effector_names);
         ar & boost::serialization::make_nvp("contact_patches",m_contact_patches);
         ar & boost::serialization::make_nvp("time_interval",m_time_interval);
         ar & boost::serialization::make_nvp("reference_configuration",m_reference_configuration);
@@ -280,7 +282,7 @@ namespace multicontact_api
       template<class Archive>
       void load(Archive & ar, const unsigned int /*version*/)
       {
-        ar >> boost::serialization::make_nvp("effector_names",m_effector_names_);
+        ar >> boost::serialization::make_nvp("effector_names",m_effector_names);
         ar >> boost::serialization::make_nvp("contact_patches",m_contact_patches);
         ar >> boost::serialization::make_nvp("time_interval",m_time_interval);
         ar >> boost::serialization::make_nvp("reference_configuration",m_reference_configuration);
