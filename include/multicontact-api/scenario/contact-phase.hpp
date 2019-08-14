@@ -15,6 +15,8 @@
 #include "multicontact-api/container/ref.hpp"
 
 #include <curves/curve_abc.h>
+#include <curves/piecewise_curve.h>
+#include <curves/polynomial.h>
 #include <curves/cubic_hermite_spline.h>
 
 #include <map>
@@ -63,17 +65,17 @@ namespace multicontact_api
       std::pair<double,double> m_time_interval;
       ConfigurationVector m_reference_configuration;
 
-      curve_abc_t* m_q;
-      curve_abc_t* m_dq;
-      curve_abc_t* m_ddq;
-      curve_abc_t* m_tau;
-      curve_abc_t* m_c;
-      curve_abc_t* m_dc;
-      curve_abc_t* m_ddc;
-      curve_abc_t* m_L;
-      curve_abc_t* m_dL;
-      curve_abc_t* m_wrench;
-      curve_abc_t* m_zmp;
+      curve_abc_t* m_q = NULL;
+      curve_abc_t* m_dq = NULL;
+      curve_abc_t* m_ddq = NULL;
+      curve_abc_t* m_tau = NULL;
+      curve_abc_t* m_c = NULL;
+      curve_abc_t* m_dc = NULL;
+      curve_abc_t* m_ddc = NULL;
+      curve_abc_t* m_L = NULL;
+      curve_abc_t* m_dL = NULL;
+      curve_abc_t* m_wrench = NULL;
+      curve_abc_t* m_zmp = NULL;
 
       CurveMap m_contact_forces;
       CurveMap m_contact_normal_force;
@@ -82,10 +84,11 @@ namespace multicontact_api
       StateVector m_init_state;
       StateVector m_final_state;
 
-      CubicHermiteSpline3 * m_angular_momentum_ref;
-      CubicHermiteSpline3 * m_com_ref;
-      CubicHermiteSpline3 * m_vcom_ref;
-      CubicHermiteSpline24 * m_forces_ref;
+      CubicHermiteSpline3 m_angular_momentum_ref;
+      CubicHermiteSpline3 m_com_ref;
+      CubicHermiteSpline3 m_vcom_ref;
+      CubicHermiteSpline24 m_forces_ref;
+      
       /*Variables*/
 
 
@@ -141,7 +144,10 @@ namespace multicontact_api
         m_contact_patches == other.m_contact_patches
         && m_lwc == other.m_lwc
         && m_sowc == other.m_sowc
+        && m_init_state == other.m_init_state
+        && m_final_state == other.m_final_state
         ;
+        // TO DO : Test equality on curves
       }
 
       template<typename S2>
@@ -189,6 +195,49 @@ namespace multicontact_api
 
     private:
 
+      template <class Archive, typename Type >
+      void serialize_pointer(Archive & ar, std::string name, Type * ptr) const
+      {
+        std::cout << "start ser "<<name<<std::endl;
+        std::string name_boolean = name + std::string("_bool");
+        bool isNull = false;
+        std::cout<<"value ptr : "<<ptr<<std::endl;
+        if (ptr != NULL)
+        {
+          std::cout << "ptr not NULL"<<std::endl;
+          ar & boost::serialization::make_nvp(name_boolean.c_str(),isNull);
+          //std::cout << "Here 2"<<std::endl;
+          ar & boost::serialization::make_nvp(name.c_str(),ptr);
+        }
+        else
+        {
+          std::cout << "ptr NULL"<<std::endl;
+          isNull = true;
+          ar & boost::serialization::make_nvp(name_boolean.c_str(),isNull);
+        }
+        std::cout << "end"<<std::endl;
+      }
+
+      template <class Archive, typename Type >
+      void deserialize_pointer(Archive & ar, std::string name, Type ** ptr) const
+      {
+        std::cout << "start deser "<<name<<std::endl;
+        std::string name_boolean = name + std::string("_bool");
+        bool isNull;
+        ar >> boost::serialization::make_nvp(name_boolean.c_str(),isNull);
+        if (!isNull)
+        {
+          std::cout << "ptr not NULL"<<std::endl;
+          ar >> boost::serialization::make_nvp(name.c_str(),(*ptr));
+        }
+        else
+        {
+          std::cout << "ptr NULL"<<std::endl;
+          (*ptr) = NULL;
+        }
+        std::cout << "end"<<std::endl;
+      }
+
       // Serialization of the class
       friend class boost::serialization::access;
 
@@ -200,29 +249,27 @@ namespace multicontact_api
         ar & boost::serialization::make_nvp("time_interval",m_time_interval);
         ar & boost::serialization::make_nvp("reference_configuration",m_reference_configuration);
 
-        ar & boost::serialization::make_nvp("m_q",m_q);
-        ar & boost::serialization::make_nvp("m_dq",m_dq);
-        ar & boost::serialization::make_nvp("m_ddq",m_ddq);
-        ar & boost::serialization::make_nvp("m_tau",m_tau);
-        ar & boost::serialization::make_nvp("m_c",m_c);
-        ar & boost::serialization::make_nvp("m_dc",m_dc);
-        ar & boost::serialization::make_nvp("m_ddc",m_ddc);
-        ar & boost::serialization::make_nvp("m_L",m_L);
-        ar & boost::serialization::make_nvp("m_dL",m_dL);
-        ar & boost::serialization::make_nvp("m_wrench",m_wrench);
+        serialize_pointer<Archive, curve_abc_t>(ar, std::string("m_q"), m_q);
+        serialize_pointer<Archive, curve_abc_t>(ar, std::string("m_dq"), m_dq);
+        serialize_pointer<Archive, curve_abc_t>(ar, std::string("m_ddq"), m_ddq);
+        serialize_pointer<Archive, curve_abc_t>(ar, std::string("m_tau"), m_tau);
+        serialize_pointer<Archive, curve_abc_t>(ar, std::string("m_c"), m_c);
+        serialize_pointer<Archive, curve_abc_t>(ar, std::string("m_dc"), m_dc);
+        serialize_pointer<Archive, curve_abc_t>(ar, std::string("m_ddc"), m_ddc);
+        serialize_pointer<Archive, curve_abc_t>(ar, std::string("m_L"), m_L);
+        serialize_pointer<Archive, curve_abc_t>(ar, std::string("m_dL"), m_dL);
+        serialize_pointer<Archive, curve_abc_t>(ar, std::string("m_wrench"), m_wrench);
 
         ar & boost::serialization::make_nvp("contact_forces",m_contact_forces);
         ar & boost::serialization::make_nvp("contact_normal_force",m_contact_normal_force);
         ar & boost::serialization::make_nvp("effector_trajectories",m_effector_trajectories);
-
         ar & boost::serialization::make_nvp("init_state",m_init_state);
         ar & boost::serialization::make_nvp("final_state",m_final_state);
 
-        ar & boost::serialization::make_nvp("m_angular_momentum_ref",m_angular_momentum_ref);
-        ar & boost::serialization::make_nvp("m_com_ref",m_com_ref);
-        ar & boost::serialization::make_nvp("m_vcom_ref",m_vcom_ref);
-        ar & boost::serialization::make_nvp("m_forces_ref",m_forces_ref);
-
+        ar & boost::serialization::make_nvp("m_angular_momentum_ref", m_angular_momentum_ref);
+        ar & boost::serialization::make_nvp("m_com_ref", m_com_ref);
+        ar & boost::serialization::make_nvp("m_vcom_ref", m_vcom_ref);
+        ar & boost::serialization::make_nvp("m_forces_ref", m_forces_ref);
 
         ar & boost::serialization::make_nvp("lwc",m_lwc);
         ar & boost::serialization::make_nvp("sowc",m_sowc);
@@ -238,29 +285,27 @@ namespace multicontact_api
         ar >> boost::serialization::make_nvp("time_interval",m_time_interval);
         ar >> boost::serialization::make_nvp("reference_configuration",m_reference_configuration);
 
-        ar >> boost::serialization::make_nvp("m_q",m_q);
-        ar >> boost::serialization::make_nvp("m_dq",m_dq);
-        ar >> boost::serialization::make_nvp("m_ddq",m_ddq);
-        ar >> boost::serialization::make_nvp("m_tau",m_tau);
-        ar >> boost::serialization::make_nvp("m_c",m_c);
-        ar >> boost::serialization::make_nvp("m_dc",m_dc);
-        ar >> boost::serialization::make_nvp("m_ddc",m_ddc);
-        ar >> boost::serialization::make_nvp("m_L",m_L);
-        ar >> boost::serialization::make_nvp("m_dL",m_dL);
-        ar >> boost::serialization::make_nvp("m_wrench",m_wrench);
+        deserialize_pointer<Archive, curve_abc_t>(ar, std::string("m_q"), &m_q);
+        deserialize_pointer<Archive, curve_abc_t>(ar, std::string("m_dq"), &m_dq);
+        deserialize_pointer<Archive, curve_abc_t>(ar, std::string("m_ddq"), &m_ddq);
+        deserialize_pointer<Archive, curve_abc_t>(ar, std::string("m_tau"), &m_tau);
+        deserialize_pointer<Archive, curve_abc_t>(ar, std::string("m_c"), &m_c);
+        deserialize_pointer<Archive, curve_abc_t>(ar, std::string("m_dc"), &m_dc);
+        deserialize_pointer<Archive, curve_abc_t>(ar, std::string("m_ddc"), &m_ddc);
+        deserialize_pointer<Archive, curve_abc_t>(ar, std::string("m_L"), &m_L);
+        deserialize_pointer<Archive, curve_abc_t>(ar, std::string("m_dL"), &m_dL);
+        deserialize_pointer<Archive, curve_abc_t>(ar, std::string("m_wrench"), &m_wrench);
 
         ar >> boost::serialization::make_nvp("contact_forces",m_contact_forces);
         ar >> boost::serialization::make_nvp("contact_normal_force",m_contact_normal_force);
         ar >> boost::serialization::make_nvp("effector_trajectories",m_effector_trajectories);
-
         ar >> boost::serialization::make_nvp("init_state",m_init_state);
         ar >> boost::serialization::make_nvp("final_state",m_final_state);
 
-        ar >> boost::serialization::make_nvp("m_angular_momentum_ref",m_angular_momentum_ref);
-        ar >> boost::serialization::make_nvp("m_com_ref",m_com_ref);
-        ar >> boost::serialization::make_nvp("m_vcom_ref",m_vcom_ref);
-        ar >> boost::serialization::make_nvp("m_forces_ref",m_forces_ref);
-
+        ar >> boost::serialization::make_nvp("m_angular_momentum_ref", m_angular_momentum_ref);
+        ar >> boost::serialization::make_nvp("m_com_ref", m_com_ref);
+        ar >> boost::serialization::make_nvp("m_vcom_ref", m_vcom_ref);
+        ar >> boost::serialization::make_nvp("m_forces_ref", m_forces_ref);
 
         ar >> boost::serialization::make_nvp("lwc",m_lwc);
         ar >> boost::serialization::make_nvp("sowc",m_sowc);
