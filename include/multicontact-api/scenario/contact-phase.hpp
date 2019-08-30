@@ -38,6 +38,8 @@ namespace multicontact_api
 
       typedef _Scalar Scalar;
       typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> point_t;
+      typedef Eigen::Matrix<Scalar,3, 1> point3_t;
+      typedef Eigen::Matrix<Scalar,24, 1> point24_t;
       typedef curves::curve_abc<Scalar, Scalar, true, point_t> curve_abc_t;
 
       typedef ContactPatchTpl<Scalar> ContactPatch;
@@ -52,8 +54,8 @@ namespace multicontact_api
       typedef Eigen::Matrix<double,6,Eigen::Dynamic> Matrix6x;
       typedef Eigen::Matrix<_Scalar,Eigen::Dynamic,1> ConfigurationVector;
 
-      typedef curves::cubic_hermite_spline<Scalar,Scalar,3,true> CubicHermiteSpline3;
-      typedef curves::cubic_hermite_spline<Scalar,Scalar,24,true> CubicHermiteSpline24;
+      typedef curves::cubic_hermite_spline<Scalar,Scalar,true,point3_t> CubicHermiteSpline3;
+      typedef curves::cubic_hermite_spline<Scalar,Scalar,true,point24_t> CubicHermiteSpline24;
 
       typedef Eigen::Matrix<Scalar,9,1> StateVector;
 
