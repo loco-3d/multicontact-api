@@ -52,7 +52,6 @@ SET(${PROJECT_NAME}_PYTHON_HEADERS
   bindings/python/scenario/contact-model-planar.hpp
   bindings/python/scenario/contact-patch.hpp
   bindings/python/scenario/contact-phase.hpp
-  bindings/python/scenario/contact-phase-humanoid.hpp
   bindings/python/scenario/contact-sequence.hpp
   bindings/python/scenario/enums.hpp
   bindings/python/scenario/expose-scenario.hpp
