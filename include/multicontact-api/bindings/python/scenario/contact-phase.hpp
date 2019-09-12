@@ -4,6 +4,7 @@
 #ifndef __multicontact_api_python_scenario_contact_phase_hpp__
 #define __multicontact_api_python_scenario_contact_phase_hpp__
 
+#include <pinocchio/fwd.hpp>
 #include <eigenpy/memory.hpp>
 #include <typeinfo>
 
