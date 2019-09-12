@@ -4,13 +4,10 @@
 #include "multicontact-api/bindings/python/scenario/expose-scenario.hpp"
 #include "multicontact-api/bindings/python/scenario/contact-patch.hpp"
 
-namespace multicontact_api
-{
-  namespace python
-  {
-    void exposeContactPatch()
-    {
-      ContactPatchPythonVisitor<multicontact_api::scenario::ContactPatch>::expose("ContactPatch");
-    }
-  }
+namespace multicontact_api {
+namespace python {
+void exposeContactPatch() {
+  ContactPatchPythonVisitor<multicontact_api::scenario::ContactPatch>::expose("ContactPatch");
 }
+}  // namespace python
+}  // namespace multicontact_api

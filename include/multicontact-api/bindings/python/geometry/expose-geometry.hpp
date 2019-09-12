@@ -4,24 +4,20 @@
 #ifndef __multicontact_api_python_expose_geometry_hpp__
 #define __multicontact_api_python_expose_geometry_hpp__
 
+namespace multicontact_api {
+namespace python {
 
-namespace multicontact_api
-{
-  namespace python
-  {
+void exposeEllipsoid();
+void exposeLinearCone();
+void exposeSecondOrderCone();
 
-    void exposeEllipsoid();
-    void exposeLinearCone();
-    void exposeSecondOrderCone();
-
-    inline void exposeGeometry()
-    {
-      exposeEllipsoid();
-      exposeLinearCone();
-      exposeSecondOrderCone();
-    }
-
-  }
+inline void exposeGeometry() {
+  exposeEllipsoid();
+  exposeLinearCone();
+  exposeSecondOrderCone();
 }
 
-#endif // ifndef __multicontact_api_python_expose_geometry_hpp__
+}  // namespace python
+}  // namespace multicontact_api
+
+#endif  // ifndef __multicontact_api_python_expose_geometry_hpp__

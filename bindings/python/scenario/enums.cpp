@@ -7,39 +7,32 @@
 
 #include <boost/python/enum.hpp>
 
-namespace multicontact_api
-{
-  namespace python
-  {
-    namespace bp = boost::python;
+namespace multicontact_api {
+namespace python {
+namespace bp = boost::python;
 
-    using namespace multicontact_api::scenario;
+using namespace multicontact_api::scenario;
 
-    void exposeEnumHumanoidPhaseType()
-    {
-      bp::enum_<HumanoidPhaseType>("HumanoidPhaseType")
-      .value("SINGLE_SUPPORT",SINGLE_SUPPORT)
-      .value("DOUBLE_SUPPORT",DOUBLE_SUPPORT)
-      .value("TRIPLE_SUPPORT",TRIPLE_SUPPORT)
-      .value("QUADRUPLE_SUPPORT",QUADRUPLE_SUPPORT)
-      .value("NO_SUPPORT",NO_SUPPORT)
-      .value("HUMANOID_PHASE_UNDEFINED",HUMANOID_PHASE_UNDEFINED)
-      ;
-    }
-
-    void exposeEnumConicType()
-    {
-      bp::enum_<ConicType>("ConicType")
-      .value("CONIC_SOWC",CONIC_SOWC)
-      .value("CONIC_DOUBLE_DESCRIPTION",CONIC_DOUBLE_DESCRIPTION)
-      .value("CONIC_UNDEFINED",CONIC_UNDEFINED)
-      ;
-    }
-
-    void exposeScenarioEnums()
-    {
-      exposeEnumHumanoidPhaseType();
-      exposeEnumConicType();
-    }
-  }
+void exposeEnumHumanoidPhaseType() {
+  bp::enum_<HumanoidPhaseType>("HumanoidPhaseType")
+      .value("SINGLE_SUPPORT", SINGLE_SUPPORT)
+      .value("DOUBLE_SUPPORT", DOUBLE_SUPPORT)
+      .value("TRIPLE_SUPPORT", TRIPLE_SUPPORT)
+      .value("QUADRUPLE_SUPPORT", QUADRUPLE_SUPPORT)
+      .value("NO_SUPPORT", NO_SUPPORT)
+      .value("HUMANOID_PHASE_UNDEFINED", HUMANOID_PHASE_UNDEFINED);
 }
+
+void exposeEnumConicType() {
+  bp::enum_<ConicType>("ConicType")
+      .value("CONIC_SOWC", CONIC_SOWC)
+      .value("CONIC_DOUBLE_DESCRIPTION", CONIC_DOUBLE_DESCRIPTION)
+      .value("CONIC_UNDEFINED", CONIC_UNDEFINED);
+}
+
+void exposeScenarioEnums() {
+  exposeEnumHumanoidPhaseType();
+  exposeEnumConicType();
+}
+}  // namespace python
+}  // namespace multicontact_api
