@@ -4,6 +4,7 @@
 #ifndef __multicontact_api_python_geometry_linear_cone_hpp__
 #define __multicontact_api_python_geometry_linear_cone_hpp__
 
+#include <pinocchio/fwd.hpp>
 #include <eigenpy/eigenpy.hpp>
 
 #include "multicontact-api/geometry/linear-cone.hpp"

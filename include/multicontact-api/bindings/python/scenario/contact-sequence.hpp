@@ -4,6 +4,7 @@
 #ifndef __multicontact_api_python_scenario_contact_sequence_hpp__
 #define __multicontact_api_python_scenario_contact_sequence_hpp__
 
+#include <pinocchio/fwd.hpp>
 #include <eigenpy/eigenpy.hpp>
 #include <pinocchio/bindings/python/utils/std-aligned-vector.hpp>
 

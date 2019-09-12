@@ -4,6 +4,7 @@
 #ifndef __multicontact_api_python_geometry_ellipsoid_hpp__
 #define __multicontact_api_python_geometry_ellipsoid_hpp__
 
+#include <pinocchio/fwd.hpp>
 #include <boost/python.hpp>
 
 #include "multicontact-api/geometry/ellipsoid.hpp"
