@@ -3,19 +3,16 @@
 
 #include "multicontact-api/bindings/python/trajectories/cubic-hermite-spline.hpp"
 
-namespace multicontact_api
-{
-  namespace python
-  {
-    void exposeTrajectories()
-    {
-      using namespace trajectories;
-      typedef CubicHermiteSplineTpl<double,3> CubicHermiteSpline3;
-      typedef CubicHermiteSplineTpl<double,Eigen::Dynamic> CubicHermiteSpline;
+namespace multicontact_api {
+namespace python {
+void exposeTrajectories() {
+  using namespace trajectories;
+  typedef CubicHermiteSplineTpl<double, 3> CubicHermiteSpline3;
+  typedef CubicHermiteSplineTpl<double, Eigen::Dynamic> CubicHermiteSpline;
 
-      CubicHermiteSplinePythonVisitor<CubicHermiteSpline3>::expose("CubicHermiteSpline3");
-      CubicHermiteSplinePythonVisitor<CubicHermiteSpline>::expose("CubicHermiteSpline");
-      exposeSplineAlgos();
-    }
-  }
+  CubicHermiteSplinePythonVisitor<CubicHermiteSpline3>::expose("CubicHermiteSpline3");
+  CubicHermiteSplinePythonVisitor<CubicHermiteSpline>::expose("CubicHermiteSpline");
+  exposeSplineAlgos();
 }
+}  // namespace python
+}  // namespace multicontact_api

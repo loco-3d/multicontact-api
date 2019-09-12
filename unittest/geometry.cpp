@@ -14,8 +14,7 @@ using namespace multicontact_api::geometry;
 
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
-BOOST_AUTO_TEST_CASE(WrenchConeTest)
-{
+BOOST_AUTO_TEST_CASE(WrenchConeTest) {
   using std::fabs;
   typedef ForceCone::Matrix3x Matrix3x;
   typedef WrenchCone::Matrix6x Matrix6x;
@@ -24,7 +23,7 @@ BOOST_AUTO_TEST_CASE(WrenchConeTest)
   typedef ForceCone::Scalar Scalar;
 
   const Index size = 10;
-  const Matrix3x rays(Matrix3x::Random(3,size));
+  const Matrix3x rays(Matrix3x::Random(3, size));
 
   ForceCone C3(rays);
   BOOST_CHECK(C3.size() == size);
@@ -52,10 +51,10 @@ BOOST_AUTO_TEST_CASE(WrenchConeTest)
 
   // Export gmm to xml file
   const std::string xml_filename = "C3_in.xml";
-  C3.saveAsXML(xml_filename,"ForceCone");
+  C3.saveAsXML(xml_filename, "ForceCone");
 
   ForceCone C3_from_xml(0);
-  C3_from_xml.loadFromXML(xml_filename,"ForceCone");
+  C3_from_xml.loadFromXML(xml_filename, "ForceCone");
 
   BOOST_CHECK(C3_from_xml.isApprox(C3));
 
@@ -69,12 +68,11 @@ BOOST_AUTO_TEST_CASE(WrenchConeTest)
   BOOST_CHECK(C3_from_bin.isApprox(C3));
 }
 
-BOOST_AUTO_TEST_CASE(SecondOrderConeTest)
-{
+BOOST_AUTO_TEST_CASE(SecondOrderConeTest) {
   const double mu = 0.3;
-  const SOC3d::VectorD direction(0.,0.,1.);
+  const SOC3d::VectorD direction(0., 0., 1.);
 
-  SOC3d cone3 = SOC3d::RegularCone(mu,direction);
+  SOC3d cone3 = SOC3d::RegularCone(mu, direction);
 
   BOOST_CHECK(cone3.check(direction));
 
@@ -82,9 +80,9 @@ BOOST_AUTO_TEST_CASE(SecondOrderConeTest)
   x[0] = mu;
   BOOST_CHECK(cone3.check(x));
 
-  x[0] = 0.; x[1] = mu;
+  x[0] = 0.;
+  x[1] = mu;
   BOOST_CHECK(cone3.check(x));
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

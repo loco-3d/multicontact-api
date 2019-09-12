@@ -4,28 +4,24 @@
 #ifndef __multicontact_api_python_scenario_expose_scenario_hpp__
 #define __multicontact_api_python_scenario_expose_scenario_hpp__
 
+namespace multicontact_api {
+namespace python {
 
-namespace multicontact_api
-{
-  namespace python
-  {
+void exposeContactPatch();
+void exposeContactPhase();
+void exposeContactSequence();
+void exposeScenarioEnums();
+void exposeContactModels();
 
-    void exposeContactPatch();
-    void exposeContactPhase();
-    void exposeContactSequence();
-    void exposeScenarioEnums();
-    void exposeContactModels();
-
-    inline void exposeScenario()
-    {
-      exposeContactPatch();
-      exposeContactPhase();
-      exposeContactSequence();
-      exposeScenarioEnums();
-      exposeContactModels();
-    }
-
-  }
+inline void exposeScenario() {
+  exposeContactPatch();
+  exposeContactPhase();
+  exposeContactSequence();
+  exposeScenarioEnums();
+  exposeContactModels();
 }
 
-#endif // ifndef __multicontact_api_python_scenario_expose_scenario_hpp__
+}  // namespace python
+}  // namespace multicontact_api
+
+#endif  // ifndef __multicontact_api_python_scenario_expose_scenario_hpp__

@@ -10,8 +10,7 @@
 
 namespace bp = boost::python;
 
-BOOST_PYTHON_MODULE(libmulticontact_api)
-{
+BOOST_PYTHON_MODULE(libmulticontact_api) {
   eigenpy::enableEigenPy();
 
   using namespace multicontact_api::python;

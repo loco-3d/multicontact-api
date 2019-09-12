@@ -6,38 +6,28 @@
 
 #include "multicontact-api/scenario/constraint.hpp"
 
-namespace multicontact_api
-{
-  namespace scenario
-  {
+namespace multicontact_api {
+namespace scenario {
 
-    template<typename Derived>
-    struct ContactConstraintBase : ConstraintBase<Derived>
-    {
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+template <typename Derived>
+struct ContactConstraintBase : ConstraintBase<Derived> {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-      typedef typename traits<Derived>::ContactModel ContactModel;
+  typedef typename traits<Derived>::ContactModel ContactModel;
 
-      ContactConstraintBase()
-      : m_contact_model(ContactModel())
-      {}
+  ContactConstraintBase() : m_contact_model(ContactModel()) {}
 
-      ContactConstraintBase(const ContactModel & contact_model)
-      : m_contact_model(contact_model)
-      {}
+  ContactConstraintBase(const ContactModel& contact_model) : m_contact_model(contact_model) {}
 
-      void setContactModel(const ContactModel & contact_model)
-      { m_contact_model = contact_model; }
+  void setContactModel(const ContactModel& contact_model) { m_contact_model = contact_model; }
 
-      const ContactModel & contactModel() const { return m_contact_model; }
-      ContactModel & contactModel() { return m_contact_model; }
+  const ContactModel& contactModel() const { return m_contact_model; }
+  ContactModel& contactModel() { return m_contact_model; }
 
-    protected:
+ protected:
+  ContactModel m_contact_model;
+};
+}  // namespace scenario
+}  // namespace multicontact_api
 
-      ContactModel m_contact_model;
-
-    };
-  }
-}
-
-#endif // ifndef __multicontact_api_scenario_contact_constraint_hpp__
+#endif  // ifndef __multicontact_api_scenario_contact_constraint_hpp__
