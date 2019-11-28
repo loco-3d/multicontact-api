@@ -4,7 +4,6 @@
 #include "multicontact-api/bindings/python/scenario/expose-scenario.hpp"
 #include "multicontact-api/bindings/python/scenario/contact-phase.hpp"
 
-<<<<<<< f9c313c597929adfebcc22f273c67361c3dfef6c
 namespace multicontact_api {
 namespace python {
 void exposeContactPhase() {
