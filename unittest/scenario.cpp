@@ -7,9 +7,10 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/utility/binary.hpp>
 
-#include "multicontact-api/scenario/contact-phase.hpp"
-#include "multicontact-api/scenario/contact-sequence.hpp"
+#include "multicontact-api/scenario/contact-model-planar.hpp"
 #include "multicontact-api/scenario/contact-patch.hpp"
+//#include "multicontact-api/scenario/contact-phase.hpp"
+//#include "multicontact-api/scenario/contact-sequence.hpp"
 
 using namespace multicontact_api::scenario;
 
@@ -27,6 +28,8 @@ struct ATpl {
 };
 
 typedef ATpl<double> Ad;
+typedef pinocchio::SE3Tpl<double> SE3;
+
 
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
@@ -41,53 +44,95 @@ BOOST_AUTO_TEST_CASE(contact_model) {
 }
 
 BOOST_AUTO_TEST_CASE(contact_patch) {
+  // check default constructor :
   ContactPatch cp;
-  cp.contactModel().m_mu = 0.3;
-  cp.contactModel().m_ZMP_radius = 0.01;
-  cp.placement().setRandom();
-  cp.contactModelPlacement().setRandom();
-  cp.worldContactModelPlacement().setRandom();
-  ContactPatch cp2(cp);
-  ContactPatch cp3 = cp2;
-  BOOST_CHECK(cp == cp);
-  BOOST_CHECK(cp == cp2);
-  Ad a1;
-  Ad a2(a1);
+  BOOST_CHECK(cp.placement() == SE3::Identity());
+  BOOST_CHECK(cp.friction() == -1.);
+  SE3 p = SE3::Identity();
+  p.setRandom();
+  cp.placement() = p;
+  BOOST_CHECK(cp.placement() == p);
+  cp.friction() = 0.7;
+  BOOST_CHECK(cp.friction() == 0.7);
+
+  // constructor with placement :
+  p.setRandom();
+  ContactPatch cp1(p);
+  BOOST_CHECK(cp1.placement() == p);
+  BOOST_CHECK(cp1.friction() == -1.);
+
+  // constructor with placement and friction
+  p.setRandom();
+  ContactPatch cp2(p,0.9);
+  BOOST_CHECK(cp2.placement() == p);
+  BOOST_CHECK(cp2.friction() == 0.9);
+
+  // check comparison operator
+  BOOST_CHECK(cp1 != cp2);
+  ContactPatch cp3(p,0.9);
+  BOOST_CHECK(cp3 == cp2);
+  cp2.friction() = 0.1;
+  BOOST_CHECK(cp3 != cp2);
+
+  // copy constructor
+  ContactPatch cp4(cp3);
+  BOOST_CHECK(cp4 == cp3);
+  BOOST_CHECK(cp4.placement() == p);
+  BOOST_CHECK(cp4.friction() == 0.9);
+  cp4.placement() = SE3::Identity();
+  BOOST_CHECK(cp3 != cp4);
+
+  // serialization :
+  std::string fileName("fileTest");
+  cp3.saveAsText(fileName);
+  ContactPatch cp_from_text;
+  cp_from_text.loadFromText(fileName);
+  BOOST_CHECK(cp3 == cp_from_text);
+
+  cp3.saveAsXML(fileName,"ContactPatch");
+  ContactPatch cp_from_xml;
+  cp_from_xml.loadFromXML(fileName,"ContactPatch");
+  BOOST_CHECK(cp3 == cp_from_xml);
+
+  cp3.saveAsBinary(fileName);
+  ContactPatch cp_from_bin;
+  cp_from_bin.loadFromBinary(fileName);
+  BOOST_CHECK(cp3 == cp_from_bin);
 }
 
-BOOST_AUTO_TEST_CASE(contact_phase)
-{
-  ContactPhase4 cp, cp_test;
-  for(ContactPhase4::ContactPatchMap::iterator it = cp.contact_patches().begin();
-      it !=  cp.contact_patches().end(); ++it)
-  {
-    it->second.contactModel().m_mu = 0.3;
-    it->second.contactModel().m_ZMP_radius = 0.01;
-    it->second.placement().setRandom();
-    it->second.contactModelPlacement().setRandom();
-    it->second.worldContactModelPlacement().setRandom();
-  }
-  ContactPhase4 cp2(cp);
-  BOOST_CHECK(cp == cp);
-  BOOST_CHECK(cp == cp2);
-  // test serialization
-  cp.saveAsText("serialization_cp_test.test");
-  cp_test.loadFromText("serialization_cp_test.test");
-  remove("serialization_cp_test.test");
-  BOOST_CHECK(cp == cp_test);
-}
+//BOOST_AUTO_TEST_CASE(contact_phase)
+//{
+//  ContactPhase4 cp, cp_test;
+//  for(ContactPhase4::ContactPatchMap::iterator it = cp.contact_patches().begin();
+//      it !=  cp.contact_patches().end(); ++it)
+//  {
+//    it->second.contactModel().m_mu = 0.3;
+//    it->second.contactModel().m_ZMP_radius = 0.01;
+//    it->second.placement().setRandom();
+//    it->second.contactModelPlacement().setRandom();
+//    it->second.worldContactModelPlacement().setRandom();
+//  }
+//  ContactPhase4 cp2(cp);
+//  BOOST_CHECK(cp == cp);
+//  BOOST_CHECK(cp == cp2);
+//  // test serialization
+//  cp.saveAsText("serialization_cp_test.test");
+//  cp_test.loadFromText("serialization_cp_test.test");
+//  remove("serialization_cp_test.test");
+//  BOOST_CHECK(cp == cp_test);
+//}
 
-BOOST_AUTO_TEST_CASE(contact_sequence)
-{
-  ContactPhase4 cp;
-  ContactSequence4 cs(1);
-  ContactSequence4 cs_test(0);
-  cs.m_contact_phases[0] = cp;
-  // test serialization
-  cs.saveAsText("serialization_cs_test.test");
-  cs_test.loadFromText("serialization_cs_test.test");
-  remove("serialization_cp_test.test");
-  BOOST_CHECK(cs == cs_test);
-}
+//BOOST_AUTO_TEST_CASE(contact_sequence)
+//{
+//  ContactPhase4 cp;
+//  ContactSequence4 cs(1);
+//  ContactSequence4 cs_test(0);
+//  cs.m_contact_phases[0] = cp;
+//  // test serialization
+//  cs.saveAsText("serialization_cs_test.test");
+//  cs_test.loadFromText("serialization_cs_test.test");
+//  remove("serialization_cp_test.test");
+//  BOOST_CHECK(cs == cs_test);
+//}
 
 BOOST_AUTO_TEST_SUITE_END()

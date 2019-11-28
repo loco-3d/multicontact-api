@@ -19,10 +19,10 @@ struct ContactModelPlanarTpl : public serialization::Serializable<ContactModelPl
 
   typedef _Scalar Scalar;
 
-  /// \brief Default constructor.
+  /// \brief Default constructor.
   ContactModelPlanarTpl() : m_mu(-1.), m_ZMP_radius(-1.) {}
 
-  /// \brief Default constructor.
+  /// \brief Default constructor.
   ContactModelPlanarTpl(const Scalar mu, const Scalar ZMP_radius) : m_mu(mu), m_ZMP_radius(ZMP_radius) {}
 
   /// \brief Copy constructor
@@ -52,7 +52,6 @@ struct ContactModelPlanarTpl : public serialization::Serializable<ContactModelPl
 
   /// \brief Friction coefficient.
   Scalar m_mu;
-
   /// \brief ZMP radius.
   Scalar m_ZMP_radius;
 
