@@ -73,6 +73,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
       m_dL(),
       m_wrench(),
       m_zmp(),
+      m_root(),
       m_contact_forces(),
       m_contact_normal_force(),
       m_effector_trajectories(),
@@ -85,10 +86,11 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
 
   /**
    * @brief ContactPhaseTpl Constructor with time interval
-   * @param t_begin the time at the beginning of this contact phase
+   * @param t_init the time at the beginning of this contact phase
    * @param t_final the time at the end of this contact phase
+   * @throw invalid_argument if t_final < t_init
    */
-  ContactPhaseTpl(const Scalar t_begin, const Scalar t_final)
+  ContactPhaseTpl(const Scalar t_init, const Scalar t_final)
     : m_c_init(point3_t::Zero()),
       m_dc_init(point3_t::Zero()),
       m_ddc_init(point3_t::Zero()),
@@ -112,14 +114,18 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
       m_dL(),
       m_wrench(),
       m_zmp(),
+      m_root(),
       m_contact_forces(),
       m_contact_normal_force(),
       m_effector_trajectories(),
       m_effector_in_contact(),
       m_contact_patches(),
-      m_t_init(t_begin),
+      m_t_init(t_init),
       m_t_final(t_final)
-  {}
+  {
+    if(t_final < t_init)
+      throw std::invalid_argument("t_final cannot be inferior to t_initial");
+  }
 
 
 
@@ -149,6 +155,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
       m_dL(other.m_dL),
       m_wrench(other.m_wrench),
       m_zmp(other.m_zmp),
+      m_root(other.m_root),
       m_contact_forces(other.m_contact_forces),
       m_contact_normal_force(other.m_contact_normal_force),
       m_effector_trajectories(other.m_effector_trajectories),
@@ -184,6 +191,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
           m_dL == other.m_dL &&
           m_wrench == other.m_wrench &&
           m_zmp == other.m_zmp &&
+          m_root == other.m_root &&
           m_contact_forces == other.m_contact_forces &&
           m_contact_normal_force == other.m_contact_normal_force &&
           m_effector_trajectories == other.m_effector_trajectories &&
@@ -247,18 +255,24 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
   curve_ptr m_wrench;
   /// \brief trajectory for the zmp
   curve_ptr m_zmp;
+  /// \brief SE3 trajectory of the root of the robot
+  curve_SE3_ptr m_root;
 
   // getter and setter for the timings
   Scalar timeInitial() const {return m_t_init;}
   void timeInitial(const Scalar t){m_t_init = t;}
   Scalar timeFinal() const {return m_t_final;}
   void timeFinal(const Scalar t){
-    if(t<=m_t_init)
-      throw std::invalid_argument("t_final cannot be inferior to t_begin");
+    if(t<m_t_init)
+      throw std::invalid_argument("t_final cannot be inferior to t_initial");
     m_t_final = t;
   }
   Scalar duration() const {return m_t_final - m_t_init;}
-  void duration(const Scalar d){m_t_final = m_t_init + d;}
+  void duration(const Scalar d){
+    if(d <= 0 )
+      throw std::invalid_argument("Duration of the phase cannot be negative.");
+    m_t_final = m_t_init + d;
+  }
 
   // getter for the map trajectories
   CurveMap contactForces() const{return m_contact_forces;}
@@ -330,7 +344,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    * @throw invalid_argument if eeName is defined in contact for this phase
    * @return false if a trajectory already existed (and have been overwrited) true otherwise
    */
-  bool adEffectorTrajectory(const std::string& eeName, const curve_SE3_ptr trajectory){
+  bool addEffectorTrajectory(const std::string& eeName, const curve_SE3_ptr trajectory){
     if(m_effector_in_contact.count(eeName) > 0)
       throw std::invalid_argument("Cannot add an effector trajectory for effector "+eeName+" as it is in contact for the current phase.");
     bool alreadyExist(m_effector_trajectories.count(eeName));
@@ -340,7 +354,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
     return !alreadyExist;
   }
 
-  ContactPatchMap contactPatches() const{return m_contact_patches;}
+  ContactPatchMap contactPatches() const {return m_contact_patches;}
   ContactPatch contactPatch(const std::string& eeName) {
     if(m_contact_patches.count(eeName) == 0){
       throw std::invalid_argument("This contact phase do not contain any contact patch for the effector "+eeName);
@@ -379,6 +393,13 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
     m_contact_forces.erase(eeName);
     m_contact_normal_force.erase(eeName);
     return existed;
+  }
+
+  std::set<std::string> effectorsInContact() const{
+    return m_effector_in_contact;
+  }
+  bool isEffectorInContact(const std::string& eeName) const {
+    return m_effector_in_contact.count(eeName);
   }
 
   /**
