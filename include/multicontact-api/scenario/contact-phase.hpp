@@ -56,12 +56,12 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
       m_L_init(point3_t::Zero()),
       m_dL_init(point3_t::Zero()),
       m_q_init(),
-      m_c_end(point3_t::Zero()),
-      m_dc_end(point3_t::Zero()),
-      m_ddc_end(point3_t::Zero()),
-      m_L_end(point3_t::Zero()),
-      m_dL_end(point3_t::Zero()),
-      m_q_end(),
+      m_c_final(point3_t::Zero()),
+      m_dc_final(point3_t::Zero()),
+      m_ddc_final(point3_t::Zero()),
+      m_L_final(point3_t::Zero()),
+      m_dL_final(point3_t::Zero()),
+      m_q_final(),
       m_q(),
       m_dq(),
       m_ddq(),
@@ -78,29 +78,29 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
       m_effector_trajectories(),
       m_effector_in_contact(),
       m_contact_patches(),
-      m_t_begin(-1),
-      m_t_end(-1)
+      m_t_init(-1),
+      m_t_final(-1)
   {}
 
 
   /**
    * @brief ContactPhaseTpl Constructor with time interval
    * @param t_begin the time at the beginning of this contact phase
-   * @param t_end the time at the end of this contact phase
+   * @param t_final the time at the end of this contact phase
    */
-  ContactPhaseTpl(const Scalar t_begin, const Scalar t_end)
+  ContactPhaseTpl(const Scalar t_begin, const Scalar t_final)
     : m_c_init(point3_t::Zero()),
       m_dc_init(point3_t::Zero()),
       m_ddc_init(point3_t::Zero()),
       m_L_init(point3_t::Zero()),
       m_dL_init(point3_t::Zero()),
       m_q_init(),
-      m_c_end(point3_t::Zero()),
-      m_dc_end(point3_t::Zero()),
-      m_ddc_end(point3_t::Zero()),
-      m_L_end(point3_t::Zero()),
-      m_dL_end(point3_t::Zero()),
-      m_q_end(),
+      m_c_final(point3_t::Zero()),
+      m_dc_final(point3_t::Zero()),
+      m_ddc_final(point3_t::Zero()),
+      m_L_final(point3_t::Zero()),
+      m_dL_final(point3_t::Zero()),
+      m_q_final(),
       m_q(),
       m_dq(),
       m_ddq(),
@@ -117,8 +117,8 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
       m_effector_trajectories(),
       m_effector_in_contact(),
       m_contact_patches(),
-      m_t_begin(t_begin),
-      m_t_end(t_end)
+      m_t_init(t_begin),
+      m_t_final(t_final)
   {}
 
 
@@ -132,12 +132,12 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
       m_L_init(other.m_L_init),
       m_dL_init(other.m_dL_init),
       m_q_init(other.m_q_init),
-      m_c_end(other.m_c_end),
-      m_dc_end(other.m_dc_end),
-      m_ddc_end(other.m_ddc_end),
-      m_L_end(other.m_L_end),
-      m_dL_end(other.m_dL_end),
-      m_q_end(other.m_q_end),
+      m_c_final(other.m_c_final),
+      m_dc_final(other.m_dc_final),
+      m_ddc_final(other.m_ddc_final),
+      m_L_final(other.m_L_final),
+      m_dL_final(other.m_dL_final),
+      m_q_final(other.m_q_final),
       m_q(other.m_q),
       m_dq(other.m_dq),
       m_ddq(other.m_ddq),
@@ -154,8 +154,8 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
       m_effector_trajectories(other.m_effector_trajectories),
       m_effector_in_contact(other.m_effector_in_contact),
       m_contact_patches(other.m_contact_patches),
-      m_t_begin(other.m_t_begin),
-      m_t_end(other.m_t_end)
+      m_t_init(other.m_t_init),
+      m_t_final(other.m_t_final)
   {}
 
 
@@ -167,12 +167,12 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
           m_L_init == other.m_L_init &&
           m_dL_init == other.m_dL_init &&
           m_q_init == other.m_q_init &&
-          m_c_end == other.m_c_end &&
-          m_dc_end == other.m_dc_end &&
-          m_ddc_end == other.m_ddc_end &&
-          m_L_end == other.m_L_end &&
-          m_dL_end == other.m_dL_end &&
-          m_q_end == other.m_q_end &&
+          m_c_final == other.m_c_final &&
+          m_dc_final == other.m_dc_final &&
+          m_ddc_final == other.m_ddc_final &&
+          m_L_final == other.m_L_final &&
+          m_dL_final == other.m_dL_final &&
+          m_q_final == other.m_q_final &&
           m_q == other.m_q &&
           m_dq == other.m_dq &&
           m_ddq == other.m_ddq &&
@@ -189,8 +189,8 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
           m_effector_trajectories == other.m_effector_trajectories &&
           m_effector_in_contact == other.m_effector_in_contact &&
           m_contact_patches == other.m_contact_patches &&
-          m_t_begin == other.m_t_begin &&
-          m_t_end == other.m_t_end;
+          m_t_init == other.m_t_init &&
+          m_t_final == other.m_t_final;
   }
 
   template <typename S2>
@@ -213,17 +213,17 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
   /// \brief Initial whole body configuration of this phase
   pointX_t m_q_init;
   /// \brief Final position of the center of mass for this contact phase
-  point3_t m_c_end;
+  point3_t m_c_final;
   /// \brief Final velocity of the center of mass for this contact phase
-  point3_t m_dc_end;
+  point3_t m_dc_final;
   /// \brief Final acceleration of the center of mass for this contact phase
-  point3_t m_ddc_end;
+  point3_t m_ddc_final;
   /// \brief Final angular momentum for this contact phase
-  point3_t m_L_end;
+  point3_t m_L_final;
   /// \brief Final angular momentum derivative for this contact phase
-  point3_t m_dL_end;
+  point3_t m_dL_final;
   /// \brief Final whole body configuration of this phase
-  pointX_t m_q_end;
+  pointX_t m_q_final;
 
   /// \brief trajectory for the joint positions
   curve_ptr m_q;
@@ -249,16 +249,16 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
   curve_ptr m_zmp;
 
   // getter and setter for the timings
-  Scalar timeBegin() const {return m_t_begin;}
-  void timeBegin(const Scalar t){m_t_begin = t;}
-  Scalar timeEnd() const {return m_t_end;}
-  void timeEnd(const Scalar t){
-    if(t<=m_t_begin)
-      throw std::invalid_argument("t_end cannot be inferior to t_begin");
-    m_t_end = t;
+  Scalar timeInitial() const {return m_t_init;}
+  void timeInitial(const Scalar t){m_t_init = t;}
+  Scalar timeFinal() const {return m_t_final;}
+  void timeFinal(const Scalar t){
+    if(t<=m_t_init)
+      throw std::invalid_argument("t_final cannot be inferior to t_begin");
+    m_t_final = t;
   }
-  Scalar duration() const {return m_t_end - m_t_begin;}
-  void duration(const Scalar d){m_t_end = m_t_begin + d;}
+  Scalar duration() const {return m_t_final - m_t_init;}
+  void duration(const Scalar d){m_t_final = m_t_init + d;}
 
   // getter for the map trajectories
   CurveMap contactForces() const{return m_contact_forces;}
@@ -385,7 +385,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    * @brief isConsistent check if all the members of the phase are consistent together:
    * - There is a contact patch defined for all effector in contact
    * - There is only contact forces for the effector defined in contact
-   * - If a trajectory is defined, it is defined between t_begin and t_end
+   * - If a trajectory is defined, it is defined between t_begin and t_final
    * - If init/end values are defined and a trajectory for this values is also defined, check that they match
    * - The times are positives and tbegin <= tmax
    * @param throw_if_inconsistent if true, throw an runtime_error if not consistent
@@ -410,9 +410,9 @@ protected:
   /// \brief map effector name : contact patches. All the patches are actives
   ContactPatchMap m_contact_patches;
   /// \brief time at the beginning of the contact phase
-  Scalar m_t_begin;
+  Scalar m_t_init;
   /// \brief time at the end of the contact phase
-  Scalar m_t_end;
+  Scalar m_t_final;
 
 
 
