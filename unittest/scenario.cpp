@@ -9,7 +9,7 @@
 
 #include "multicontact-api/scenario/contact-model-planar.hpp"
 #include "multicontact-api/scenario/contact-patch.hpp"
-//#include "multicontact-api/scenario/contact-phase.hpp"
+#include "multicontact-api/scenario/contact-phase.hpp"
 //#include "multicontact-api/scenario/contact-sequence.hpp"
 
 using namespace multicontact_api::scenario;
@@ -100,27 +100,11 @@ BOOST_AUTO_TEST_CASE(contact_patch) {
   BOOST_CHECK(cp3 == cp_from_bin);
 }
 
-//BOOST_AUTO_TEST_CASE(contact_phase)
-//{
-//  ContactPhase4 cp, cp_test;
-//  for(ContactPhase4::ContactPatchMap::iterator it = cp.contact_patches().begin();
-//      it !=  cp.contact_patches().end(); ++it)
-//  {
-//    it->second.contactModel().m_mu = 0.3;
-//    it->second.contactModel().m_ZMP_radius = 0.01;
-//    it->second.placement().setRandom();
-//    it->second.contactModelPlacement().setRandom();
-//    it->second.worldContactModelPlacement().setRandom();
-//  }
-//  ContactPhase4 cp2(cp);
-//  BOOST_CHECK(cp == cp);
-//  BOOST_CHECK(cp == cp2);
-//  // test serialization
-//  cp.saveAsText("serialization_cp_test.test");
-//  cp_test.loadFromText("serialization_cp_test.test");
-//  remove("serialization_cp_test.test");
-//  BOOST_CHECK(cp == cp_test);
-//}
+BOOST_AUTO_TEST_CASE(contact_phase)
+{
+
+
+}
 
 //BOOST_AUTO_TEST_CASE(contact_sequence)
 //{

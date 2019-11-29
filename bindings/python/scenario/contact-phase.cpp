@@ -10,5 +10,17 @@ void exposeContactPhase() {
   ContactPhasePythonVisitor<multicontact_api::scenario::ContactPhase4>::expose("ContactPhase4");
   //ContactPhaseHumanoidPythonVisitor<multicontact_api::scenario::ContactPhaseHumanoid>::expose("ContactPhaseHumanoid");
 }
-}  // namespace python
+}
+
+CurveMap ContactPhaseTpl::contact_forces() const
+{
+    return m_contact_forces;
+}
+
+void ContactPhaseTpl::setContact_forces(const CurveMap &contact_forces)
+{
+    m_contact_forces = contact_forces;
+}
+
+// namespace python
 }  // namespace multicontact_api
