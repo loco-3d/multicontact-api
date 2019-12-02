@@ -15,8 +15,10 @@
 #include <string>
 #include <sstream>
 #include <boost/serialization/map.hpp>
+#include <boost/serialization/set.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/shared_ptr.hpp>
+#include <curves/serialization/registeration.hpp>
 
 namespace multicontact_api{
 namespace scenario  {
@@ -417,6 +419,39 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
     return true;
   }
 
+  void disp(std::ostream& os) const {
+    Eigen::Matrix<Scalar,3, 5> state0(Eigen::Matrix<Scalar,3, 5>::Zero());
+    Eigen::Matrix<Scalar,3, 5> state1(Eigen::Matrix<Scalar,3, 5>::Zero());
+    state0.block(0,0,3,1) = m_c_init;
+    state0.block(0,1,3,1) = m_dc_init;
+    state0.block(0,2,3,1) = m_ddc_init;
+    state0.block(0,3,3,1) = m_L_init;
+    state0.block(0,4,3,1) = m_dL_init;
+    state1.block(0,0,3,1) = m_c_final;
+    state1.block(0,1,3,1) = m_dc_final;
+    state1.block(0,2,3,1) = m_ddc_final;
+    state1.block(0,3,3,1) = m_L_final;
+    state1.block(0,4,3,1) = m_dL_final;
+
+    os <<"Contact phase defined for t \in ["<<m_t_init<<";"<<m_t_final<<"]"<<std::endl
+      << "Conecting (c0,dc0,ddc0,L0,dL0) = "<<std::endl<<state0<<std::endl
+      << "to        (c0,dc0,ddc0,L0,dL0) = "<<std::endl<<state1<<std::endl;
+    os << "Effectors in contact "<<m_effector_in_contact.size()<<" : "<<std::endl;
+    for(std::set<std::string>::const_iterator ee = m_effector_in_contact.begin() ; ee != m_effector_in_contact.end() ; ++ee){
+      os << "______________________________________________"<<std::endl
+         << "Effector "<<*ee<<" contact patch:"<<std::endl
+         << m_contact_patches.at(*ee) <<std::endl
+         << "Has contact force trajectory : "<<bool(m_contact_forces.count(*ee))<<std::endl
+         << "Has contact normal force trajectory : "<<bool(m_contact_normal_force.count(*ee))<<std::endl;
+    }
+  }
+
+  template <typename S2>
+  friend std::ostream& operator<<(std::ostream& os, const ContactPhaseTpl<S2>& cp) {
+    cp.disp(os);
+    return os;
+  }
+
 
 protected:
   // private members
@@ -435,7 +470,46 @@ protected:
   /// \brief time at the end of the contact phase
   Scalar m_t_final;
 
+private:
+ // Serialization of the class
+ friend class boost::serialization::access;
 
+ template <class Archive>
+ void serialize(Archive& ar, const unsigned int /*version*/) {
+   //ar& boost::serialization::make_nvp("placement", m_placement);
+   curves::serialization::register_types<Archive>(ar);
+   ar& boost::serialization::make_nvp("c_init", m_c_init);
+   ar& boost::serialization::make_nvp("dc_init", m_dc_init);
+   ar& boost::serialization::make_nvp("ddc_init", m_ddc_init);
+   ar& boost::serialization::make_nvp("L_init", m_L_init);
+   ar& boost::serialization::make_nvp("dL_init", m_dL_init);
+   ar& boost::serialization::make_nvp("q_init", m_q_init);
+   ar& boost::serialization::make_nvp("c_final", m_c_final);
+   ar& boost::serialization::make_nvp("dc_final", m_dc_final);
+   ar& boost::serialization::make_nvp("ddc_final", m_ddc_final);
+   ar& boost::serialization::make_nvp("L_final", m_L_final);
+   ar& boost::serialization::make_nvp("dL_final", m_dL_final);
+   ar& boost::serialization::make_nvp("q_final", m_q_final);
+   ar& boost::serialization::make_nvp("q", m_q);
+   ar& boost::serialization::make_nvp("dq", m_dq);
+   ar& boost::serialization::make_nvp("ddq", m_ddq);
+   ar& boost::serialization::make_nvp("tau", m_tau);
+   ar& boost::serialization::make_nvp("c", m_c);
+   ar& boost::serialization::make_nvp("dc", m_dc);
+   ar& boost::serialization::make_nvp("ddc", m_ddc);
+   ar& boost::serialization::make_nvp("L", m_L);
+   ar& boost::serialization::make_nvp("dL", m_dL);
+   ar& boost::serialization::make_nvp("wrench", m_wrench);
+   ar& boost::serialization::make_nvp("zmp", m_zmp);
+   ar& boost::serialization::make_nvp("root", m_root);
+   ar& boost::serialization::make_nvp("contact_forces", m_contact_forces);
+   ar& boost::serialization::make_nvp("contact_normal_force", m_contact_normal_force);
+   ar& boost::serialization::make_nvp("effector_trajectories", m_effector_trajectories);
+   ar& boost::serialization::make_nvp("effector_in_contact", m_effector_in_contact);
+   ar& boost::serialization::make_nvp("contact_patches", m_contact_patches);
+   ar& boost::serialization::make_nvp("t_init", m_t_init);
+   ar& boost::serialization::make_nvp("t_final", m_t_final);
+ }
 
 }; //struct contact phase
 } //scenario

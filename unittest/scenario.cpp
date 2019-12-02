@@ -18,9 +18,10 @@
 #include <curves/polynomial.h>
 #include <curves/bezier_curve.h>
 #include <curves/piecewise_curve.h>
+#include <curves/exact_cubic.h>
+#include <curves/cubic_hermite_spline.h>
 
-
-
+typedef Eigen::Matrix<double, 1, 1> point1_t;
 using curves::point3_t;
 using curves::point6_t;
 typedef Eigen::Matrix<double, 12, 1> point12_t;
@@ -121,6 +122,11 @@ curve_ptr_t buildRandomPolynomial12D(){
   return buildRandomPolynomial<point12_t>();
 }
 
+curve_ptr_t buildRandomPolynomial1D(){
+  return buildRandomPolynomial<point1_t>();
+}
+
+
 
 
 curve_SE3_ptr_t buildPiecewiseSE3(){
@@ -170,6 +176,56 @@ curve_SE3_ptr_t buildRandomSE3LinearTraj(const double min, const double max){
   return res;
 }
 
+
+void explicitContactPhaseAssertEqual(ContactPhase& cp1, ContactPhase& cp2){
+  BOOST_CHECK(cp1.m_c_init == cp2.m_c_init);
+  BOOST_CHECK(cp1.m_dc_init == cp2.m_dc_init);
+  BOOST_CHECK(cp1.m_ddc_init == cp2.m_ddc_init);
+  BOOST_CHECK(cp1.m_L_init == cp2.m_L_init);
+  BOOST_CHECK(cp1.m_dL_init == cp2.m_dL_init);
+  BOOST_CHECK(cp1.m_q_init == cp2.m_q_init);
+  BOOST_CHECK(cp1.m_c_final == cp2.m_c_final);
+  BOOST_CHECK(cp1.m_dc_final == cp2.m_dc_final);
+  BOOST_CHECK(cp1.m_ddc_final == cp2.m_ddc_final);
+  BOOST_CHECK(cp1.m_L_final == cp2.m_L_final);
+  BOOST_CHECK(cp1.m_dL_final == cp2.m_dL_final);
+  BOOST_CHECK(cp1.m_q_final == cp2.m_q_final);
+  BOOST_CHECK(cp1.m_c_init == cp2.m_c_init);
+  BOOST_CHECK(cp1.m_dc_init == cp2.m_dc_init);
+  BOOST_CHECK(cp1.m_ddc_init == cp2.m_ddc_init);
+  BOOST_CHECK(cp1.m_L_init == cp2.m_L_init);
+  BOOST_CHECK(cp1.m_dL_init == cp2.m_dL_init);
+  BOOST_CHECK(cp1.m_q_init == cp2.m_q_init);
+  BOOST_CHECK(cp1.m_c_final == cp2.m_c_final);
+  BOOST_CHECK(cp1.m_dc_final == cp2.m_dc_final);
+  BOOST_CHECK(cp1.m_ddc_final == cp2.m_ddc_final);
+  BOOST_CHECK(cp1.m_L_final == cp2.m_L_final);
+  BOOST_CHECK(cp1.m_dL_final == cp2.m_dL_final);
+  BOOST_CHECK(cp1.m_q_final == cp2.m_q_final);
+  BOOST_CHECK((*cp1.m_q)(cp2.m_q->min())==(*cp2.m_q)(cp2.m_q->min()));
+  BOOST_CHECK((*cp1.m_dq)(cp2.m_dq->min())==(*cp2.m_dq)(cp2.m_dq->min()));
+  BOOST_CHECK((*cp1.m_ddq)(cp2.m_ddq->min())==(*cp2.m_ddq)(cp2.m_ddq->min()));
+  BOOST_CHECK((*cp1.m_tau)(cp2.m_tau->min())==(*cp2.m_tau)(cp2.m_tau->min()));
+  BOOST_CHECK((*cp1.m_c)(cp2.m_c->min())==(*cp2.m_c)(cp2.m_c->min()));
+  BOOST_CHECK((*cp1.m_dc)(cp2.m_dc->min())==(*cp2.m_dc)(cp2.m_dc->min()));
+  BOOST_CHECK((*cp1.m_ddc)(cp2.m_ddc->min())==(*cp2.m_ddc)(cp2.m_ddc->min()));
+  BOOST_CHECK((*cp1.m_L)(cp2.m_L->min())==(*cp2.m_L)(cp2.m_L->min()));
+  BOOST_CHECK((*cp1.m_dL)(cp2.m_dL->min())==(*cp2.m_dL)(cp2.m_dL->min()));
+  BOOST_CHECK((*cp1.m_wrench)(cp2.m_wrench->min())==(*cp2.m_wrench)(cp2.m_wrench->min()));
+  BOOST_CHECK((*cp1.m_zmp)(cp2.m_zmp->min())==(*cp2.m_zmp)(cp2.m_zmp->min()));
+  BOOST_CHECK((*cp1.m_root)(cp2.m_root->min()).isApprox((*cp2.m_root)(cp2.m_root->min())));
+  BOOST_CHECK(cp1.contactForces() == cp2.contactForces());
+  BOOST_CHECK(cp1.contactNormalForces() == cp2.contactNormalForces());
+  BOOST_CHECK(cp1.effectorTrajectories() == cp2.effectorTrajectories());
+  BOOST_CHECK(cp1.effectorsInContact() == cp2.effectorsInContact());
+  BOOST_CHECK(cp1.contactPatches() == cp2.contactPatches());
+  for(std::set<std::string>::const_iterator ee = cp1.effectorsInContact().begin() ; ee != cp1.effectorsInContact().end() ; ++ee){
+    std::cout<<" for effector "<<*ee<<std::endl;
+    BOOST_CHECK(cp1.contactPatch(*ee) == cp2.contactPatch(*ee));
+    BOOST_CHECK(cp1.contactForces(*ee) == cp2.contactForces(*ee));
+    BOOST_CHECK(cp1.contactNormalForces(*ee) == cp2.contactNormalForces(*ee));
+  }
+}
 
 
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
@@ -223,7 +279,7 @@ BOOST_AUTO_TEST_CASE(contact_patch) {
   cp4.placement() = SE3::Identity();
   BOOST_CHECK(cp3 != cp4);
 
-  // operator = 
+  // operator =
   ContactPatch cp5 = cp4;
   BOOST_CHECK(cp4 == cp5);
   cp5.friction() = 2.;
@@ -379,7 +435,8 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   BOOST_CHECK((*cp2.contactNormalForces("left_leg"))(min) == nf0);
   BOOST_CHECK_THROW(cp2.contactNormalForces("right_leg"),std::invalid_argument);
   BOOST_CHECK_THROW(cp2.addContactNormalForceTrajectory("right_leg",force12d),std::invalid_argument); // right leg is not in contact, cannot add force
-  BOOST_CHECK_THROW(cp2.addContactNormalForceTrajectory("left_leg",force12d),std::invalid_argument); // should be of dimension 1 
+  BOOST_CHECK_THROW(cp2.addContactNormalForceTrajectory("left_leg",force12d),std::invalid_argument); // should be of dimension 1
+
 
   // Check effector trajectory : 
   curve_SE3_ptr_t effR = buildPiecewiseSE3();
@@ -396,15 +453,6 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   BOOST_CHECK_THROW(cp2.effectorTrajectories("left_leg"),std::invalid_argument);
   BOOST_CHECK_THROW(cp2.addEffectorTrajectory("left_leg",effR),std::invalid_argument); // right leg is not in contact, cannot add force
   //cp2.addEffectorTrajectory("right_leg",force12d); // should not compile : not the right return type for the curve
-
-  // check that when removing the contact the trajectory are correctly deleted : 
-  cp2.removeContact("left_leg");
-  BOOST_CHECK(!cp2.isEffectorInContact("left_leg"));
-  BOOST_CHECK(cp2.contactForces().count("left_leg") == 0);
-  BOOST_CHECK(cp2.contactNormalForces().count("left_leg") == 0);
-  // check that when adding a contact the effector trajectory is correctly deleted :
-  cp2.addContact("right_leg",patchR);
-  BOOST_CHECK(cp2.effectorTrajectories().count("right_leg") == 0);
 
   // check setting init / final data :
   // public members :
@@ -423,7 +471,6 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   pointX_t m_q_final;
   */
 
-  ContactPhase cp3(0.5,2.); // public members :
   point3_t c_init= point3_t::Random();
   point3_t dc_init= point3_t::Random();
   pointX_t ddc_init= point3_t::Random(); // test with point X for automatic conversion
@@ -436,30 +483,30 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   pointX_t L_final= point3_t::Random();
   point3_t dL_final= point3_t::Random();
   pointX_t q_final= point12_t::Random();
-  cp3.m_c_init = c_init;
-  cp3.m_dc_init = dc_init;
-  cp3.m_ddc_init = ddc_init;
-  cp3.m_L_init = L_init;
-  cp3.m_dL_init = dL_init;
-  cp3.m_q_init = q_init;
-  cp3.m_c_final = c_final;
-  cp3.m_dc_final = dc_final;
-  cp3.m_ddc_final = ddc_final;
-  cp3.m_L_final = L_final;
-  cp3.m_dL_final = dL_final;
-  cp3.m_q_final = q_final;
-  BOOST_CHECK(cp3.m_c_init == c_init);
-  BOOST_CHECK(cp3.m_dc_init == dc_init);
-  BOOST_CHECK(cp3.m_ddc_init == ddc_init);
-  BOOST_CHECK(cp3.m_L_init == L_init);
-  BOOST_CHECK(cp3.m_dL_init == dL_init);
-  BOOST_CHECK(cp3.m_q_init == q_init);
-  BOOST_CHECK(cp3.m_c_final == c_final);
-  BOOST_CHECK(cp3.m_dc_final == dc_final);
-  BOOST_CHECK(cp3.m_ddc_final == ddc_final);
-  BOOST_CHECK(cp3.m_L_final == L_final);
-  BOOST_CHECK(cp3.m_dL_final == dL_final);
-  BOOST_CHECK(cp3.m_q_final == q_final);
+  cp2.m_c_init = c_init;
+  cp2.m_dc_init = dc_init;
+  cp2.m_ddc_init = ddc_init;
+  cp2.m_L_init = L_init;
+  cp2.m_dL_init = dL_init;
+  cp2.m_q_init = q_init;
+  cp2.m_c_final = c_final;
+  cp2.m_dc_final = dc_final;
+  cp2.m_ddc_final = ddc_final;
+  cp2.m_L_final = L_final;
+  cp2.m_dL_final = dL_final;
+  cp2.m_q_final = q_final;
+  BOOST_CHECK(cp2.m_c_init == c_init);
+  BOOST_CHECK(cp2.m_dc_init == dc_init);
+  BOOST_CHECK(cp2.m_ddc_init == ddc_init);
+  BOOST_CHECK(cp2.m_L_init == L_init);
+  BOOST_CHECK(cp2.m_dL_init == dL_init);
+  BOOST_CHECK(cp2.m_q_init == q_init);
+  BOOST_CHECK(cp2.m_c_final == c_final);
+  BOOST_CHECK(cp2.m_dc_final == dc_final);
+  BOOST_CHECK(cp2.m_ddc_final == ddc_final);
+  BOOST_CHECK(cp2.m_L_final == L_final);
+  BOOST_CHECK(cp2.m_dL_final == dL_final);
+  BOOST_CHECK(cp2.m_q_final == q_final);
 
   // check adding trajectory to public members :
 /*
@@ -489,64 +536,70 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   curve_ptr_t wrench = buildRandomPolynomial3D();
   curve_ptr_t zmp = buildRandomPolynomial3D();
   curve_SE3_ptr_t root = buildRandomSE3LinearTraj(1,5.5);
-  cp3.m_q = q;
-  cp3.m_dq = dq;
-  cp3.m_ddq = ddq;
-  cp3.m_tau = tau;
-  cp3.m_c = c;
-  cp3.m_dc = dc;
-  cp3.m_ddc = ddc;
-  cp3.m_L = L;
-  cp3.m_dL = dL;
-  cp3.m_wrench = wrench;
-  cp3.m_zmp = zmp;
-  cp3.m_root = root;
+  cp2.m_q = q;
+  cp2.m_dq = dq;
+  cp2.m_ddq = ddq;
+  cp2.m_tau = tau;
+  cp2.m_c = c;
+  cp2.m_dc = dc;
+  cp2.m_ddc = ddc;
+  cp2.m_L = L;
+  cp2.m_dL = dL;
+  cp2.m_wrench = wrench;
+  cp2.m_zmp = zmp;
+  cp2.m_root = root;
 
-  BOOST_CHECK((*cp3.m_q)(q->min()) == (*q)(q->min()));
-  BOOST_CHECK((*cp3.m_dq)(dq->min()) == (*dq)(dq->min()));
-  BOOST_CHECK((*cp3.m_ddq)(ddq->min()) == (*ddq)(ddq->min()));
-  BOOST_CHECK((*cp3.m_tau)(tau->min()) == (*tau)(tau->min()));
-  BOOST_CHECK((*cp3.m_c)(c->min()) == (*c)(c->min()));
-  BOOST_CHECK((*cp3.m_dc)(dc->min()) == (*dc)(dc->min()));
-  BOOST_CHECK((*cp3.m_ddc)(ddc->min()) == (*ddc)(ddc->min()));
-  BOOST_CHECK((*cp3.m_L)(L->min()) == (*L)(L->min()));
-  BOOST_CHECK((*cp3.m_dL)(dL->min()) == (*dL)(dL->min()));
-  BOOST_CHECK((*cp3.m_wrench)(wrench->min()) == (*wrench)(wrench->min()));
-  BOOST_CHECK((*cp3.m_zmp)(zmp->min()) == (*zmp)(zmp->min()));
-  BOOST_CHECK((*cp3.m_root)(root->min()).isApprox((*root)(root->min())));
-  BOOST_CHECK((*cp3.m_q)(q->max()) == (*q)(q->max()));
-  BOOST_CHECK((*cp3.m_dq)(dq->max()) == (*dq)(dq->max()));
-  BOOST_CHECK((*cp3.m_ddq)(ddq->max()) == (*ddq)(ddq->max()));
-  BOOST_CHECK((*cp3.m_tau)(tau->max()) == (*tau)(tau->max()));
-  BOOST_CHECK((*cp3.m_c)(c->max()) == (*c)(c->max()));
-  BOOST_CHECK((*cp3.m_dc)(dc->max()) == (*dc)(dc->max()));
-  BOOST_CHECK((*cp3.m_ddc)(ddc->max()) == (*ddc)(ddc->max()));
-  BOOST_CHECK((*cp3.m_L)(L->max()) == (*L)(L->max()));
-  BOOST_CHECK((*cp3.m_dL)(dL->max()) == (*dL)(dL->max()));
-  BOOST_CHECK((*cp3.m_wrench)(wrench->max()) == (*wrench)(wrench->max()));
-  BOOST_CHECK((*cp3.m_zmp)(zmp->max()) == (*zmp)(zmp->max()));
-  BOOST_CHECK((*cp3.m_root)(root->max()).isApprox((*root)(root->max())));
+  BOOST_CHECK((*cp2.m_q)(q->min()) == (*q)(q->min()));
+  BOOST_CHECK((*cp2.m_dq)(dq->min()) == (*dq)(dq->min()));
+  BOOST_CHECK((*cp2.m_ddq)(ddq->min()) == (*ddq)(ddq->min()));
+  BOOST_CHECK((*cp2.m_tau)(tau->min()) == (*tau)(tau->min()));
+  BOOST_CHECK((*cp2.m_c)(c->min()) == (*c)(c->min()));
+  BOOST_CHECK((*cp2.m_dc)(dc->min()) == (*dc)(dc->min()));
+  BOOST_CHECK((*cp2.m_ddc)(ddc->min()) == (*ddc)(ddc->min()));
+  BOOST_CHECK((*cp2.m_L)(L->min()) == (*L)(L->min()));
+  BOOST_CHECK((*cp2.m_dL)(dL->min()) == (*dL)(dL->min()));
+  BOOST_CHECK((*cp2.m_wrench)(wrench->min()) == (*wrench)(wrench->min()));
+  BOOST_CHECK((*cp2.m_zmp)(zmp->min()) == (*zmp)(zmp->min()));
+  BOOST_CHECK((*cp2.m_root)(root->min()).isApprox((*root)(root->min())));
+  BOOST_CHECK((*cp2.m_q)(q->max()) == (*q)(q->max()));
+  BOOST_CHECK((*cp2.m_dq)(dq->max()) == (*dq)(dq->max()));
+  BOOST_CHECK((*cp2.m_ddq)(ddq->max()) == (*ddq)(ddq->max()));
+  BOOST_CHECK((*cp2.m_tau)(tau->max()) == (*tau)(tau->max()));
+  BOOST_CHECK((*cp2.m_c)(c->max()) == (*c)(c->max()));
+  BOOST_CHECK((*cp2.m_dc)(dc->max()) == (*dc)(dc->max()));
+  BOOST_CHECK((*cp2.m_ddc)(ddc->max()) == (*ddc)(ddc->max()));
+  BOOST_CHECK((*cp2.m_L)(L->max()) == (*L)(L->max()));
+  BOOST_CHECK((*cp2.m_dL)(dL->max()) == (*dL)(dL->max()));
+  BOOST_CHECK((*cp2.m_wrench)(wrench->max()) == (*wrench)(wrench->max()));
+  BOOST_CHECK((*cp2.m_zmp)(zmp->max()) == (*zmp)(zmp->max()));
+  BOOST_CHECK((*cp2.m_root)(root->max()).isApprox((*root)(root->max())));
   }
-  BOOST_CHECK_NO_THROW(cp3.m_q->operator()(cp3.m_q->min())); // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(cp3.m_dq->operator()(cp3.m_dq->min())); // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(cp3.m_ddq->operator()(cp3.m_ddq->min())); // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(cp3.m_tau->operator()(cp3.m_tau->min())); // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(cp3.m_c->operator()(cp3.m_c->min())); // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(cp3.m_dc->operator()(cp3.m_dc->min())); // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(cp3.m_ddc->operator()(cp3.m_ddc->min())); // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(cp3.m_L->operator()(cp3.m_L->min())); // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(cp3.m_dL->operator()(cp3.m_dL->min())); // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(cp3.m_wrench->operator()(cp3.m_wrench->min())); // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(cp3.m_root->operator()(cp3.m_root->min())); // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(cp3.m_zmp->operator()(cp3.m_zmp->min())); // check that the curves still exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_q->operator()(cp2.m_q->min())); // check that the curves still exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_dq->operator()(cp2.m_dq->min())); // check that the curves still exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_ddq->operator()(cp2.m_ddq->min())); // check that the curves still exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_tau->operator()(cp2.m_tau->min())); // check that the curves still exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_c->operator()(cp2.m_c->min())); // check that the curves still exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_dc->operator()(cp2.m_dc->min())); // check that the curves still exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_ddc->operator()(cp2.m_ddc->min())); // check that the curves still exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_L->operator()(cp2.m_L->min())); // check that the curves still exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_dL->operator()(cp2.m_dL->min())); // check that the curves still exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_wrench->operator()(cp2.m_wrench->min())); // check that the curves still exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_root->operator()(cp2.m_root->min())); // check that the curves still exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_zmp->operator()(cp2.m_zmp->min())); // check that the curves still exist after leaving the scope
 
 
   // check copy constructor and operator ==
-  ContactPhase cp4(cp3);
-  ContactPhase cp5 = cp3;
-  BOOST_CHECK(cp2 != cp3);
-  BOOST_CHECK(cp4 == cp3);
-  BOOST_CHECK(cp5 == cp3);
+  //first add more contact and trajectories :
+  cp2.addContact("right_hand",ContactPatch(SE3::Identity().setRandom()));
+  cp2.addContactForceTrajectory("right_hand",buildRandomPolynomial12D());
+  cp2.addContactNormalForceTrajectory("right_hand",buildRandomPolynomial1D());
+  cp2.addEffectorTrajectory("knee",buildRandomSE3LinearTraj(cp2.timeInitial(),cp2.timeFinal()));
+
+  ContactPhase cp4(cp2);
+  ContactPhase cp5 = cp2;
+  BOOST_CHECK(cp2 != cp1);
+  BOOST_CHECK(cp4 == cp2);
+  BOOST_CHECK(cp5 == cp2);
   BOOST_CHECK(cp4.m_c_init == c_init);
   BOOST_CHECK(cp4.m_dc_init == dc_init);
   BOOST_CHECK(cp4.m_ddc_init == ddc_init);
@@ -571,189 +624,254 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   BOOST_CHECK(cp5.m_L_final == L_final);
   BOOST_CHECK(cp5.m_dL_final == dL_final);
   BOOST_CHECK(cp5.m_q_final == q_final);
-  BOOST_CHECK((*cp5.m_q)(cp3.m_q->min())==(*cp3.m_q)(cp3.m_q->min()));
-  BOOST_CHECK((*cp5.m_dq)(cp3.m_dq->min())==(*cp3.m_dq)(cp3.m_dq->min()));
-  BOOST_CHECK((*cp5.m_ddq)(cp3.m_ddq->min())==(*cp3.m_ddq)(cp3.m_ddq->min()));
-  BOOST_CHECK((*cp5.m_tau)(cp3.m_tau->min())==(*cp3.m_tau)(cp3.m_tau->min()));
-  BOOST_CHECK((*cp5.m_c)(cp3.m_c->min())==(*cp3.m_c)(cp3.m_c->min()));
-  BOOST_CHECK((*cp5.m_dc)(cp3.m_dc->min())==(*cp3.m_dc)(cp3.m_dc->min()));
-  BOOST_CHECK((*cp5.m_ddc)(cp3.m_ddc->min())==(*cp3.m_ddc)(cp3.m_ddc->min()));
-  BOOST_CHECK((*cp5.m_L)(cp3.m_L->min())==(*cp3.m_L)(cp3.m_L->min()));
-  BOOST_CHECK((*cp5.m_dL)(cp3.m_dL->min())==(*cp3.m_dL)(cp3.m_dL->min()));
-  BOOST_CHECK((*cp5.m_wrench)(cp3.m_wrench->min())==(*cp3.m_wrench)(cp3.m_wrench->min()));
-  BOOST_CHECK((*cp5.m_zmp)(cp3.m_zmp->min())==(*cp3.m_zmp)(cp3.m_zmp->min()));
-  BOOST_CHECK((*cp5.m_root)(cp3.m_root->min()).isApprox((*cp3.m_root)(cp3.m_root->min())));
+  BOOST_CHECK((*cp5.m_q)(cp2.m_q->min())==(*cp2.m_q)(cp2.m_q->min()));
+  BOOST_CHECK((*cp5.m_dq)(cp2.m_dq->min())==(*cp2.m_dq)(cp2.m_dq->min()));
+  BOOST_CHECK((*cp5.m_ddq)(cp2.m_ddq->min())==(*cp2.m_ddq)(cp2.m_ddq->min()));
+  BOOST_CHECK((*cp5.m_tau)(cp2.m_tau->min())==(*cp2.m_tau)(cp2.m_tau->min()));
+  BOOST_CHECK((*cp5.m_c)(cp2.m_c->min())==(*cp2.m_c)(cp2.m_c->min()));
+  BOOST_CHECK((*cp5.m_dc)(cp2.m_dc->min())==(*cp2.m_dc)(cp2.m_dc->min()));
+  BOOST_CHECK((*cp5.m_ddc)(cp2.m_ddc->min())==(*cp2.m_ddc)(cp2.m_ddc->min()));
+  BOOST_CHECK((*cp5.m_L)(cp2.m_L->min())==(*cp2.m_L)(cp2.m_L->min()));
+  BOOST_CHECK((*cp5.m_dL)(cp2.m_dL->min())==(*cp2.m_dL)(cp2.m_dL->min()));
+  BOOST_CHECK((*cp5.m_wrench)(cp2.m_wrench->min())==(*cp2.m_wrench)(cp2.m_wrench->min()));
+  BOOST_CHECK((*cp5.m_zmp)(cp2.m_zmp->min())==(*cp2.m_zmp)(cp2.m_zmp->min()));
+  BOOST_CHECK((*cp5.m_root)(cp2.m_root->min()).isApprox((*cp2.m_root)(cp2.m_root->min())));
+  BOOST_CHECK(cp5.contactForces() == cp2.contactForces());
+  BOOST_CHECK(cp5.contactNormalForces() == cp2.contactNormalForces());
+  BOOST_CHECK(cp5.effectorTrajectories() == cp2.effectorTrajectories());
+  BOOST_CHECK(cp5.effectorsInContact() == cp2.effectorsInContact());
+  BOOST_CHECK(cp5.contactPatches() == cp2.contactPatches());
+  BOOST_CHECK(cp5.contactForces("left_leg") == cp2.contactForces("left_leg"));
+  BOOST_CHECK(cp5.contactNormalForces("left_leg") == cp2.contactNormalForces("left_leg"));
+  BOOST_CHECK(cp5.contactForces("right_hand") == cp2.contactForces("right_hand"));
+  BOOST_CHECK(cp5.contactNormalForces("right_hand") == cp2.contactNormalForces("right_hand"));
+  BOOST_CHECK(cp5.effectorTrajectories("right_leg") == cp2.effectorTrajectories("right_leg"));
+  BOOST_CHECK(cp5.effectorTrajectories("knee") == cp2.effectorTrajectories("knee"));
+  BOOST_CHECK(cp5.contactPatch("left_leg") == cp2.contactPatch("left_leg"));
+  BOOST_CHECK(cp5.contactPatch("right_hand") == cp2.contactPatch("right_hand"));
+
+  // check operator != and ==
   pointX_t p = point3_t::Random();
   cp5.m_c_init = p;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_c_init == p);
-  BOOST_CHECK(cp3.m_c_init != p);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_c_init != p);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   p = point3_t::Random();
   cp5.m_dc_init = p;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_dc_init == p);
-  BOOST_CHECK(cp3.m_dc_init != p);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_dc_init != p);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   p = point3_t::Random();
   cp5.m_ddc_init = p;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_ddc_init == p);
-  BOOST_CHECK(cp3.m_ddc_init != p);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_ddc_init != p);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   p = point3_t::Random();
   cp5.m_L_init = p;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_L_init == p);
-  BOOST_CHECK(cp3.m_L_init != p);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_L_init != p);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   p = point3_t::Random();
   cp5.m_dL_init = p;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_dL_init == p);
-  BOOST_CHECK(cp3.m_dL_init != p);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_dL_init != p);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   p = point12_t::Random();
   cp5.m_q_init = p;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_q_init == p);
-  BOOST_CHECK(cp3.m_q_init != p);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_q_init != p);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   p = point3_t::Random();
   cp5.m_c_final = p;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_c_final == p);
-  BOOST_CHECK(cp3.m_c_final != p);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_c_final != p);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   p = point3_t::Random();
   cp5.m_dc_final = p;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_dc_final == p);
-  BOOST_CHECK(cp3.m_dc_final != p);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_dc_final != p);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   p = point3_t::Random();
   cp5.m_ddc_final = p;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_ddc_final == p);
-  BOOST_CHECK(cp3.m_ddc_final != p);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_ddc_final != p);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   p = point3_t::Random();
   cp5.m_L_final = p;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_L_final == p);
-  BOOST_CHECK(cp3.m_L_final != p);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_L_final != p);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   p = point3_t::Random();
   cp5.m_dL_final = p;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_dL_final == p);
-  BOOST_CHECK(cp3.m_dL_final != p);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_dL_final != p);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   p = point12_t::Random();
   cp5.m_q_final = p;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_q_final == p);
-  BOOST_CHECK(cp3.m_q_final != p);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_q_final != p);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
 
   curve_ptr_t curve;
   curve = buildRandomPolynomial12D();
   cp5.m_q = curve;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_q == curve);
-  BOOST_CHECK(cp3.m_q != curve);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_q != curve);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   curve = buildRandomPolynomial12D();
   cp5.m_dq = curve;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_dq == curve);
-  BOOST_CHECK(cp3.m_dq != curve);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_dq != curve);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   curve = buildRandomPolynomial12D();
   cp5.m_ddq = curve;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_ddq == curve);
-  BOOST_CHECK(cp3.m_ddq != curve);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_ddq != curve);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   curve = buildRandomPolynomial12D();
   cp5.m_tau = curve;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_tau == curve);
-  BOOST_CHECK(cp3.m_tau != curve);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_tau != curve);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   curve = buildRandomPolynomial3D();
   cp5.m_c = curve;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_c == curve);
-  BOOST_CHECK(cp3.m_c != curve);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_c != curve);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   curve = buildRandomPolynomial3D();
   cp5.m_dc = curve;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_dc == curve);
-  BOOST_CHECK(cp3.m_dc != curve);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_dc != curve);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   curve = buildRandomPolynomial3D();
   cp5.m_ddc = curve;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_ddc == curve);
-  BOOST_CHECK(cp3.m_ddc != curve);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_ddc != curve);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   curve = buildRandomPolynomial3D();
   cp5.m_L = curve;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_L == curve);
-  BOOST_CHECK(cp3.m_L != curve);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_L != curve);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   curve = buildRandomPolynomial3D();
   cp5.m_dL = curve;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_dL == curve);
-  BOOST_CHECK(cp3.m_dL != curve);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_dL != curve);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   curve = buildRandomPolynomial3D();
   cp5.m_wrench = curve;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_wrench == curve);
-  BOOST_CHECK(cp3.m_wrench != curve);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_wrench != curve);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   curve = buildRandomPolynomial3D();
   cp5.m_zmp = curve;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_zmp == curve);
-  BOOST_CHECK(cp3.m_zmp != curve);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_zmp != curve);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
   curve_SE3_ptr_t curveSE3 = buildRandomSE3LinearTraj(1.5,2.9);
   cp5.m_root = curveSE3;
-  BOOST_CHECK(cp5 != cp3);
+  BOOST_CHECK(cp5 != cp2);
   BOOST_CHECK(cp5.m_root == curveSE3);
-  BOOST_CHECK(cp3.m_root != curveSE3);
-  cp5 = cp3;
-  BOOST_CHECK(cp5 == cp3);
+  BOOST_CHECK(cp2.m_root != curveSE3);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
+
+  cp5.removeContact("left_leg");
+  BOOST_CHECK(cp5 != cp2);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
+  cp5.addContact("test",ContactPatch(SE3::Identity().setRandom()));
+  BOOST_CHECK(cp5 != cp2);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
+  cp5.addEffectorTrajectory("knee",buildRandomSE3LinearTraj(cp5.timeInitial(),cp5.timeFinal()));
+  BOOST_CHECK(cp5 != cp2);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
+  cp5.addContactForceTrajectory("left_leg",buildRandomPolynomial12D());
+  BOOST_CHECK(cp5 != cp2);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
+  cp5.addContactNormalForceTrajectory("left_leg",buildRandomPolynomial1D());
+  BOOST_CHECK(cp5 != cp2);
+  cp5 = cp2;
+  BOOST_CHECK(cp5 == cp2);
+
+
+  // check that when removing the contact the trajectory are correctly deleted :
+  cp5.removeContact("left_leg");
+  BOOST_CHECK(!cp5.isEffectorInContact("left_leg"));
+  BOOST_CHECK(cp5.contactForces().count("left_leg") == 0);
+  BOOST_CHECK(cp5.contactNormalForces().count("left_leg") == 0);
+  // check that when adding a contact the effector trajectory is correctly deleted :
+  cp5.addContact("right_leg",patchR);
+  BOOST_CHECK(cp5.effectorTrajectories().count("right_leg") == 0);
+
   // check serialization
+  std::string fileName("fileTest");
+  ContactPhase cp_from_txt,cp_from_xml,cp_from_bin;
+  std::cout<<"cp2 before serialization : "<<std::endl<<cp2<<std::endl;
+
+  cp2.saveAsText(fileName+".txt");
+  cp_from_txt.loadFromText(fileName+".txt");
+  BOOST_CHECK(cp2 == cp_from_txt);
+  std::cout<<"cp2 after deserialization : "<<std::endl<<cp_from_txt<<std::endl;
+
+  cp2.saveAsXML(fileName+".xml","ContactPhase");
+  cp_from_xml.loadFromXML(fileName+".xml","ContactPhase");
+  BOOST_CHECK(cp2 == cp_from_xml);
+
+  cp2.saveAsBinary(fileName);
+  cp_from_bin.loadFromBinary(fileName);
+  BOOST_CHECK(cp2 == cp_from_bin);
+
+  explicitContactPhaseAssertEqual(cp2,cp_from_txt);
 
 }
 
