@@ -12,6 +12,7 @@
 #include "multicontact-api/scenario/contact-phase.hpp"
 //#include "multicontact-api/scenario/contact-sequence.hpp"
 
+#include <curves/fwd.h>
 #include <curves/so3_linear.h>
 #include <curves/se3_curve.h>
 #include <curves/polynomial.h>
@@ -20,24 +21,15 @@
 
 
 
-typedef Eigen::Vector3d point3_t;
-typedef Eigen::Matrix<double, 6, 1> point6_t;
+using curves::point3_t;
+using curves::point6_t;
 typedef Eigen::Matrix<double, 12, 1> point12_t;
-typedef Eigen::VectorXd pointX_t;
-typedef std::vector<pointX_t, Eigen::aligned_allocator<pointX_t> > t_pointX_t;
-typedef Eigen::Matrix<double, 3, 3> matrix3_t;
-typedef Eigen::Quaternion<double> quaternion_t;
-typedef curves::curve_abc<double, double, true, pointX_t> curve_abc_t;
-typedef boost::shared_ptr<curve_abc_t> curve_ptr_t;
-typedef curves::polynomial<double, double, true, pointX_t, t_pointX_t> polynomial_t;
-typedef curves::bezier_curve<double, double, true, pointX_t> bezier_curve_t;
-typedef curves::piecewise_curve<double, double, true, pointX_t, t_pointX_t, polynomial_t> piecewise_polynomial_curve_t;
-typedef Eigen::Transform<double, 3, Eigen::Affine> transform_t;
-typedef curves::SO3Linear<double, double, true> SO3Linear_t;
-typedef curves::SE3Curve<double, double, true> SE3Curve_t;
-typedef curves::piecewise_curve<double, double, true, SE3Curve_t::point_t, t_pointX_t, SE3Curve_t,SE3Curve_t::point_derivate_t> piecewise_SE3_curve_t;
-typedef curves::curve_abc<double, double, true, transform_t,point6_t> curve_SE3_t;
-typedef boost::shared_ptr<curve_SE3_t> curve_SE3_ptr;
+using curves::pointX_t;
+using curves::matrix3_t;
+using curves::quaternion_t;
+using curves::t_pointX_t;
+using curves::curve_ptr_t;
+using curves::curve_SE3_ptr_t;
 
 using namespace multicontact_api::scenario;
 
@@ -95,9 +87,9 @@ curve_ptr_t buildPiecewisePolynomialC2(){
   time_points.push_back(t2);
   time_points.push_back(t3);
 
-  piecewise_polynomial_curve_t ppc_C2 = piecewise_polynomial_curve_t::convert_discrete_points_to_polynomial<polynomial_t>(
+  curves::piecewise_t ppc_C2 = curves::piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
           points, points_derivative, points_second_derivative, time_points);
-  curve_ptr_t res(new piecewise_polynomial_curve_t(ppc_C2));
+  curve_ptr_t res(new curves::piecewise_t(ppc_C2));
   return res;
 }
 
@@ -117,7 +109,7 @@ curve_ptr_t buildRandomPolynomial(){
   vec.push_back(b);
   vec.push_back(c);
   vec.push_back(d);
-  curve_ptr_t res (new polynomial_t(vec.begin(), vec.end(), min, max));
+  curve_ptr_t res (new curves::polynomial_t(vec.begin(), vec.end(), min, max));
   return  res;
 }
 
@@ -131,7 +123,7 @@ curve_ptr_t buildRandomPolynomial12D(){
 
 
 
-curve_SE3_ptr buildPiecewiseSE3(){
+curve_SE3_ptr_t buildPiecewiseSE3(){
   const double min = 0.5;
   const double mid = 1.2;
   const double max = 2.;
@@ -139,7 +131,7 @@ curve_SE3_ptr buildPiecewiseSE3(){
   quaternion_t q1(0., 1., 0, 0);
   pointX_t p0 = point3_t(1., 1.5, -2.);
   pointX_t p1 = point3_t(3., 0, 1.);
-  SE3Curve_t cLinear(p0, p1, q0, q1, min, mid);
+  curve_SE3_ptr_t cLinear(new curves::SE3Curve_t(p0, p1, q0, q1, min, mid));
   point3_t a(1, 2, 3);
   point3_t b(2, 3, 4);
   point3_t c(3, 4, 5);
@@ -149,12 +141,12 @@ curve_SE3_ptr buildPiecewiseSE3(){
   params.push_back(b);
   params.push_back(c);
   params.push_back(d);
-  boost::shared_ptr<bezier_curve_t> translation_bezier(new bezier_curve_t(params.begin(), params.end(), mid, max));
-  SE3Curve_t cBezier(translation_bezier, q0.toRotationMatrix(), q1.toRotationMatrix());
+  boost::shared_ptr<curves::bezier_t> translation_bezier(new curves::bezier_t(params.begin(), params.end(), mid, max));
+  curve_SE3_ptr_t cBezier(new curves::SE3Curve_t(translation_bezier, q0.toRotationMatrix(), q1.toRotationMatrix()));
 
-  piecewise_SE3_curve_t piecewiseSE3(cLinear);
-  piecewiseSE3.add_curve(cBezier);
-  curve_SE3_ptr res = boost::make_shared<piecewise_SE3_curve_t>(piecewiseSE3);
+  curves::piecewise_SE3_t piecewiseSE3(cLinear);
+  piecewiseSE3.add_curve_ptr(cBezier);
+  curve_SE3_ptr_t res = boost::make_shared<curves::piecewise_SE3_t>(piecewiseSE3);
   return res;
 
 }
@@ -168,13 +160,13 @@ quaternion_t randomQuaternion(){ // already included in newest eigen release
   return quaternion_t(a * sin(u2), a * cos(u2), b * sin(u3), b * cos(u3)).normalized();
 }
 
-curve_SE3_ptr buildRandomSE3LinearTraj(const double min, const double max){
+curve_SE3_ptr_t buildRandomSE3LinearTraj(const double min, const double max){
   quaternion_t q0 = randomQuaternion();
   quaternion_t q1 = randomQuaternion();
   pointX_t p0 = point3_t::Random();
   pointX_t p1 = point3_t::Random();
 
-  curve_SE3_ptr res(new SE3Curve_t(p0, p1, q0, q1, min, max));
+  curve_SE3_ptr_t res(new curves::SE3Curve_t(p0, p1, q0, q1, min, max));
   return res;
 }
 
@@ -332,7 +324,7 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   pointX_t f1 = point12_t::Random();
   const double min = 0.5;
   const double max = 2.;
-  curve_ptr_t force12d(new polynomial_t(f0, f1, min, max));
+  curve_ptr_t force12d(new curves::polynomial_t(f0, f1, min, max));
   bool newTraj = cp2.addContactForceTrajectory("left_leg",force12d);
   BOOST_CHECK(newTraj);
   newTraj = cp2.addContactForceTrajectory("left_leg",force12d);
@@ -345,7 +337,7 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   BOOST_CHECK((*cp2.contactForces("left_leg"))(1.2) == (*force12d)(1.2));
   pointX_t f0_1 = point12_t::Random();
   pointX_t f1_1 = point12_t::Random();
-  curve_ptr_t force12d_1(new polynomial_t(f0_1, f1_1, min, max));
+  curve_ptr_t force12d_1(new curves::polynomial_t(f0_1, f1_1, min, max));
   cp2.contactForces().insert(std::pair<std::string,curve_ptr_t>("right_leg",force12d_1)); // should not have any effect only const getter
   BOOST_CHECK(cp2.contactForces().count("right_leg") == 0);
   cp2.contactForces().erase("left_leg"); // should not have any effect
@@ -365,7 +357,7 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   nf0 << 56.3;
   pointX_t nf1(1);
   nf1 << 5893.2;
-  curve_ptr_t force1d(new polynomial_t(nf0, nf1, min, max));
+  curve_ptr_t force1d(new curves::polynomial_t(nf0, nf1, min, max));
   newTraj = cp2.addContactNormalForceTrajectory("left_leg",force1d);
   BOOST_CHECK(newTraj);
   newTraj = cp2.addContactNormalForceTrajectory("left_leg",force1d);
@@ -380,7 +372,7 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   nf0_1 << 147.2;
   pointX_t nf1_1(1);
   nf1_1 << 562;
-  curve_ptr_t force1d_1(new polynomial_t(nf0_1, nf1_1, min, max));
+  curve_ptr_t force1d_1(new curves::polynomial_t(nf0_1, nf1_1, min, max));
   cp2.contactNormalForces().insert(std::pair<std::string,curve_ptr_t>("right_leg",force1d_1)); // should not have any effect only const getter
   BOOST_CHECK(cp2.contactNormalForces().count("right_leg") == 0);
   cp2.contactNormalForces().erase("left_leg"); // should not have any effect
@@ -390,7 +382,7 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   BOOST_CHECK_THROW(cp2.addContactNormalForceTrajectory("left_leg",force12d),std::invalid_argument); // should be of dimension 1 
 
   // Check effector trajectory : 
-  curve_SE3_ptr effR = buildPiecewiseSE3();
+  curve_SE3_ptr_t effR = buildPiecewiseSE3();
   newTraj = cp2.addEffectorTrajectory("right_leg",effR);
   BOOST_CHECK(newTraj);
   newTraj = cp2.addEffectorTrajectory("right_leg",effR);
@@ -482,7 +474,7 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   curve_ptr m_dL;
   curve_ptr m_wrench;
   curve_ptr m_zmp;
-  curve_SE3_ptr m_root;
+  curve_SE3_ptr_t m_root;
   */
   { // inner scope to check that the curves are not destroyed
   curve_ptr_t q = buildRandomPolynomial12D();
@@ -496,7 +488,7 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   curve_ptr_t dL = buildRandomPolynomial3D();
   curve_ptr_t wrench = buildRandomPolynomial3D();
   curve_ptr_t zmp = buildRandomPolynomial3D();
-  curve_SE3_ptr root = buildRandomSE3LinearTraj(1,5.5);
+  curve_SE3_ptr_t root = buildRandomSE3LinearTraj(1,5.5);
   cp3.m_q = q;
   cp3.m_dq = dq;
   cp3.m_ddq = ddq;
@@ -754,7 +746,7 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   BOOST_CHECK(cp3.m_zmp != curve);
   cp5 = cp3;
   BOOST_CHECK(cp5 == cp3);
-  curve_SE3_ptr curveSE3 = buildRandomSE3LinearTraj(1.5,2.9);
+  curve_SE3_ptr_t curveSE3 = buildRandomSE3LinearTraj(1.5,2.9);
   cp5.m_root = curveSE3;
   BOOST_CHECK(cp5 != cp3);
   BOOST_CHECK(cp5.m_root == curveSE3);
