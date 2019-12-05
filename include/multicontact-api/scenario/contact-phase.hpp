@@ -14,10 +14,10 @@
 #include <set>
 #include <string>
 #include <sstream>
+#include <boost/shared_ptr.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/set.hpp>
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 #include <curves/serialization/registeration.hpp>
 
 namespace multicontact_api{
@@ -182,18 +182,18 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
           m_L_final == other.m_L_final &&
           m_dL_final == other.m_dL_final &&
           m_q_final == other.m_q_final &&
-          m_q == other.m_q &&
-          m_dq == other.m_dq &&
-          m_ddq == other.m_ddq &&
-          m_tau == other.m_tau &&
-          m_c == other.m_c &&
-          m_dc == other.m_dc &&
-          m_ddc == other.m_ddc &&
-          m_L == other.m_L &&
-          m_dL == other.m_dL &&
-          m_wrench == other.m_wrench &&
-          m_zmp == other.m_zmp &&
-          m_root == other.m_root &&
+          (m_q == other.m_q || *m_q == *other.m_q)&&
+          (m_dq == other.m_dq || *m_dq == *other.m_dq)&&
+          (m_ddq == other.m_ddq || *m_ddq == *other.m_ddq)&&
+          (m_tau == other.m_tau || *m_tau == *other.m_tau)&&
+          (m_c == other.m_c || *m_c == *other.m_c)&&
+          (m_dc == other.m_dc || *m_dc == *other.m_dc)&&
+          (m_ddc == other.m_ddc || *m_ddc == *other.m_ddc)&&
+          (m_L == other.m_L || *m_L == *other.m_L)&&
+          (m_dL == other.m_dL || *m_dL == *other.m_dL)&&
+          (m_wrench == other.m_wrench || *m_wrench == *other.m_wrench)&&
+          (m_zmp == other.m_zmp || *m_zmp == *other.m_zmp)&&
+          (m_root == other.m_root || *m_root == *other.m_root)&&
           m_contact_forces == other.m_contact_forces &&
           m_contact_normal_force == other.m_contact_normal_force &&
           m_effector_trajectories == other.m_effector_trajectories &&
@@ -511,7 +511,35 @@ private:
    ar& boost::serialization::make_nvp("t_final", m_t_final);
  }
 
+
+
 }; //struct contact phase
+
+// define operator == for map of shared ptr: start by checking if the ptr are same, otherwise check if the values are the sames
+bool operator==(const ContactPhase::CurveMap& a,const ContactPhase::CurveMap& b){
+  if(a.size() != b.size())
+    return false;
+  for(ContactPhase::CurveMap::const_iterator it = a.begin() ; it != a.end() ; ++it){
+    if(b.count(it->first) < 1)
+      return false;
+    if((it->second != b.at(it->first)) && (*it->second != *b.at(it->first)))
+      return false;
+  }
+  return true;
+}
+
+bool operator==(const ContactPhase::CurveSE3Map& a,const ContactPhase::CurveSE3Map& b){
+  if(a.size() != b.size())
+    return false;
+  for(ContactPhase::CurveSE3Map::const_iterator it = a.begin() ; it != a.end() ; ++it){
+    if(b.count(it->first) < 1)
+      return false;
+    if((it->second != b.at(it->first)) && (*it->second != *b.at(it->first)))
+      return false;
+  }
+  return true;
+}
+
 } //scenario
 }// multicontact-api
 
