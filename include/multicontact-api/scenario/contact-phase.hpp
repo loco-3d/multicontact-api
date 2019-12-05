@@ -313,7 +313,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
     if(m_effector_in_contact.count(eeName) == 0)
       throw std::invalid_argument("Cannot add a contact force trajectory for effector "+eeName+" as it is not in contact for the current phase.");
     bool alreadyExist(m_contact_forces.count(eeName));
-    if(m_contact_forces.count(eeName))
+    if(alreadyExist)
       m_contact_forces.erase(eeName);
     m_contact_forces.insert(std::pair<std::string,curve_ptr>(eeName,trajectory));
     return !alreadyExist;
@@ -333,7 +333,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
     if(trajectory->dim() != 1)
       throw std::invalid_argument("Contact normal force trajectory must be of dimension 1");
     bool alreadyExist(m_contact_normal_force.count(eeName));
-    if(m_contact_normal_force.count(eeName))
+    if(alreadyExist)
       m_contact_normal_force.erase(eeName);
     m_contact_normal_force.insert(std::pair<std::string,curve_ptr>(eeName,trajectory));
     return !alreadyExist;
@@ -350,7 +350,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
     if(m_effector_in_contact.count(eeName) > 0)
       throw std::invalid_argument("Cannot add an effector trajectory for effector "+eeName+" as it is in contact for the current phase.");
     bool alreadyExist(m_effector_trajectories.count(eeName));
-    if(m_effector_trajectories.count(eeName))
+    if(alreadyExist)
       m_effector_trajectories.erase(eeName);
     m_effector_trajectories.insert(std::pair<std::string,curve_SE3_ptr>(eeName,trajectory));
     return !alreadyExist;
@@ -405,6 +405,27 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
   }
 
   /**
+   * @brief effectorsWithTrajectory return a set of all effectors for which an effector trajectory have been defined
+   * @return a set of all effectors for which an effector trajectory have been defined
+   */
+  std::set<std::string> effectorsWithTrajectory() const{
+    std::set<std::string> effectors;
+    for(typename CurveSE3Map::const_iterator mit = m_effector_trajectories.begin() ; mit != m_effector_trajectories.end(); ++mit)
+    {
+      effectors.insert(mit->first);
+    }
+    return effectors;
+  }
+
+  /**
+   * @brief effectorHaveAtrajectory check if an end effector trajectory have been defined for a given effector
+   * @param eeName the effector name
+   * @return true if there is a trajectory defined, false otherwise
+   */
+  bool effectorHaveAtrajectory(const std::string& eeName) const {
+    return m_effector_trajectories.count(eeName);
+  }
+  /**
    * @brief isConsistent check if all the members of the phase are consistent together:
    * - There is a contact patch defined for all effector in contact
    * - There is only contact forces for the effector defined in contact
@@ -433,7 +454,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
     state1.block(0,3,3,1) = m_L_final;
     state1.block(0,4,3,1) = m_dL_final;
 
-    os <<"Contact phase defined for t \in ["<<m_t_init<<";"<<m_t_final<<"]"<<std::endl
+    os<<"Contact phase defined for t \in ["<<m_t_init<<";"<<m_t_final<<"]"<<std::endl
       << "Conecting (c0,dc0,ddc0,L0,dL0) = "<<std::endl<<state0<<std::endl
       << "to        (c0,dc0,ddc0,L0,dL0) = "<<std::endl<<state1<<std::endl;
     os << "Effectors in contact "<<m_effector_in_contact.size()<<" : "<<std::endl;
