@@ -169,6 +169,8 @@ quaternion_t randomQuaternion(){ // already included in newest eigen release
 curve_SE3_ptr_t buildRandomSE3LinearTraj(const double min, const double max){
   quaternion_t q0 = randomQuaternion();
   quaternion_t q1 = randomQuaternion();
+  q0.normalize();
+  q1.normalize();
   pointX_t p0 = point3_t::Random();
   pointX_t p1 = point3_t::Random();
 
@@ -214,16 +216,48 @@ void explicitContactPhaseAssertEqual(ContactPhase& cp1, ContactPhase& cp2){
   BOOST_CHECK((*cp1.m_wrench)(cp2.m_wrench->min())==(*cp2.m_wrench)(cp2.m_wrench->min()));
   BOOST_CHECK((*cp1.m_zmp)(cp2.m_zmp->min())==(*cp2.m_zmp)(cp2.m_zmp->min()));
   BOOST_CHECK((*cp1.m_root)(cp2.m_root->min()).isApprox((*cp2.m_root)(cp2.m_root->min())));
+  BOOST_CHECK(*cp1.m_q == *cp2.m_q);
+  BOOST_CHECK(*cp1.m_dq == *cp2.m_dq);
+  BOOST_CHECK(*cp1.m_ddq == *cp2.m_ddq);
+  BOOST_CHECK(*cp1.m_tau == *cp2.m_tau);
+  BOOST_CHECK(*cp1.m_c == *cp2.m_c);
+  BOOST_CHECK(*cp1.m_dc == *cp2.m_dc);
+  BOOST_CHECK(*cp1.m_ddc == *cp2.m_ddc);
+  BOOST_CHECK(*cp1.m_L == *cp2.m_L);
+  BOOST_CHECK(*cp1.m_dL == *cp2.m_dL);
+  BOOST_CHECK(*cp1.m_wrench == *cp2.m_wrench);
+  BOOST_CHECK(*cp1.m_zmp == *cp2.m_zmp);
+  BOOST_CHECK(*cp1.m_root == *cp2.m_root);
   BOOST_CHECK(cp1.contactForces() == cp2.contactForces());
   BOOST_CHECK(cp1.contactNormalForces() == cp2.contactNormalForces());
   BOOST_CHECK(cp1.effectorTrajectories() == cp2.effectorTrajectories());
   BOOST_CHECK(cp1.effectorsInContact() == cp2.effectorsInContact());
   BOOST_CHECK(cp1.contactPatches() == cp2.contactPatches());
   for(std::set<std::string>::const_iterator ee = cp1.effectorsInContact().begin() ; ee != cp1.effectorsInContact().end() ; ++ee){
-    std::cout<<" for effector "<<*ee<<std::endl;
+    std::cout<<"## For effector "<<*ee<<std::endl;
+    BOOST_CHECK(cp2.isEffectorInContact(*ee));
     BOOST_CHECK(cp1.contactPatch(*ee) == cp2.contactPatch(*ee));
-    BOOST_CHECK(cp1.contactForces(*ee) == cp2.contactForces(*ee));
-    BOOST_CHECK(cp1.contactNormalForces(*ee) == cp2.contactNormalForces(*ee));
+    if(cp1.contactForces().count(*ee)){
+      BOOST_CHECK(cp2.contactForces().count(*ee));
+      BOOST_CHECK(*cp1.contactForces(*ee) == *cp2.contactForces(*ee));
+      BOOST_CHECK((*cp1.contactForces(*ee))(cp1.contactForces(*ee)->min()) == (*cp2.contactForces(*ee))(cp2.contactForces(*ee)->min()));
+      BOOST_CHECK((*cp1.contactForces(*ee))(cp1.contactForces(*ee)->max()) == (*cp2.contactForces(*ee))(cp2.contactForces(*ee)->max()));
+    }
+    if(cp1.contactNormalForces().count(*ee)){
+      BOOST_CHECK(cp2.contactNormalForces().count(*ee));
+      BOOST_CHECK(*cp1.contactNormalForces(*ee) == *cp2.contactNormalForces(*ee));
+      BOOST_CHECK((*cp1.contactNormalForces(*ee))(cp1.contactNormalForces(*ee)->min()) == (*cp2.contactNormalForces(*ee))(cp2.contactNormalForces(*ee)->min()));
+      BOOST_CHECK((*cp1.contactNormalForces(*ee))(cp1.contactNormalForces(*ee)->max()) == (*cp2.contactNormalForces(*ee))(cp2.contactNormalForces(*ee)->max()));
+    }
+  }
+  const ContactPhase::CurveSE3Map trajMap = cp2.effectorTrajectories();
+  for (ContactPhase::CurveSE3Map::const_iterator mit = trajMap.begin() ; mit != trajMap.end(); ++mit)
+  {
+    std::cout<<"## For effector trajectory "<<mit->first<<std::endl;
+    BOOST_CHECK(cp2.effectorTrajectories().count(mit->first));
+    BOOST_CHECK(*cp1.effectorTrajectories(mit->first) == *cp2.effectorTrajectories(mit->first));
+    BOOST_CHECK((*cp1.effectorTrajectories(mit->first))(cp1.effectorTrajectories(mit->first)->min()).isApprox((*cp2.effectorTrajectories(mit->first))(cp2.effectorTrajectories(mit->first)->min())));
+    BOOST_CHECK((*cp1.effectorTrajectories(mit->first))(cp1.effectorTrajectories(mit->first)->max()).isApprox((*cp2.effectorTrajectories(mit->first))(cp2.effectorTrajectories(mit->first)->max())));
   }
 }
 
@@ -588,13 +622,45 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   BOOST_CHECK_NO_THROW(cp2.m_zmp->operator()(cp2.m_zmp->min())); // check that the curves still exist after leaving the scope
 
 
-  // check copy constructor and operator ==
-  //first add more contact and trajectories :
+  //add more contact and trajectories :
   cp2.addContact("right_hand",ContactPatch(SE3::Identity().setRandom()));
   cp2.addContactForceTrajectory("right_hand",buildRandomPolynomial12D());
   cp2.addContactNormalForceTrajectory("right_hand",buildRandomPolynomial1D());
-  cp2.addEffectorTrajectory("knee",buildRandomSE3LinearTraj(cp2.timeInitial(),cp2.timeFinal()));
+  int num_ctc = 0;
+  for (ContactPhase::CurveMap::const_iterator mit = cp2.contactForces().begin() ; mit != cp2.contactForces().end(); ++mit)
+  {
+    BOOST_CHECK(mit->first == "right_hand" || mit->first == "left_leg");
+    num_ctc ++;
+  }
+  BOOST_CHECK(num_ctc == 2);
 
+  curve_SE3_ptr_t eff_knee(buildRandomSE3LinearTraj(cp2.timeInitial(),cp2.timeFinal()));
+  double min_knee = eff_knee->min();
+  double max_knee = eff_knee->max();
+  newTraj = cp2.addEffectorTrajectory("knee",eff_knee);
+  BOOST_CHECK(newTraj);
+  BOOST_CHECK((*cp2.effectorTrajectories()["knee"])(min_knee).isApprox((*eff_knee)(min_knee)));
+  BOOST_CHECK((*cp2.effectorTrajectories()["knee"])(max_knee).isApprox((*eff_knee)(max_knee)));
+  BOOST_CHECK((*cp2.effectorTrajectories()["right_leg"])(min).isApprox((*effR)(min)));
+  BOOST_CHECK((*cp2.effectorTrajectories()["right_leg"])(max).isApprox((*effR)(max)));
+  BOOST_CHECK((*cp2.effectorTrajectories()["right_leg"])(1.2).isApprox((*effR)(1.2)));
+  BOOST_CHECK(cp2.effectorTrajectories().size() == 2);
+  int num_eff_traj = 0;
+  const ContactPhase::CurveSE3Map trajMap = cp2.effectorTrajectories();
+  for (ContactPhase::CurveSE3Map::const_iterator mit = trajMap.begin() ; mit != trajMap.end(); ++mit)
+  {
+    BOOST_CHECK(mit->first == "knee" || mit->first == "right_leg");
+    num_eff_traj ++;
+  }
+  BOOST_CHECK(num_eff_traj == 2);
+  BOOST_CHECK(cp2.effectorsWithTrajectory().size() == 2);
+  BOOST_CHECK(cp2.effectorsWithTrajectory().count("right_leg"));
+  BOOST_CHECK(cp2.effectorsWithTrajectory().count("knee"));
+  BOOST_CHECK(cp2.effectorHaveAtrajectory("knee"));
+  BOOST_CHECK(cp2.effectorHaveAtrajectory("right_leg"));
+  BOOST_CHECK(!cp2.effectorHaveAtrajectory("left_leg"));
+
+  // check copy constructor and operator ==
   ContactPhase cp4(cp2);
   ContactPhase cp5 = cp2;
   BOOST_CHECK(cp2 != cp1);
