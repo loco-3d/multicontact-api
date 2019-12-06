@@ -8,7 +8,6 @@ namespace multicontact_api {
 namespace python {
 void exposeContactPhase() {
   ContactPhasePythonVisitor<multicontact_api::scenario::ContactPhase4>::expose("ContactPhase4");
-  //ContactPhaseHumanoidPythonVisitor<multicontact_api::scenario::ContactPhaseHumanoid>::expose("ContactPhaseHumanoid");
 }
 }
 

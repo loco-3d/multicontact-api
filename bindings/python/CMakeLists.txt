@@ -8,8 +8,8 @@ SET(${PROJECT_NAME}_PYTHON_SOURCES
   geometry/second-order-cone.cpp
   scenario/contact-model.cpp
   scenario/contact-patch.cpp
-  scenario/contact-phase.cpp
-  scenario/contact-sequence.cpp
+  #scenario/contact-phase.cpp
+  #scenario/contact-sequence.cpp
   scenario/enums.cpp
   )
 
