@@ -270,8 +270,14 @@ BOOST_AUTO_TEST_CASE(contact_model) {
 
   ContactModelPlanar mp1(mu, ZMP_radius);
   ContactModelPlanar mp2(mp1);
+  BOOST_CHECK(mp1.m_mu == mu);
+  BOOST_CHECK(mp1.m_ZMP_radius == ZMP_radius);
 
   BOOST_CHECK(mp1 == mp2);
+  mp1.m_mu = 0.5;
+  BOOST_CHECK(mp1 != mp2);
+
+  //TODO : check serialization
 }
 
 BOOST_AUTO_TEST_CASE(contact_patch) {
