@@ -362,6 +362,8 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   BOOST_CHECK(cp1.timeInitial() == 0.5);
   BOOST_CHECK(cp1.timeFinal() == 3.5);
   BOOST_CHECK(cp1.duration() == 3.);
+  BOOST_CHECK(cp1.numContacts() == 0);
+
   // check exeptions related to wrong timing 
   BOOST_CHECK_THROW(cp1.timeFinal(0.1),std::invalid_argument);
   BOOST_CHECK_THROW(cp1.duration(-2.),std::invalid_argument);
@@ -382,6 +384,7 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   BOOST_CHECK(cp2.isEffectorInContact("left_leg"));  BOOST_CHECK(!cp2.isEffectorInContact("other"));
   BOOST_CHECK(cp2.contactPatch("left_leg") == patchL);
   BOOST_CHECK(cp2.contactPatches()["left_leg"] == patchL);
+  BOOST_CHECK(cp2.numContacts() == 1);
   BOOST_CHECK_THROW(cp2.contactPatch("other"),std::invalid_argument);
 
   ContactPatch patchR(SE3::Identity().setRandom());
@@ -405,11 +408,13 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   BOOST_CHECK(cp2.isEffectorInContact("left_leg"));
   BOOST_CHECK(cp2.isEffectorInContact("right_leg"));
   BOOST_CHECK(cp2.contactPatch("left_leg") != patchL);
+  BOOST_CHECK(cp2.numContacts() == 2);
 
   bool exist = cp2.removeContact("right_leg");
   BOOST_CHECK(exist);
   BOOST_CHECK(cp2.isEffectorInContact("left_leg"));
   BOOST_CHECK(!cp2.isEffectorInContact("right_leg"));
+  BOOST_CHECK(cp2.numContacts() == 1);
   exist = cp2.removeContact("other");
   BOOST_CHECK(!exist);
   exist = cp2.removeContact("right_leg");

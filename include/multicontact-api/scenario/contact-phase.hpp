@@ -397,6 +397,10 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
     return existed;
   }
 
+  std::size_t numContacts() const{
+    return m_effector_in_contact.size();
+  }
+
   std::set<std::string> effectorsInContact() const{
     return m_effector_in_contact;
   }
