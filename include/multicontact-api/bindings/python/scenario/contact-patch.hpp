@@ -29,11 +29,11 @@ struct ContactPatchPythonVisitor : public boost::python::def_visitor<ContactPatc
         .def(bp::init<ContactPatch>(bp::arg("other"), "Copy contructor."))
         .add_property("placement",
                       // getter require to use "make_function" to pass the return_internal_reference policy (return ref to custom object)
-                      bp::make_function((SE3 & (ContactPatch::*)(void)) &ContactPatch::placement,bp::return_internal_reference<>()),
+                      bp::make_function(&getPlacement,bp::return_internal_reference<>()),
                       &setPlacement,
                       "Placement of the patch represented as a pinocchio SE3 object.")
         .add_property("friction",
-                      bp::make_function((Scalar & (ContactPatch::*)(void)) &ContactPatch::friction,bp::return_value_policy<bp::return_by_value>()),
+                      bp::make_function(&getFriction,bp::return_value_policy<bp::return_by_value>()),
                       &setFriction,
                       "Friction coefficient between the robot and the environment for this contact.")
         .def(bp::self == bp::self)
@@ -50,8 +50,10 @@ struct ContactPatchPythonVisitor : public boost::python::def_visitor<ContactPatc
   }
 
  protected:
-  // define setter
+  // define setter and getter
+  static SE3& getPlacement(ContactPatch& self){return self.placement();}
   static void setPlacement(ContactPatch& self, const SE3& placement) { self.placement() = placement; }
+  static Scalar& getFriction(ContactPatch& self){return self.friction();}
   static void setFriction(ContactPatch& self, const Scalar& friction) { self.friction() = friction; }
   static ContactPatch copy(const ContactPatch& self) { return ContactPatch(self); }
 };
