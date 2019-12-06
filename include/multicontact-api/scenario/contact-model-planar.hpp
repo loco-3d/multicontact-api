@@ -37,7 +37,7 @@ struct ContactModelPlanarTpl : public serialization::Serializable<ContactModelPl
 
   template <typename S2>
   bool operator!=(const ContactModelPlanarTpl<S2>& other) const {
-    return !(*this != other);
+    return !(*this == other);
   }
 
   void disp(std::ostream& os) const {
