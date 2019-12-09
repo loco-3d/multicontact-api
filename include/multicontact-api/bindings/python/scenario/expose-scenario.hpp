@@ -15,7 +15,7 @@ void exposeContactModels();
 
 inline void exposeScenario() {
   exposeContactPatch();
-  //exposeContactPhase();
+  exposeContactPhase();
   //exposeContactSequence();
   exposeScenarioEnums();
   exposeContactModels();

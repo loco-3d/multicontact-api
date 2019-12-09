@@ -10,12 +10,10 @@
 
 #include "multicontact-api/scenario/contact-phase.hpp"
 #include "multicontact-api/bindings/python/serialization/archive.hpp"
-#include "multicontact-api/bindings/python/container/array.hpp"
-#include "multicontact-api/bindings/python/container/visitor.hpp"
-#include "multicontact-api/bindings/python/container/reference-wrapper.hpp"
+#include "multicontact-api/bindings/python/utils/printable.hpp"
 
 #include <boost/python/suite/indexing/map_indexing_suite.hpp>
-
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 namespace multicontact_api{
 namespace python{
@@ -27,80 +25,88 @@ namespace python{
       : public bp::def_visitor< ContactPhasePythonVisitor<ContactPhase> >
   {
     typedef typename ContactPhase::Scalar Scalar;
-    typedef typename ContactPhase::SOC6 SOC6;
-    typedef typename ContactPhase::WrenchCone WrenchCone;
-    typedef typename ContactPhase::ContactPatchVector ContactPatchVector;
     typedef typename ContactPhase::ContactPatch ContactPatch;
     typedef typename ContactPhase::SE3 SE3;
-    typedef typename ContactPhase::Matrix6x Matrix6x;
+    typedef typename ContactPhase::t_strings t_strings;
+
+    // call macro for all ContactPhase methods that can be overloaded
+    BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(isConsistent_overloads,ContactPhase::isConsistent,0,1)
+
+
 
     template<class PyClass>
     void visit(PyClass & cl) const
     {
-      cl
-          .def(bp::init<>(bp::arg(""),"Default constructor."))
-          .def(bp::init<ContactPhase>(bp::args("other"),"Copy contructor."))
-          .def("numActivePatches",&ContactPhase::numActivePatches,"Returns the number of active patches.")
-          .def("getActivePatches",&ContactPhase::getActivePatches,"Returns the vector of active patches.")
+//      bp::class_<t_strings>("std_vector_strings")
+//          .def(bp::vector_indexing_suite<t_strings>() );
 
-          .add_property("sowc",
-                        bp::make_function(&getSOWC,bp::return_internal_reference<>()),
-                        &setSOWC,
-                        "Second order conic constraint representing the Wrench Cone of contact forces of the patches."
-                        )
-          .add_property("sowc_placement",
-                        bp::make_function(&getSOWCPlacement,bp::return_internal_reference<>()),
-                        &setSOWCPlacement,
-                        "Returns the placement of the SDWC."
-                        )
-          .add_property("double_description",
-                        &getDoubleDescription,
-                        &setDoubleDescription,
-                        "Returns the double description of the LWC."
-                        )
-          .add_property("lwc",
-                        bp::make_function(&getLWC,bp::return_internal_reference<>()),
-                        &setLWC,
-                        "Linear cone constraint representing the Wrench Cone of contact forces of the patches."
-                        )
-          .def(bp::self == bp::self)
-          .def(bp::self != bp::self);
-
+      // define bindings for maps
       bp::class_< typename ContactPhase::ContactPatchMap >("StdMap_string_contactPatch")
           .def(bp::map_indexing_suite< typename ContactPhase::ContactPatchMap >() )
           ;
 
-      // Expose related types
-      related();
+      bp::class_< typename ContactPhase::CurveMap >("StdMap_string_curve")
+          .def(bp::map_indexing_suite< typename ContactPhase::CurveMap >() )
+          ;
+
+      bp::class_< typename ContactPhase::CurveSE3Map >("StdMap_string_curveSE3")
+          .def(bp::map_indexing_suite< typename ContactPhase::CurveSE3Map >() )
+          ;
+
+
+      cl
+          .def(bp::init<>(bp::arg(""),"Default constructor."))
+          .def(bp::init<Scalar,Scalar>(bp::args("t_init","t_final"),"Constructor with time interval."))
+          .def(bp::init<ContactPhase>(bp::arg("other"),"Copy contructor."))
+          .add_property("timeInitial", &getTimeInitial, &setTimeInitial,
+                        "The time at the begining of this contact phase.")
+          .add_property("timeFinal", &getTimeFinal, &setTimeFinal,
+                        "The time at the end of this contact phase.")
+          .add_property("duration", &getDuration, &setDuration,
+                        "The duration this contact phase.")
+          .def("numContacts",&ContactPhase::numContacts,"Returns the number of active contacts.")
+          .def("effectorsInContact",&effectorsInContactAsList,"Returns the names of the effectors in contact.")
+          .def("isConsistent",&ContactPhase::isConsistent,isConsistent_overloads( bp::arg("throw_if_invalid"),
+                  "isConsistent check if all the members of the phase are consistent together."
+                  "if throw_if_invalid == True it raise an error instead of returning False."))
+          .def(bp::self == bp::self)
+          .def(bp::self != bp::self);
+
     }
 
     static void expose(const std::string& class_name) {
       std::string doc = "Contact Phase";
       bp::class_<ContactPhase>(class_name.c_str(), doc.c_str(), bp::no_init)
           .def(ContactPhasePythonVisitor<ContactPhase>())
-          .def(SerializableVisitor<ContactPhase>());
-
-      // Expose related types
-      related();
+          .def(SerializableVisitor<ContactPhase>())
+          .def(PrintableVisitor<ContactPhase>());
     }
 
-    static void related() {
-      VectorPythonVisitor<ContactPatchVector, true>::expose(typeid(ContactPatchVector).name());
-      reference_wrapper_converter<typename ContactPatchVector::value_type>::expose();
-    }
 
   protected:
-    static SOC6& getSOWC(ContactPhase& self) { return self.sowc(); }
-    static void setSOWC(ContactPhase& self, const SOC6& cone) { self.sowc() = cone; }
 
-    static Matrix6x getDoubleDescription(const ContactPhase& self) { return self.doubleDescription(); }
-    static void setDoubleDescription(ContactPhase& self, const Matrix6x& mat) { self.doubleDescription() = mat; }
+    // Converts a C++ vector to a python list
+    // Note : lot of overhead, should not be used for large vector and/or operations called frequently.
+    // prefer the direct bindings with StdMap_string_contactPatch for this cases.
+    template <class T>
+    static bp::list toPythonList(std::vector<T> vector) {
+        typename std::vector<T>::const_iterator iter;
+        boost::python::list list;
+        for (iter = vector.begin(); iter != vector.end(); ++iter) {
+            list.append(*iter);
+        }
+        return list;
+    }
 
-    static SE3& getSOWCPlacement(ContactPhase& self) { return self.sowcPlacement(); }
-    static void setSOWCPlacement(ContactPhase& self, const SE3& placement) { self.sowcPlacement() = placement; }
+    // define getter and setter (because they are overloaded in c++)
+    static Scalar getTimeInitial(ContactPhase& self){return self.timeInitial();}
+    static void setTimeInitial(ContactPhase& self, const Scalar& time) { self.timeInitial(time); }
+    static Scalar getTimeFinal(ContactPhase& self){return self.timeFinal();}
+    static void setTimeFinal(ContactPhase& self, const Scalar& time) { self.timeFinal(time);  }
+    static Scalar getDuration(ContactPhase& self){return self.duration();}
+    static void setDuration(ContactPhase& self, const Scalar& time) { self.duration(time);  }
 
-    static WrenchCone& getLWC(ContactPhase& self) { return self.lwc(); }
-    static void setLWC(ContactPhase& self, const WrenchCone& cone) { self.lwc() = cone; }
+    static bp::list effectorsInContactAsList(ContactPhase& self){return toPythonList<std::string>(self.effectorsInContact());}
   };
 }  // namespace python
 }  // namespace multicontact_api
