@@ -8,7 +8,7 @@ from math import sqrt,sin,cos
 import multicontact_api
 multicontact_api.switchToNumpyArray()
 
-from multicontact_api import ContactModelPlanar,ContactPatch
+from multicontact_api import ContactModelPlanar,ContactPatch,ContactPhase
 from pinocchio import SE3,Quaternion
 
 
@@ -109,8 +109,52 @@ class ContactPatchTest(unittest.TestCase):
     cp1.placement.setRandom()
     self.assertTrue(cp1 != cp2)
 
+  def test_serialization(self):
+    #TODO
+    pass
+
+class ContactPhaseTest(unittest.TestCase):
+
+  def test_default_constructor(self):
+    cp = ContactPhase()
+    self.assertEqual(cp.timeInitial,-1)
+    self.assertEqual(cp.timeFinal,-1)
+    self.assertEqual(cp.duration,0)
+    self.assertEqual(cp.numContacts(),0)
+    self.assertEqual(len(cp.effectorsInContact()),0)
+
+  def test_constructor_with_arguments(self):
+    cp = ContactPhase(1,5)
+    self.assertEqual(cp.timeInitial,1)
+    self.assertEqual(cp.timeFinal,5)
+    self.assertEqual(cp.duration,4)
+    self.assertEqual(cp.numContacts(),0)
+    self.assertEqual(len(cp.effectorsInContact()),0)
+    with self.assertRaises(ValueError):
+      cp = ContactPhase(1,0.5)
+
+
+  def test_timings_setter(self):
+    cp = ContactPhase()
+    cp.timeInitial = 1.5
+    cp.timeFinal = 3.
+    self.assertEqual(cp.timeInitial,1.5)
+    self.assertEqual(cp.timeFinal,3.)
+    self.assertEqual(cp.duration,1.5)
+    cp.duration = 2.
+    self.assertEqual(cp.timeInitial,1.5)
+    self.assertEqual(cp.timeFinal,3.5)
+    self.assertEqual(cp.duration,2.)
+    with self.assertRaises(ValueError):
+      cp.timeFinal = 1.
+    with self.assertRaises(ValueError):
+      cp.duration = -0.5
+
+
+
+
 
 
 if __name__ == '__main__':
-    unittest.main()
+  unittest.main()
 
