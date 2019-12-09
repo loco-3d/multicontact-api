@@ -233,7 +233,8 @@ void explicitContactPhaseAssertEqual(ContactPhase& cp1, ContactPhase& cp2){
   BOOST_CHECK(cp1.effectorTrajectories() == cp2.effectorTrajectories());
   BOOST_CHECK(cp1.effectorsInContact() == cp2.effectorsInContact());
   BOOST_CHECK(cp1.contactPatches() == cp2.contactPatches());
-  for(std::set<std::string>::const_iterator ee = cp1.effectorsInContact().begin() ; ee != cp1.effectorsInContact().end() ; ++ee){
+  const ContactPhase::t_strings eeNames = cp2.effectorsInContact();
+  for(ContactPhase::t_strings::const_iterator ee = eeNames.begin() ; ee != eeNames.end() ; ++ee){
     std::cout<<"## For effector "<<*ee<<std::endl;
     BOOST_CHECK(cp2.isEffectorInContact(*ee));
     BOOST_CHECK(cp1.contactPatch(*ee) == cp2.contactPatch(*ee));
@@ -665,8 +666,6 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   }
   BOOST_CHECK(num_eff_traj == 2);
   BOOST_CHECK(cp2.effectorsWithTrajectory().size() == 2);
-  BOOST_CHECK(cp2.effectorsWithTrajectory().count("right_leg"));
-  BOOST_CHECK(cp2.effectorsWithTrajectory().count("knee"));
   BOOST_CHECK(cp2.effectorHaveAtrajectory("knee"));
   BOOST_CHECK(cp2.effectorHaveAtrajectory("right_leg"));
   BOOST_CHECK(!cp2.effectorHaveAtrajectory("left_leg"));
