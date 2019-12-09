@@ -467,9 +467,9 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
     state1.block(0,3,3,1) = m_L_final;
     state1.block(0,4,3,1) = m_dL_final;
 
-    os<<"Contact phase defined for t \in ["<<m_t_init<<";"<<m_t_final<<"]"<<std::endl
-      << "Conecting (c0,dc0,ddc0,L0,dL0) = "<<std::endl<<state0<<std::endl
-      << "to        (c0,dc0,ddc0,L0,dL0) = "<<std::endl<<state1<<std::endl;
+    os<<"Contact phase defined for t \\in ["<<m_t_init<<";"<<m_t_final<<"]"<<std::endl
+     << "Conecting (c0,dc0,ddc0,L0,dL0) = "<<std::endl<<state0<<std::endl
+     << "to        (c0,dc0,ddc0,L0,dL0) = "<<std::endl<<state1<<std::endl;
     os << "Effectors in contact "<<m_effector_in_contact.size()<<" : "<<std::endl;
     for(t_strings::const_iterator ee = m_effector_in_contact.begin() ; ee != m_effector_in_contact.end() ; ++ee){
       os << "______________________________________________"<<std::endl
