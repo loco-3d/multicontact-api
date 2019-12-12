@@ -10,7 +10,8 @@ multicontact_api.switchToNumpyArray()
 
 from multicontact_api import ContactModelPlanar,ContactPatch,ContactPhase
 from pinocchio import SE3,Quaternion
-
+import curves
+from curves import SE3Curve,polynomial,bezier,piecewise,piecewise_SE3
 
 def randomQuaternion():
   u1 = uniform(0.,1.)
@@ -150,8 +151,96 @@ class ContactPhaseTest(unittest.TestCase):
     with self.assertRaises(ValueError):
       cp.duration = -0.5
 
+  def test_contact_methods(self):
+    cp = ContactPhase(1.5,3)
+    p = SE3()
+    p.setRandom()
+    patchRF = ContactPatch(p,0.5)
+    new = cp.addContact("right-leg",patchRF)
+    self.assertTrue(new)
+    self.assertTrue(cp.isEffectorInContact("right-leg"))
+    self.assertTrue("right-leg" in cp.effectorsInContact())
+    self.assertEqual(patchRF,cp.contactPatch("right-leg"))
+    self.assertEqual(cp.numContacts(),1)
+
+    # add another contact :
+    p = SE3()
+    p.setRandom()
+    patchLF = ContactPatch(p,0.5)
+    new = cp.addContact("left-leg",patchLF)
+    self.assertTrue(new)
+    self.assertTrue(cp.isEffectorInContact("right-leg"))
+    self.assertTrue("right-leg" in cp.effectorsInContact())
+    self.assertEqual(patchRF,cp.contactPatch("right-leg"))
+    self.assertTrue(cp.isEffectorInContact("left-leg"))
+    self.assertTrue("left-leg" in cp.effectorsInContact())
+    self.assertEqual(patchLF,cp.contactPatch("left-leg"))
+    self.assertEqual(cp.numContacts(),2)
+    # check that the patch can be overwritten:
+    p = SE3()
+    p.setRandom()
+    patchRF2 = ContactPatch(p,0.5)
+    new = cp.addContact("right-leg",patchRF2)
+    self.assertFalse(new)
+
+    # check deletion of contacts :
+    exist = cp.removeContact("right-leg")
+    self.assertTrue(exist)
+    self.assertTrue(cp.isEffectorInContact("left-leg"))
+    self.assertTrue("left-leg" in cp.effectorsInContact())
+    self.assertEqual(patchLF,cp.contactPatch("left-leg"))
+    self.assertEqual(cp.numContacts(),1)
+    self.assertFalse(cp.isEffectorInContact("right-leg"))
+    self.assertFalse("right-leg" in cp.effectorsInContact())
+    with self.assertRaises(ValueError):
+      cp.contactPatch("right-leg")
+    exist = cp.removeContact("right-leg")
+    self.assertFalse(exist)
+
+    exist = cp.removeContact("left-leg")
+    self.assertTrue(exist)
+    self.assertFalse(cp.isEffectorInContact("left-leg"))
+    self.assertFalse("left-leg" in cp.effectorsInContact())
+    self.assertFalse(cp.isEffectorInContact("right-leg"))
+    self.assertFalse("right-leg" in cp.effectorsInContact())
+    self.assertEqual(cp.numContacts(),0)
+
+  def test_contact_patch_access(self):
+    cp = ContactPhase(1.5,3)
+    p = SE3()
+    p.setRandom()
+    patchRF = ContactPatch(p,0.5)
+    cp.addContact("right-leg",patchRF)
+    # check that the contactPatch have been copied and it's not a pointer :
+    patchRF.placement.setRandom()
+    self.assertNotEqual(patchRF,cp.contactPatch("right-leg"))
+    patchRF = ContactPatch(cp.contactPatch("right-leg"))
+    self.assertEqual(patchRF,cp.contactPatch("right-leg"))
+    patchRF.placement.translation += np.array([0,0.1,0])
+    self.assertNotEqual(patchRF,cp.contactPatch("right-leg"))
+    patchRF =  ContactPatch(cp.contactPatch("right-leg"))
+    # check that the getter of contactPatch is a non const reference:
+    cp.contactPatch('right-leg').placement.setRandom()
+    self.assertNotEqual(patchRF,cp.contactPatch("right-leg"))
+    patchRF =  ContactPatch(cp.contactPatch("right-leg"))
+    cp.contactPatch('right-leg').friction = 0.7
+    self.assertNotEqual(patchRF,cp.contactPatch("right-leg"))
+    patchRF =  ContactPatch(cp.contactPatch("right-leg"))
+    cp.contactPatch("right-leg").placement.translation += np.array([0,0.1,0])
+    self.assertNotEqual(patchRF,cp.contactPatch("right-leg"))
+
+    patchRF = cp.contactPatch("right-leg")
+    self.assertEqual(patchRF,cp.contactPatch("right-leg"))
+    patchRF.placement.translation += np.array([0,0.1,0])
+    self.assertEqual(patchRF,cp.contactPatch("right-leg"))
 
 
+  def test_effector_trajectory(self):
+    cp = ContactPhase(1.5,3)
+    p = SE3()
+    p.setRandom()
+    patchRF = ContactPatch(p,0.5)
+    cp.addContact("right-leg",patchRF)
 
 
 
