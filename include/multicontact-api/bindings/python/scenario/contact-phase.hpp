@@ -15,6 +15,7 @@
 #include <boost/python/suite/indexing/map_indexing_suite.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
+
 namespace multicontact_api{
 namespace python{
 
@@ -28,6 +29,9 @@ namespace python{
     typedef typename ContactPhase::ContactPatch ContactPatch;
     typedef typename ContactPhase::SE3 SE3;
     typedef typename ContactPhase::t_strings t_strings;
+    typedef typename ContactPhase::curve_ptr curve_ptr;
+    typedef typename ContactPhase::curve_SE3_ptr curve_SE3_ptr;
+
 
     // call macro for all ContactPhase methods that can be overloaded
     BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(isConsistent_overloads,ContactPhase::isConsistent,0,1)
@@ -64,10 +68,58 @@ namespace python{
                         "The time at the end of this contact phase.")
           .add_property("duration", &getDuration, &setDuration,
                         "The duration this contact phase.")
+          // accessor to map with key
+          .def("contactForce", &contactForcesFromKey,bp::arg("effector_name"),
+               "Return a pointer to the contact force trajectory for this effector.\n"
+               "Throw a ValueError if the effector is not in contact.")
+          .def("contactNormalForce", &contactNormalForcesFromKey,bp::arg("effector_name"),
+               "Return a pointer to the contact normal force trajectory for this effector.\n"
+               "Throw a ValueError if the effector is not in contact.")
+          .def("effectorTrajectory", &effectorTrajectoriesFromKey,bp::arg("effector_name"),
+               "Return a pointer to the effector trajectory (in SE3) for this effector.\n"
+               "Throw a ValueError if the effector is in contact.")
+          .def("contactPatch", &contactPatchFromKey,bp::arg("effector_name"),bp::return_internal_reference<>(),
+               "Return the ContactPatch object for this effector.\n"
+               "Throw a ValueError if the effector is not in contact.")
+          // Bindings of the maps:
+
+          // adding trajectory to map :
+          .def("addContactForceTrajectory", &ContactPhase::addContactForceTrajectory,bp::args("effector_name","trajectory"),
+               "Add a trajectory to the map of contact forces.\n"
+               "If a trajectory already exist for this effector, it is overwritted.\n"
+               "Throw invalid_argument if eeName is not defined in contact for this phase.\n"
+               "Return false if a trajectory already existed (and have been overwrited) true otherwise.")
+          .def("addContactNormalForceTrajectory", &ContactPhase::addContactNormalForceTrajectory,bp::args("effector_name","trajectory"),
+               "Add a trajectory to the map of contact normal forces.\n"
+               "If a trajectory already exist for this effector, it is overwritted.\n"
+               "Throw a ValueError if eeName is not defined in contact for this phase.\n"
+               "Throw a ValueError if trajectory is not of dimension 1.\n"
+               "Return false if a trajectory already existed (and have been overwrited) true otherwise.")
+          .def("addEffectorTrajectory", &ContactPhase::addEffectorTrajectory,bp::args("effector_name","trajectory"),
+               "Add a trajectory to the map of effector trajectories.\n"
+               "If a trajectory already exist for this effector, it is overwritted.\n"
+               "Throw a ValueError if eeName is defined in contact for this phase.\n"
+               "Return false if a trajectory already existed (and have been overwrited) true otherwise.")
+          // contacts
+          .def("addContact", &ContactPhase::addContact,bp::args("effector_name","patch"),
+               "Add a new contact patch for effector_name to this contact phase\n"
+               "If a contact phase already exist for this effector, it is overwritted.\n"
+               "If an end effector trajectory exist for this contact, it is removed.\n"
+               "Return false if a contact for this effector already existed (and have been overwrited) true otherwise.")
+          .def("removeContact", &ContactPhase::removeContact,bp::arg("effector_name"),
+               "Remove the contact for effector_name.\n"
+               "This will also remove the contact_patch, all the contact_forces and contact_normal_forces related to this contact.\n"
+               "Return true if the effector was in contact, false otherwise")
           .def("numContacts",&ContactPhase::numContacts,"Returns the number of active contacts.")
+          .def("isEffectorInContact",&ContactPhase::isEffectorInContact,bp::arg("effector_name"),
+               "Returns True if the given effector_name is in contact for this phase, False otherwise.")
           .def("effectorsInContact",&effectorsInContactAsList,"Returns the names of the effectors in contact.")
+          .def("effectorHaveAtrajectory",&ContactPhase::effectorHaveAtrajectory,bp::arg("effector_name"),
+               "Returns True if the given effector_name have an effector_trajectory defined in this phase, False otherwise.")
+          .def("effectorsWithTrajectory",&effectorsWithTrajectoryAsList,
+               "Returns the names of the effectors for which an end effector trajectory have been defined in this phase.")
           .def("isConsistent",&ContactPhase::isConsistent,isConsistent_overloads( bp::arg("throw_if_invalid"),
-                  "isConsistent check if all the members of the phase are consistent together."
+                  "isConsistent check if all the members of the phase are consistent together.\n"
                   "if throw_if_invalid == True it raise an error instead of returning False."))
           .def(bp::self == bp::self)
           .def(bp::self != bp::self);
@@ -85,6 +137,21 @@ namespace python{
 
   protected:
 
+
+    // define getter and setter (because they are overloaded in c++)
+    static Scalar getTimeInitial(ContactPhase& self){return self.timeInitial();}
+    static void setTimeInitial(ContactPhase& self, const Scalar& time) { self.timeInitial(time); }
+    static Scalar getTimeFinal(ContactPhase& self){return self.timeFinal();}
+    static void setTimeFinal(ContactPhase& self, const Scalar& time) { self.timeFinal(time);  }
+    static Scalar getDuration(ContactPhase& self){return self.duration();}
+    static void setDuration(ContactPhase& self, const Scalar& time) { self.duration(time);  }
+
+    // accessor to map with key:
+    static curve_ptr contactForcesFromKey(ContactPhase& self,const std::string& eeName){return self.contactForces(eeName);}
+    static curve_ptr contactNormalForcesFromKey(ContactPhase& self,const std::string& eeName){return self.contactNormalForces(eeName);}
+    static curve_SE3_ptr effectorTrajectoriesFromKey(ContactPhase& self,const std::string& eeName){return self.effectorTrajectories(eeName);}
+    static ContactPatch& contactPatchFromKey(ContactPhase& self,const std::string& eeName){return self.contactPatch(eeName);}
+
     // Converts a C++ vector to a python list
     // Note : lot of overhead, should not be used for large vector and/or operations called frequently.
     // prefer the direct bindings with StdMap_string_contactPatch for this cases.
@@ -97,16 +164,9 @@ namespace python{
         }
         return list;
     }
-
-    // define getter and setter (because they are overloaded in c++)
-    static Scalar getTimeInitial(ContactPhase& self){return self.timeInitial();}
-    static void setTimeInitial(ContactPhase& self, const Scalar& time) { self.timeInitial(time); }
-    static Scalar getTimeFinal(ContactPhase& self){return self.timeFinal();}
-    static void setTimeFinal(ContactPhase& self, const Scalar& time) { self.timeFinal(time);  }
-    static Scalar getDuration(ContactPhase& self){return self.duration();}
-    static void setDuration(ContactPhase& self, const Scalar& time) { self.duration(time);  }
-
     static bp::list effectorsInContactAsList(ContactPhase& self){return toPythonList<std::string>(self.effectorsInContact());}
+    static bp::list effectorsWithTrajectoryAsList(ContactPhase& self){return toPythonList<std::string>(self.effectorsWithTrajectory());}
+
   };
 }  // namespace python
 }  // namespace multicontact_api
