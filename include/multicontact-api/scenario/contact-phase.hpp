@@ -359,7 +359,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
   }
 
   ContactPatchMap contactPatches() const {return m_contact_patches;}
-  ContactPatch contactPatch(const std::string& eeName) {
+  ContactPatch& contactPatch(const std::string& eeName) {
     if(m_contact_patches.count(eeName) == 0){
       throw std::invalid_argument("This contact phase do not contain any contact patch for the effector "+eeName);
     }else{
