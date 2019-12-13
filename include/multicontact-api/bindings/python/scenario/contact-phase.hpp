@@ -82,7 +82,14 @@ namespace python{
                "Return the ContactPatch object for this effector.\n"
                "Throw a ValueError if the effector is not in contact.")
           // Bindings of the maps:
-
+          .def("contactPatches", &contactPatchesAsDict,
+               "Return a CONST dict EffectorName:ContactPatch")
+          .def("contactForces", &contactForcesAsDict,
+               "Return a CONST dict EffectorName:contact force")
+          .def("contactNormalForces", &contactNormalForcesAsDict,
+               "Return a CONST dict EffectorName:contact normal force")
+          .def("effectorTrajectories", &effectorTrajectoriesAsDict,
+               "Return a CONST dict EffectorName:effector trajectory")
           // adding trajectory to map :
           .def("addContactForceTrajectory", &ContactPhase::addContactForceTrajectory,bp::args("effector_name","trajectory"),
                "Add a trajectory to the map of contact forces.\n"
@@ -154,7 +161,7 @@ namespace python{
 
     // Converts a C++ vector to a python list
     // Note : lot of overhead, should not be used for large vector and/or operations called frequently.
-    // prefer the direct bindings with StdMap_string_contactPatch for this cases.
+    // prefer the direct bindings with std_vector_strings for this cases.
     template <class T>
     static bp::list toPythonList(std::vector<T> vector) {
         typename std::vector<T>::const_iterator iter;
@@ -166,6 +173,25 @@ namespace python{
     }
     static bp::list effectorsInContactAsList(ContactPhase& self){return toPythonList<std::string>(self.effectorsInContact());}
     static bp::list effectorsWithTrajectoryAsList(ContactPhase& self){return toPythonList<std::string>(self.effectorsWithTrajectory());}
+
+    // Converts a C++ map to a python dict
+    // Note : lot of overhead, should not be used for large map and/or operations called frequently.
+    // prefer the direct bindings with std_map_* for this cases.
+    template <class T>
+    static bp::dict toPythonDict(std::map<std::string,T> map) {
+        typename std::map<std::string,T>::const_iterator iter;
+        bp::dict dict;
+        for (iter = map.begin(); iter != map.end(); ++iter) {
+            dict[iter->first] = iter->second;
+        }
+        return dict;
+    }
+
+    static bp::dict contactPatchesAsDict(ContactPhase& self){return toPythonDict<ContactPatch>(self.contactPatches());}
+    static bp::dict contactForcesAsDict(ContactPhase& self){return toPythonDict<curve_ptr>(self.contactForces());}
+    static bp::dict contactNormalForcesAsDict(ContactPhase& self){return toPythonDict<curve_ptr>(self.contactNormalForces());}
+    static bp::dict effectorTrajectoriesAsDict(ContactPhase& self){return toPythonDict<curve_SE3_ptr>(self.effectorTrajectories());}
+
 
   };
 }  // namespace python
