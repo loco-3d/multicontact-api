@@ -248,6 +248,51 @@ class ContactPhaseTest(unittest.TestCase):
       cp.contactPatch("left-leg")
 
 
+  def test_contact_patch_dict(self):
+    cp = ContactPhase(1.5,3)
+    p = SE3()
+    p.setRandom()
+    patchRF = ContactPatch(p,0.5)
+    cp.addContact("right-leg",patchRF)
+    dict = cp.contactPatches()
+    self.assertTrue("right-leg" in dict.keys())
+    self.assertEqual(dict["right-leg"],patchRF)
+    self.assertEqual(len(dict.keys()),1)
+
+    # add another contact :
+    p = SE3()
+    p.setRandom()
+    patchLF = ContactPatch(p,0.5)
+    cp.addContact("left-leg",patchLF)
+    #check that it's not a pointer :
+    self.assertEqual(len(dict.keys()),1)
+    self.assertFalse("left-leg" in dict.keys())
+    #check that the contact have been added
+    dict = cp.contactPatches()
+    self.assertTrue("right-leg" in dict.keys())
+    self.assertTrue("left-leg" in dict.keys())
+    self.assertEqual(dict["right-leg"],patchRF)
+    self.assertEqual(dict["left-leg"],patchLF)
+    self.assertEqual(len(dict.keys()),2)
+
+    # check that changing the dict doesn't change the contact phase:
+    p = SE3()
+    p.setRandom()
+    patch2 = ContactPatch(p,0.5)
+    dict.update({"test":patch2})
+    self.assertFalse("test" in cp.contactPatches().keys())
+    # check that the map is const
+    cp.contactPatches().update({"test":patch2}) # should not have any effect
+    self.assertFalse("test" in cp.contactPatches().keys())
+
+    # check deletion :
+    cp.removeContact("right-leg")
+    dict = cp.contactPatches()
+    self.assertFalse("right-leg" in dict.keys())
+    self.assertTrue("left-leg" in dict.keys())
+    self.assertEqual(dict["left-leg"],patchLF)
+    self.assertEqual(len(dict.keys()),1)
+
   def test_effector_trajectory(self):
     cp = ContactPhase(1.5,3)
     p = SE3()
@@ -316,6 +361,45 @@ class ContactPhaseTest(unittest.TestCase):
     with self.assertRaises(BaseException):
       cp.addEffectorTrajectory("other-leg",a)
 
+  def test_effector_trajectory_dict(self):
+    cp = ContactPhase(1.5,3)
+    p = SE3()
+    p.setRandom()
+    patchRF = ContactPatch(p,0.5)
+    cp.addContact("right-leg",patchRF)
+    # create a SE3 trajectory :
+    init_pose = SE3.Identity()
+    end_pose = SE3.Identity()
+    init_pose.translation = array([0.2, -0.7, 0.6]).reshape(-1,1)
+    end_pose.translation = array([3.6, -2.2, -0.9]).reshape(-1,1)
+    init_pose.rotation = Quaternion.Identity().normalized().matrix()
+    end_pose.rotation = Quaternion(sqrt(2.) / 2., sqrt(2.) / 2., 0, 0).normalized().matrix()
+    effL = SE3Curve(init_pose, end_pose, 0.5, 2.5)
+    # add the trajectory to the contact phase :
+    cp.addEffectorTrajectory("left-leg",effL)
+    dict = cp.effectorTrajectories()
+    self.assertEqual(len(dict.keys()),1)
+    self.assertTrue("left-leg" in dict.keys())
+    self.assertEqual(dict["left-leg"],effL)
+    self.assertEqual(dict["left-leg"].min(),0.5)
+    self.assertEqual(dict["left-leg"].max(),2.5)
+    self.assertTrue(dict["left-leg"].evaluateAsSE3(0.5).isApprox(init_pose))
+    self.assertTrue(dict["left-leg"].evaluateAsSE3(2.5).isApprox(end_pose))
+
+    # check that changing the dict doesn't change the contact phase:
+    effH = piecewise_SE3(effL)
+    end_pose2 = SE3.Identity()
+    end_pose2.translation = array([-4.9, 0.8, 0.9]).reshape(-1,1)
+    end_pose2.rotation = Quaternion(sqrt(2.) / 2., 0., sqrt(2.) / 2., 0).normalized().matrix()
+    effH.append(end_pose2,4.)
+    dict.update({"hand":effH})
+    self.assertFalse("hand" in cp.effectorTrajectories().keys())
+    # check that the map is const
+    cp.effectorTrajectories().update({"hand":effH}) # should not have any effect
+    self.assertFalse("hand" in cp.effectorTrajectories().keys())
+
+
+
 
   def test_contact_force_trajectory(self):
     # create phase and add two contacts
@@ -360,6 +444,49 @@ class ContactPhaseTest(unittest.TestCase):
     # check errors :
     with self.assertRaises(ValueError):
       cp.addContactForceTrajectory("hand",fL)
+
+
+
+  def test_contact_force_trajectory_dict(self):
+    # create phase and add two contacts
+    cp = ContactPhase(1.5,3)
+    p = SE3()
+    p.setRandom()
+    cp.addContact("right-leg",ContactPatch(p,0.5))
+    p = SE3()
+    p.setRandom()
+    cp.addContact("left-leg",ContactPatch(p,0.5))
+    # create a polynomial 12D trajectory
+    fR = createRandomPiecewisePolynomial(12)
+    fL = createRandomPiecewisePolynomial(12)
+    cp.addContactForceTrajectory("right-leg",fR)
+    dict = cp.contactForces()
+    self.assertEqual(len(dict.keys()),1)
+    self.assertTrue("right-leg" in dict.keys())
+    self.assertEqual(dict["right-leg"],fR)
+    self.assertEqual(dict["right-leg"].min(),0)
+    self.assertEqual(dict["right-leg"].max(),2.)
+    self.assertTrue(array_equal(dict["right-leg"](0.5),fR(0.5)))
+    self.assertTrue(array_equal(dict["right-leg"](1.5),fR(1.5)))
+
+    cp.addContactForceTrajectory("left-leg",fL)
+    self.assertEqual(len(dict.keys()),1)
+    self.assertTrue("right-leg" in dict.keys())
+    self.assertFalse("left-leg" in dict.keys())
+    dict = cp.contactForces()
+    self.assertEqual(len(dict.keys()),2)
+    self.assertTrue("right-leg" in dict.keys())
+    self.assertTrue("left-leg" in dict.keys())
+
+    #check that changing the dict doesn"t change the contact phase
+    f2 = createRandomPiecewisePolynomial(12)
+    dict.update({"hand":f2})
+    self.assertFalse("hand" in cp.contactForces().keys())
+    # check that the map is const
+    cp.contactForces().update({"hand":f2}) # should not have any effect
+    self.assertFalse("hand" in cp.contactForces().keys())
+
+
 
   def test_contact_normal_force_trajectory(self):
     # create phase and add two contacts
@@ -410,8 +537,44 @@ class ContactPhaseTest(unittest.TestCase):
     with self.assertRaises(ValueError):
       cp.addContactNormalForceTrajectory("left-leg",fL)
 
+  def test_contact_normal_force_trajectory_dict(self):
+    # create phase and add two contacts
+    cp = ContactPhase(1.5,3)
+    p = SE3()
+    p.setRandom()
+    cp.addContact("right-leg",ContactPatch(p,0.5))
+    p = SE3()
+    p.setRandom()
+    cp.addContact("left-leg",ContactPatch(p,0.5))
+    # create a polynomial 12D trajectory
+    fR = createRandomPiecewisePolynomial(1)
+    fL = createRandomPiecewisePolynomial(1)
+    cp.addContactNormalForceTrajectory("right-leg",fR)
+    dict = cp.contactNormalForces()
+    self.assertEqual(len(dict.keys()),1)
+    self.assertTrue("right-leg" in dict.keys())
+    self.assertEqual(dict["right-leg"],fR)
+    self.assertEqual(dict["right-leg"].min(),0)
+    self.assertEqual(dict["right-leg"].max(),2.)
+    self.assertTrue(array_equal(dict["right-leg"](0.5),fR(0.5)))
+    self.assertTrue(array_equal(dict["right-leg"](1.5),fR(1.5)))
 
+    cp.addContactNormalForceTrajectory("left-leg",fL)
+    self.assertEqual(len(dict.keys()),1)
+    self.assertTrue("right-leg" in dict.keys())
+    self.assertFalse("left-leg" in dict.keys())
+    dict = cp.contactNormalForces()
+    self.assertEqual(len(dict.keys()),2)
+    self.assertTrue("right-leg" in dict.keys())
+    self.assertTrue("left-leg" in dict.keys())
 
+    #check that changing the dict doesn"t change the contact phase
+    f2 = createRandomPiecewisePolynomial(1)
+    dict.update({"hand":f2})
+    self.assertFalse("hand" in cp.contactNormalForces().keys())
+    # check that the map is const
+    cp.contactNormalForces().update({"hand":f2}) # should not have any effect
+    self.assertFalse("hand" in cp.contactNormalForces().keys())
 
 
 if __name__ == '__main__':
