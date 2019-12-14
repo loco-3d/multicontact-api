@@ -576,6 +576,96 @@ class ContactPhaseTest(unittest.TestCase):
     cp.contactNormalForces().update({"hand":f2}) # should not have any effect
     self.assertFalse("hand" in cp.contactNormalForces().keys())
 
+  def test_members_points(self):
+    cp = ContactPhase()
+    # check default values :
+    self.assertTrue(array_equal(np.zeros(3),cp.c_init))
+    self.assertTrue(array_equal(np.zeros(3),cp.dc_init))
+    self.assertTrue(array_equal(np.zeros(3),cp.ddc_init))
+    self.assertTrue(array_equal(np.zeros(3),cp.L_init))
+    self.assertTrue(array_equal(np.zeros(3),cp.dL_init))
+    self.assertTrue(array_equal(np.zeros(3),cp.c_final))
+    self.assertTrue(array_equal(np.zeros(3),cp.dc_final))
+    self.assertTrue(array_equal(np.zeros(3),cp.ddc_final))
+    self.assertTrue(array_equal(np.zeros(3),cp.L_final))
+    self.assertTrue(array_equal(np.zeros(3),cp.dL_final))
+    # set random values :
+    c_init= np.random.rand(3)
+    dc_init= np.random.rand(3)
+    ddc_init= np.random.rand(3)
+    L_init= np.random.rand(3)
+    dL_init= np.random.rand(3)
+    q_init= np.random.rand(35)
+    c_final= np.random.rand(3)
+    dc_final= np.random.rand(3)
+    ddc_final= np.random.rand(3)
+    L_final= np.random.rand(3)
+    dL_final= np.random.rand(3)
+    q_final= np.random.rand(35)
+    cp.c_init = c_init
+    cp.dc_init = dc_init
+    cp.ddc_init = ddc_init
+    cp.L_init = L_init
+    cp.dL_init = dL_init
+    cp.q_init = q_init
+    cp.c_final = c_final
+    cp.dc_final = dc_final
+    cp.ddc_final = ddc_final
+    cp.L_final = L_final
+    cp.dL_final = dL_final
+    cp.q_final = q_final
+    self.assertTrue(array_equal(cp.c_init,c_init))
+    self.assertTrue(array_equal(cp.dc_init,dc_init))
+    self.assertTrue(array_equal(cp.ddc_init,ddc_init))
+    self.assertTrue(array_equal(cp.L_init,L_init))
+    self.assertTrue(array_equal(cp.dL_init,dL_init))
+    self.assertTrue(array_equal(cp.q_init,q_init))
+    self.assertTrue(array_equal(cp.c_final,c_final))
+    self.assertTrue(array_equal(cp.dc_final,dc_final))
+    self.assertTrue(array_equal(cp.ddc_final,ddc_final))
+    self.assertTrue(array_equal(cp.L_final,L_final))
+    self.assertTrue(array_equal(cp.dL_final,dL_final))
+    self.assertTrue(array_equal(cp.q_final,q_final))
+    #check that it's not a pointer :
+    ci = cp.c_init
+    ci = np.random.rand(3)
+    self.assertFalse(array_equal(cp.c_init,ci))
+
+    # check error due to incorrect dimensions :
+    print("# Expected warning messages about dimension / column vector : ")
+    with self.assertRaises(BaseException):
+      cp.c_init = np.random.rand(4)
+    with self.assertRaises(BaseException):
+      cp.dc_init = np.random.rand(2)
+    with self.assertRaises(BaseException):
+      cp.ddc_init = np.random.rand(10)
+    with self.assertRaises(BaseException):
+      cp.L_init = np.random.rand(1)
+    with self.assertRaises(BaseException):
+      cp.dL_init = np.random.rand(4)
+    with self.assertRaises(BaseException):
+      cp.c_final = np.random.rand(5)
+    with self.assertRaises(BaseException):
+      cp.dc_final = np.random.rand(3,2)
+    with self.assertRaises(BaseException):
+      cp.ddc_final = np.random.rand(3,3)
+    with self.assertRaises(BaseException):
+      cp.L_final = np.random.rand(1,2)
+    with self.assertRaises(BaseException):
+      cp.dL_final = np.random.rand(1,3)
+    print("# End of Expected warning messages.")
+
+  def test_member_curves(self):
+    pass
+
+  def test_operator_equal(self):
+    pass
+
+  def test_copy_constructor(self):
+    pass
+
+  def test_contact_phase_serialization(self):
+    pass    #TODO
 
 if __name__ == '__main__':
   unittest.main()
