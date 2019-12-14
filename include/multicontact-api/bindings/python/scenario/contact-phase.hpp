@@ -5,6 +5,7 @@
 #define __multicontact_api_python_scenario_contact_phase_hpp__
 
 #include <pinocchio/fwd.hpp>
+#include <eigenpy/eigenpy.hpp>
 #include <eigenpy/memory.hpp>
 #include <typeinfo>
 
@@ -31,6 +32,9 @@ namespace python{
     typedef typename ContactPhase::t_strings t_strings;
     typedef typename ContactPhase::curve_ptr curve_ptr;
     typedef typename ContactPhase::curve_SE3_ptr curve_SE3_ptr;
+    typedef typename ContactPhase::point3_t point3_t;
+    typedef typename ContactPhase::point6_t point6_t;
+    typedef typename ContactPhase::pointX_t pointX_t;
 
 
     // call macro for all ContactPhase methods that can be overloaded
@@ -41,6 +45,8 @@ namespace python{
     template<class PyClass>
     void visit(PyClass & cl) const
     {
+
+
 //      bp::class_<t_strings>("std_vector_strings")
 //          .def(bp::vector_indexing_suite<t_strings>() );
 
@@ -57,7 +63,6 @@ namespace python{
           .def(bp::map_indexing_suite< typename ContactPhase::CurveSE3Map >() )
           ;
 
-
       cl
           .def(bp::init<>(bp::arg(""),"Default constructor."))
           .def(bp::init<Scalar,Scalar>(bp::args("t_init","t_final"),"Constructor with time interval."))
@@ -68,6 +73,43 @@ namespace python{
                         "The time at the end of this contact phase.")
           .add_property("duration", &getDuration, &setDuration,
                         "The duration this contact phase.")
+          // expose public members :
+          .add_property("c_init", &getCinit,&setCinit,
+                         "Initial 3D position of the center of mass for this contact phase")
+          .add_property("dc_init", &getDCinit,&setDCinit,
+                        "Initial linear velocity of the center of mass for this contact phase")
+          .add_property("ddc_init",  &getDDCinit,&setDDCinit,
+                        "Initial linear acceleration of the center of mass for this contact phase")
+          .add_property("L_init",  &getLinit,&setLinit,
+                        "Initial angular momentum for this contact phase")
+          .add_property("dL_init",  &getDLinit,&setDLinit,
+                        "Initial angular momentum derivative for this contact phase")
+          .add_property("q_init",  &getQinit,&setQinit,
+                        "Initial whole body configuration of this phase")
+          .add_property("c_final",  &getCfinal,&setCfinal,
+                        "Final 3D position of the center of mass for this contact phase")
+          .add_property("dc_final",  &getDCfinal,&setDCfinal,
+                        "Final linear velocity of the center of mass for this contact phase")
+          .add_property("ddc_final",  &getDDCfinal,&setDDCfinal,
+                        "Final linear acceleration of the center of mass for this contact phase")
+          .add_property("L_final", &getLfinal,&setLfinal,
+                        "Final angular momentum for this contact phase")
+          .add_property("dL_final", &getDLfinal,&setDLfinal,
+                        "Final angular momentum derivative for this contact phase")
+          .add_property("q_final",  &getQfinal,&setQfinal,
+                        "Final whole body configuration of this phase")
+          .def_readwrite("q_t", &ContactPhase::m_q)
+          .def_readwrite("dq_t", &ContactPhase::m_dq)
+          .def_readwrite("ddq_t", &ContactPhase::m_ddq)
+          .def_readwrite("tau_t", &ContactPhase::m_tau)
+          .def_readwrite("c_t", &ContactPhase::m_c)
+          .def_readwrite("dc_t", &ContactPhase::m_dc)
+          .def_readwrite("ddc_t", &ContactPhase::m_ddc)
+          .def_readwrite("L_t", &ContactPhase::m_L)
+          .def_readwrite("dL_t", &ContactPhase::m_dL)
+          .def_readwrite("wrench_t", &ContactPhase::m_wrench)
+          .def_readwrite("zmp_t", &ContactPhase::m_zmp)
+          .def_readwrite("root_t", &ContactPhase::m_root)
           // accessor to map with key
           .def("contactForce", &contactForcesFromKey,bp::arg("effector_name"),
                "Return a pointer to the contact force trajectory for this effector.\n"
@@ -139,6 +181,10 @@ namespace python{
           .def(ContactPhasePythonVisitor<ContactPhase>())
           .def(SerializableVisitor<ContactPhase>())
           .def(PrintableVisitor<ContactPhase>());
+
+      ENABLE_SPECIFIC_MATRIX_TYPE(point3_t);
+      ENABLE_SPECIFIC_MATRIX_TYPE(point6_t);
+      ENABLE_SPECIFIC_MATRIX_TYPE(pointX_t);
     }
 
 
@@ -152,6 +198,34 @@ namespace python{
     static void setTimeFinal(ContactPhase& self, const Scalar& time) { self.timeFinal(time);  }
     static Scalar getDuration(ContactPhase& self){return self.duration();}
     static void setDuration(ContactPhase& self, const Scalar& time) { self.duration(time);  }
+
+    //define setter and getter to class member
+    // FIXME why is it required ? a simple .def_readwrite make eigenpy fail with
+    // "No Python class registered for C++ class Eigen::Matrix<double, 3, 1, 0, 3, 1>"
+    static point3_t getCinit(ContactPhase& self){return self.m_c_init;}
+    static void setCinit(ContactPhase& self,const point3_t& val){self.m_c_init = val;}
+    static point3_t getDCinit(ContactPhase& self){return self.m_dc_init;}
+    static void setDCinit(ContactPhase& self,const point3_t& val){self.m_dc_init = val;}
+    static point3_t getDDCinit(ContactPhase& self){return self.m_ddc_init;}
+    static void setDDCinit(ContactPhase& self,const point3_t& val){self.m_ddc_init = val;}
+    static point3_t getLinit(ContactPhase& self){return self.m_L_init;}
+    static void setLinit(ContactPhase& self,const point3_t& val){self.m_L_init = val;}
+    static point3_t getDLinit(ContactPhase& self){return self.m_dL_init;}
+    static void setDLinit(ContactPhase& self,const point3_t& val){self.m_dL_init = val;}
+    static pointX_t getQinit(ContactPhase& self){return self.m_q_init;}
+    static void setQinit(ContactPhase& self,const pointX_t& val){self.m_q_init = val;}
+    static point3_t getCfinal(ContactPhase& self){return self.m_c_final;}
+    static void setCfinal(ContactPhase& self,const point3_t& val){self.m_c_final = val;}
+    static point3_t getDCfinal(ContactPhase& self){return self.m_dc_final;}
+    static void setDCfinal(ContactPhase& self,const point3_t& val){self.m_dc_final = val;}
+    static point3_t getDDCfinal(ContactPhase& self){return self.m_ddc_final;}
+    static void setDDCfinal(ContactPhase& self,const point3_t& val){self.m_ddc_final = val;}
+    static point3_t getLfinal(ContactPhase& self){return self.m_L_final;}
+    static void setLfinal(ContactPhase& self,const point3_t& val){self.m_L_final = val;}
+    static point3_t getDLfinal(ContactPhase& self){return self.m_dL_final;}
+    static void setDLfinal(ContactPhase& self,const point3_t& val){self.m_dL_final = val;}
+    static pointX_t getQfinal(ContactPhase& self){return self.m_q_final;}
+    static void setQfinal(ContactPhase& self,const pointX_t& val){self.m_q_final = val;}
 
     // accessor to map with key:
     static curve_ptr contactForcesFromKey(ContactPhase& self,const std::string& eeName){return self.contactForces(eeName);}
