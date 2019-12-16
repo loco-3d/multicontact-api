@@ -28,13 +28,22 @@ def randomQuaternion():
 
 # build random piecewise polynomial with 2 polynomial of degree 3
 # between 0;1 and 1;2
-def createRandomPiecewisePolynomial(dim):
+def createRandomPiecewisePolynomial(dim,t_min = 0,t_max = 2):
+  t_mid = (t_min+t_max)/2.
   coefs0 = np.random.rand(dim,4) # degree 3
-  pol0 = polynomial(coefs0)
+  pol0 = polynomial(coefs0,t_min,t_mid)
   pc = piecewise(pol0)
   coefs1 = np.random.rand(dim,4) # degree 3
-  pc.append(polynomial(coefs1,1,2))
+  pc.append(polynomial(coefs1,t_mid,t_max))
   return pc
+
+def createRandomSE3Traj(t_min = 0,t_max = 2):
+  p0 = SE3()
+  p0.setRandom()
+  p1 = SE3()
+  p1.setRandom()
+  curve = SE3Curve(p0,p1,t_min,t_max)
+  return curve
 
 class ContactModelTest(unittest.TestCase):
 
@@ -656,7 +665,97 @@ class ContactPhaseTest(unittest.TestCase):
     print("# End of Expected warning messages.")
 
   def test_member_curves(self):
-    pass
+    cp = ContactPhase()
+    # check default values :
+    self.assertIsNone(cp.q_t)
+    self.assertIsNone(cp.dq_t)
+    self.assertIsNone(cp.ddq_t)
+    self.assertIsNone(cp.tau_t)
+    self.assertIsNone(cp.c_t)
+    self.assertIsNone(cp.dc_t)
+    self.assertIsNone(cp.ddc_t)
+    self.assertIsNone(cp.L_t)
+    self.assertIsNone(cp.dL_t)
+    self.assertIsNone(cp.wrench_t)
+    self.assertIsNone(cp.zmp_t)
+    self.assertIsNone(cp.root_t)
+    # build random trajectories :
+    q = createRandomPiecewisePolynomial(31)
+    dq = createRandomPiecewisePolynomial(30)
+    ddq = createRandomPiecewisePolynomial(30)
+    tau = createRandomPiecewisePolynomial(30)
+    c = createRandomPiecewisePolynomial(3)
+    dc = createRandomPiecewisePolynomial(3)
+    ddc = createRandomPiecewisePolynomial(3)
+    L = createRandomPiecewisePolynomial(3)
+    dL = createRandomPiecewisePolynomial(3)
+    wrench = createRandomPiecewisePolynomial(6)
+    zmp = createRandomPiecewisePolynomial(3)
+    root = createRandomSE3Traj()
+    # assign trajectories :
+    cp.q_t = q
+    cp.dq_t = dq
+    cp.ddq_t = ddq
+    cp.tau_t = tau
+    cp.c_t = c
+    cp.dc_t = dc
+    cp.ddc_t = ddc
+    cp.L_t = L
+    cp.dL_t = dL
+    cp.wrench_t = wrench
+    cp.zmp_t = zmp
+    cp.root_t = root
+    # check getter :
+    self.assertEqual(cp.q_t , q)
+    self.assertEqual(cp.dq_t , dq)
+    self.assertEqual(cp.ddq_t , ddq)
+    self.assertEqual(cp.tau_t , tau)
+    self.assertEqual(cp.c_t , c)
+    self.assertEqual(cp.dc_t , dc)
+    self.assertEqual(cp.ddc_t , ddc)
+    self.assertEqual(cp.L_t , L)
+    self.assertEqual(cp.dL_t , dL)
+    self.assertEqual(cp.wrench_t , wrench)
+    self.assertEqual(cp.zmp_t , zmp)
+    self.assertEqual(cp.root_t , root)
+    for t in np.linspace(0.,2.,10):
+      self.assertTrue(array_equal(cp.q_t(t) , q(t)))
+      self.assertTrue(array_equal(cp.dq_t(t) , dq(t)))
+      self.assertTrue(array_equal(cp.ddq_t(t) , ddq(t)))
+      self.assertTrue(array_equal(cp.tau_t(t) , tau(t)))
+      self.assertTrue(array_equal(cp.c_t(t) , c(t)))
+      self.assertTrue(array_equal(cp.dc_t(t) , dc(t)))
+      self.assertTrue(array_equal(cp.ddc_t(t) , ddc(t)))
+      self.assertTrue(array_equal(cp.L_t(t) , L(t)))
+      self.assertTrue(array_equal(cp.dL_t(t) , dL(t)))
+      self.assertTrue(array_equal(cp.wrench_t(t) , wrench(t)))
+      self.assertTrue(array_equal(cp.zmp_t(t) , zmp(t)))
+      self.assertTrue(array_equal(cp.root_t(t) , root(t)))
+      self.assertEqual(cp.root_t.evaluateAsSE3(t) , root.evaluateAsSE3(t))
+
+    # check that deleting python variables doesn't delete members after assignement:
+    del q
+    self.assertIsNotNone(cp.q_t)
+    self.assertEqual(cp.q_t.min(),0)
+    self.assertEqual(cp.q_t.max(),2)
+    self.assertIsNotNone(cp.q_t(1.))
+    c = None
+    self.assertIsNotNone(cp.c_t)
+    self.assertEqual(cp.c_t.min(),0)
+    self.assertEqual(cp.c_t.max(),2)
+    self.assertIsNotNone(cp.c_t(1.))
+    # check that curve have not been copied and that it's the same pointer
+    dc.append(np.random.rand(3,1),3.5)
+    self.assertEqual(cp.dc_t.min(),0)
+    self.assertEqual(cp.dc_t.max(),3.5)
+    self.assertEqual(cp.dc_t,dc)
+    # check that the return of the getter is not const :
+    cp.dq_t.append(np.random.rand(30,1),4.)
+    self.assertEqual(cp.dq_t.min(),0)
+    self.assertEqual(cp.dq_t.max(),4.)
+    self.assertEqual(cp.dq_t,dq)
+
+
 
   def test_operator_equal(self):
     pass
