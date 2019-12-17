@@ -311,8 +311,8 @@ class ContactPhaseTest(unittest.TestCase):
     # create a SE3 trajectory :
     init_pose = SE3.Identity()
     end_pose = SE3.Identity()
-    init_pose.translation = array([0.2, -0.7, 0.6]).reshape(-1,1)
-    end_pose.translation = array([3.6, -2.2, -0.9]).reshape(-1,1)
+    init_pose.translation = array([0.2, -0.7, 0.6])
+    end_pose.translation = array([3.6, -2.2, -0.9])
     init_pose.rotation = Quaternion.Identity().normalized().matrix()
     end_pose.rotation = Quaternion(sqrt(2.) / 2., sqrt(2.) / 2., 0, 0).normalized().matrix()
     effL = SE3Curve(init_pose, end_pose, 0.5, 2.5)
@@ -330,7 +330,7 @@ class ContactPhaseTest(unittest.TestCase):
     # check with piecewise SE3
     effH = piecewise_SE3(effL)
     end_pose2 = SE3.Identity()
-    end_pose2.translation = array([-4.9, 0.8, 0.9]).reshape(-1,1)
+    end_pose2.translation = array([-4.9, 0.8, 0.9])
     end_pose2.rotation = Quaternion(sqrt(2.) / 2., 0., sqrt(2.) / 2., 0).normalized().matrix()
     effH.append(end_pose2,4.)
     new = cp.addEffectorTrajectory("hand",effH)
@@ -379,8 +379,8 @@ class ContactPhaseTest(unittest.TestCase):
     # create a SE3 trajectory :
     init_pose = SE3.Identity()
     end_pose = SE3.Identity()
-    init_pose.translation = array([0.2, -0.7, 0.6]).reshape(-1,1)
-    end_pose.translation = array([3.6, -2.2, -0.9]).reshape(-1,1)
+    init_pose.translation = array([0.2, -0.7, 0.6])
+    end_pose.translation = array([3.6, -2.2, -0.9])
     init_pose.rotation = Quaternion.Identity().normalized().matrix()
     end_pose.rotation = Quaternion(sqrt(2.) / 2., sqrt(2.) / 2., 0, 0).normalized().matrix()
     effL = SE3Curve(init_pose, end_pose, 0.5, 2.5)
@@ -398,7 +398,7 @@ class ContactPhaseTest(unittest.TestCase):
     # check that changing the dict doesn't change the contact phase:
     effH = piecewise_SE3(effL)
     end_pose2 = SE3.Identity()
-    end_pose2.translation = array([-4.9, 0.8, 0.9]).reshape(-1,1)
+    end_pose2.translation = array([-4.9, 0.8, 0.9])
     end_pose2.rotation = Quaternion(sqrt(2.) / 2., 0., sqrt(2.) / 2., 0).normalized().matrix()
     effH.append(end_pose2,4.)
     dict.update({"hand":effH})
