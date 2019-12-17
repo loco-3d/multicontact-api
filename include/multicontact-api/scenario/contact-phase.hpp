@@ -177,25 +177,25 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
           m_ddc_init == other.m_ddc_init &&
           m_L_init == other.m_L_init &&
           m_dL_init == other.m_dL_init &&
-          m_q_init == other.m_q_init &&
+          (m_q_init.rows() == other.m_q_init.rows() && m_q_init.cols() == other.m_q_init.cols() && m_q_init == other.m_q_init) &&
           m_c_final == other.m_c_final &&
           m_dc_final == other.m_dc_final &&
           m_ddc_final == other.m_ddc_final &&
           m_L_final == other.m_L_final &&
           m_dL_final == other.m_dL_final &&
-          m_q_final == other.m_q_final &&
-          (m_q == other.m_q || *m_q == *other.m_q)&&
-          (m_dq == other.m_dq || *m_dq == *other.m_dq)&&
-          (m_ddq == other.m_ddq || *m_ddq == *other.m_ddq)&&
-          (m_tau == other.m_tau || *m_tau == *other.m_tau)&&
-          (m_c == other.m_c || *m_c == *other.m_c)&&
-          (m_dc == other.m_dc || *m_dc == *other.m_dc)&&
-          (m_ddc == other.m_ddc || *m_ddc == *other.m_ddc)&&
-          (m_L == other.m_L || *m_L == *other.m_L)&&
-          (m_dL == other.m_dL || *m_dL == *other.m_dL)&&
-          (m_wrench == other.m_wrench || *m_wrench == *other.m_wrench)&&
-          (m_zmp == other.m_zmp || *m_zmp == *other.m_zmp)&&
-          (m_root == other.m_root || *m_root == *other.m_root)&&
+          (m_q_final.rows() == other.m_q_final.rows() && m_q_final.cols() == other.m_q_final.cols() && m_q_final == other.m_q_final) &&
+          (m_q == other.m_q || ( m_q && other.m_q && *m_q == *other.m_q))&&
+          (m_dq == other.m_dq || ( m_dq && other.m_dq && *m_dq == *other.m_dq))&&
+          (m_ddq == other.m_ddq || ( m_ddq && other.m_ddq && *m_ddq == *other.m_ddq))&&
+          (m_tau == other.m_tau || ( m_tau && other.m_tau && *m_tau == *other.m_tau))&&
+          (m_c == other.m_c || ( m_c && other.m_c && *m_c == *other.m_c))&&
+          (m_dc == other.m_dc || ( m_dc && other.m_dc && *m_dc == *other.m_dc))&&
+          (m_ddc == other.m_ddc || ( m_ddc && other.m_ddc && *m_ddc == *other.m_ddc))&&
+          (m_L == other.m_L || ( m_L && other.m_L && *m_L == *other.m_L))&&
+          (m_dL == other.m_dL || ( m_dL && other.m_dL && *m_dL == *other.m_dL))&&
+          (m_wrench == other.m_wrench || ( m_wrench && other.m_wrench && *m_wrench == *other.m_wrench))&&
+          (m_zmp == other.m_zmp || ( m_zmp && other.m_zmp && *m_zmp == *other.m_zmp))&&
+          (m_root == other.m_root || ( m_root && other.m_root && *m_root == *other.m_root))&&
           m_contact_forces == other.m_contact_forces &&
           m_contact_normal_force == other.m_contact_normal_force &&
           m_effector_trajectories == other.m_effector_trajectories &&
