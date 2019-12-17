@@ -758,7 +758,211 @@ class ContactPhaseTest(unittest.TestCase):
 
 
   def test_operator_equal(self):
-    pass
+    cp1 = ContactPhase()
+    cp2 = ContactPhase()
+    #check timings
+    self.assertTrue(cp1 == cp2)
+    cp1.timeInitial = 1.
+    self.assertTrue(cp1 != cp2)
+    cp2.timeInitial = 1.
+    self.assertTrue(cp1 == cp2)
+    cp1.timeFinal =3.5
+    self.assertTrue(cp1 != cp2)
+    cp2.duration =2.5
+    self.assertTrue(cp1 == cp2)
+    #check public members :
+    # points :
+    c_init= np.random.rand(3)
+    dc_init= np.random.rand(3)
+    ddc_init= np.random.rand(3)
+    L_init= np.random.rand(3)
+    dL_init= np.random.rand(3)
+    q_init= np.random.rand(35)
+    c_final= np.random.rand(3)
+    dc_final= np.random.rand(3)
+    ddc_final= np.random.rand(3)
+    L_final= np.random.rand(3)
+    dL_final= np.random.rand(3)
+    q_final= np.random.rand(35)
+    cp1.c_init = c_init
+    self.assertTrue(cp1 != cp2)
+    cp2.c_init = c_init
+    self.assertTrue(cp1 == cp2)
+    cp1.dc_init = dc_init
+    self.assertTrue(cp1 != cp2)
+    cp2.dc_init = dc_init
+    self.assertTrue(cp1 == cp2)
+    cp1.ddc_init = ddc_init
+    self.assertTrue(cp1 != cp2)
+    cp2.ddc_init = ddc_init
+    self.assertTrue(cp1 == cp2)
+    cp1.L_init = L_init
+    self.assertTrue(cp1 != cp2)
+    cp2.L_init = L_init
+    self.assertTrue(cp1 == cp2)
+    cp1.dL_init = dL_init
+    self.assertTrue(cp1 != cp2)
+    cp2.dL_init = dL_init
+    self.assertTrue(cp1 == cp2)
+    cp1.q_init = q_init
+    self.assertTrue(cp1 != cp2)
+    cp2.q_init = q_init
+    self.assertTrue(cp1 == cp2)
+    cp1.c_final = c_final
+    self.assertTrue(cp1 != cp2)
+    cp2.c_final = c_final.copy()
+    self.assertTrue(cp1 == cp2)
+    cp1.dc_final = dc_final
+    self.assertTrue(cp1 != cp2)
+    cp2.dc_final = dc_final.copy()
+    self.assertTrue(cp1 == cp2)
+    cp1.ddc_final = ddc_final
+    self.assertTrue(cp1 != cp2)
+    cp2.ddc_final = ddc_final.copy()
+    self.assertTrue(cp1 == cp2)
+    cp1.L_final = L_final
+    self.assertTrue(cp1 != cp2)
+    L_final2 = np.array(L_final)
+    cp2.L_final = L_final2
+    self.assertTrue(cp1 == cp2)
+    cp1.dL_final = dL_final
+    self.assertTrue(cp1 != cp2)
+    dL_final2 = np.array(dL_final)
+    cp2.dL_final = dL_final2
+    self.assertTrue(cp1 == cp2)
+    cp1.q_final = q_final
+    self.assertTrue(cp1 != cp2)
+    cp2.q_final = q_final
+    self.assertTrue(cp1 == cp2)
+    # curves :
+    q = createRandomPiecewisePolynomial(31)
+    dq = createRandomPiecewisePolynomial(30)
+    ddq = createRandomPiecewisePolynomial(30)
+    tau = createRandomPiecewisePolynomial(30)
+    c = createRandomPiecewisePolynomial(3)
+    dc = createRandomPiecewisePolynomial(3)
+    ddc = createRandomPiecewisePolynomial(3)
+    L = createRandomPiecewisePolynomial(3)
+    dL = createRandomPiecewisePolynomial(3)
+    wrench = createRandomPiecewisePolynomial(6)
+    zmp = createRandomPiecewisePolynomial(3)
+    root = createRandomSE3Traj()
+    # assign trajectories :
+    cp1.q_t = q
+    self.assertTrue(cp1 != cp2)
+    cp2.q_t = q
+    self.assertTrue(cp1 == cp2)
+    cp1.dq_t = dq
+    self.assertTrue(cp1 != cp2)
+    cp2.dq_t = piecewise(dq)
+    self.assertTrue(cp1 == cp2)
+    cp1.ddq_t = ddq
+    self.assertTrue(cp1 != cp2)
+    cp2.ddq_t = piecewise(ddq)
+    self.assertTrue(cp1 == cp2)
+    cp1.tau_t = tau
+    self.assertTrue(cp1 != cp2)
+    cp2.tau_t = tau
+    self.assertTrue(cp1 == cp2)
+    cp1.c_t = c
+    self.assertTrue(cp1 != cp2)
+    cp2.c_t = piecewise(c)
+    self.assertTrue(cp1 == cp2)
+    cp1.dc_t = dc
+    self.assertTrue(cp1 != cp2)
+    dc2 = piecewise(dc)
+    cp2.dc_t = dc2
+    self.assertTrue(cp1 == cp2)
+    cp1.ddc_t = ddc
+    self.assertTrue(cp1 != cp2)
+    cp2.ddc_t = ddc
+    self.assertTrue(cp1 == cp2)
+    cp1.L_t = L
+    self.assertTrue(cp1 != cp2)
+    cp2.L_t = L
+    self.assertTrue(cp1 == cp2)
+    cp1.dL_t = dL
+    self.assertTrue(cp1 != cp2)
+    cp2.dL_t = dL
+    self.assertTrue(cp1 == cp2)
+    cp1.wrench_t = wrench
+    self.assertTrue(cp1 != cp2)
+    cp2.wrench_t = wrench
+    self.assertTrue(cp1 == cp2)
+    cp1.zmp_t = zmp
+    self.assertTrue(cp1 != cp2)
+    cp2.zmp_t = zmp
+    self.assertTrue(cp1 == cp2)
+    cp1.root_t = root
+    self.assertTrue(cp1 != cp2)
+    cp2.root_t = piecewise_SE3(root)
+    self.assertTrue(cp1 == cp2)
+
+    # test contacts
+    p = SE3()
+    p.setRandom()
+    patchRF = ContactPatch(p,0.5)
+    cp1.addContact("right-leg",patchRF)
+    self.assertTrue(cp1 != cp2)
+    cp2.addContact("right-leg2",patchRF)
+    self.assertTrue(cp1 != cp2)
+    cp2.addContact("right-leg",patchRF)
+    self.assertTrue(cp1 != cp2)
+    cp2.removeContact("right-leg2")
+    self.assertTrue(cp1 == cp2)
+    p = SE3()
+    p.setRandom()
+    patchLF = ContactPatch(p,0.5)
+    patchLF2 = ContactPatch(p)
+    cp1.addContact("left-leg",patchLF)
+    self.assertFalse(cp1 == cp2)
+    cp2.addContact("left-leg",patchLF2)
+    self.assertFalse(cp1 == cp2)
+    cp2.removeContact("left-leg")
+    cp2.addContact("left-leg", patchLF.copy())
+    self.assertFalse(cp1 != cp2)
+
+    # test force trajectories :
+    fR = createRandomPiecewisePolynomial(12)
+    fL = createRandomPiecewisePolynomial(12)
+    fL2 = createRandomPiecewisePolynomial(12)
+    cp1.addContactForceTrajectory("right-leg",fR)
+    self.assertTrue(cp1 != cp2)
+    cp2.addContactForceTrajectory("right-leg",fR)
+    self.assertTrue(cp1 == cp2)
+    cp1.addContactForceTrajectory("left-leg",fL)
+    self.assertTrue(cp1 != cp2)
+    cp2.addContactForceTrajectory("left-leg",fL2)
+    self.assertTrue(cp1 != cp2)
+    cp2.addContactForceTrajectory("left-leg",fL)
+    self.assertTrue(cp1 == cp2)
+    fR = createRandomPiecewisePolynomial(1)
+    fL = createRandomPiecewisePolynomial(1)
+    fL2 = createRandomPiecewisePolynomial(1)
+    cp1.addContactNormalForceTrajectory("right-leg",fR)
+    self.assertTrue(cp1 != cp2)
+    cp2.addContactNormalForceTrajectory("right-leg",fR)
+    self.assertTrue(cp1 == cp2)
+    cp1.addContactNormalForceTrajectory("left-leg",fL)
+    self.assertTrue(cp1 != cp2)
+    cp2.addContactNormalForceTrajectory("left-leg",fL2)
+    self.assertTrue(cp1 != cp2)
+    cp2.addContactNormalForceTrajectory("left-leg",fL)
+    self.assertTrue(cp1 == cp2)
+    # test effector trajectories :
+    fR = createRandomSE3Traj()
+    fL = createRandomSE3Traj()
+    fL2 = createRandomSE3Traj()
+    cp1.addEffectorTrajectory("right-hand",fR)
+    self.assertTrue(cp1 != cp2)
+    cp2.addEffectorTrajectory("right-hand",fR)
+    self.assertTrue(cp1 == cp2)
+    cp1.addEffectorTrajectory("left-hand",fL)
+    self.assertTrue(cp1 != cp2)
+    cp2.addEffectorTrajectory("left-hand",fL2)
+    self.assertTrue(cp1 != cp2)
+    cp2.addEffectorTrajectory("left-hand",fL)
+    self.assertTrue(cp1 == cp2)
 
   def test_copy_constructor(self):
     pass
