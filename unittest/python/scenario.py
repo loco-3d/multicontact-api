@@ -639,6 +639,14 @@ class ContactPhaseTest(unittest.TestCase):
     ci = cp.c_init
     ci = np.random.rand(3)
     self.assertFalse(array_equal(cp.c_init,ci))
+    # it's a copy (limitation from eigenpy ...) :
+    dc_init = cp.dc_init.copy()
+    cp.dc_init += np.array([0.1,0.,-2.]) # this work as += call the setter
+    self.assertFalse(array_equal(cp.dc_init,dc_init))
+    dc_init = cp.dc_init.copy()
+    cp.dc_init[2] = 0. # this line have no effect
+    self.assertTrue(array_equal(cp.dc_init,dc_init))
+
 
     # check error due to incorrect dimensions :
     print("# Expected warning messages about dimension / column vector : ")
