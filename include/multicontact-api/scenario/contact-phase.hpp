@@ -184,18 +184,18 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
           m_L_final == other.m_L_final &&
           m_dL_final == other.m_dL_final &&
           (m_q_final.rows() == other.m_q_final.rows() && m_q_final.cols() == other.m_q_final.cols() && m_q_final == other.m_q_final) &&
-          (m_q == other.m_q || ( m_q && other.m_q && *m_q == *other.m_q))&&
-          (m_dq == other.m_dq || ( m_dq && other.m_dq && *m_dq == *other.m_dq))&&
-          (m_ddq == other.m_ddq || ( m_ddq && other.m_ddq && *m_ddq == *other.m_ddq))&&
-          (m_tau == other.m_tau || ( m_tau && other.m_tau && *m_tau == *other.m_tau))&&
-          (m_c == other.m_c || ( m_c && other.m_c && *m_c == *other.m_c))&&
-          (m_dc == other.m_dc || ( m_dc && other.m_dc && *m_dc == *other.m_dc))&&
-          (m_ddc == other.m_ddc || ( m_ddc && other.m_ddc && *m_ddc == *other.m_ddc))&&
-          (m_L == other.m_L || ( m_L && other.m_L && *m_L == *other.m_L))&&
-          (m_dL == other.m_dL || ( m_dL && other.m_dL && *m_dL == *other.m_dL))&&
-          (m_wrench == other.m_wrench || ( m_wrench && other.m_wrench && *m_wrench == *other.m_wrench))&&
-          (m_zmp == other.m_zmp || ( m_zmp && other.m_zmp && *m_zmp == *other.m_zmp))&&
-          (m_root == other.m_root || ( m_root && other.m_root && *m_root == *other.m_root))&&
+          (m_q == other.m_q || ( m_q && other.m_q && m_q->isApprox(other.m_q.get())))&&
+          (m_dq == other.m_dq || ( m_dq && other.m_dq && m_dq->isApprox(other.m_dq.get())))&&
+          (m_ddq == other.m_ddq || ( m_ddq && other.m_ddq && m_ddq->isApprox(other.m_ddq.get())))&&
+          (m_tau == other.m_tau || ( m_tau && other.m_tau && m_tau->isApprox(other.m_tau.get())))&&
+          (m_c == other.m_c || ( m_c && other.m_c && m_c->isApprox(other.m_c.get())))&&
+          (m_dc == other.m_dc || ( m_dc && other.m_dc && m_dc->isApprox(other.m_dc.get())))&&
+          (m_ddc == other.m_ddc || ( m_ddc && other.m_ddc && m_ddc->isApprox(other.m_ddc.get())))&&
+          (m_L == other.m_L || ( m_L && other.m_L && m_L->isApprox(other.m_L.get())))&&
+          (m_dL == other.m_dL || ( m_dL && other.m_dL && m_dL->isApprox(other.m_dL.get())))&&
+          (m_wrench == other.m_wrench || ( m_wrench && other.m_wrench && m_wrench->isApprox(other.m_wrench.get())))&&
+          (m_zmp == other.m_zmp || ( m_zmp && other.m_zmp && m_zmp->isApprox(other.m_zmp.get())))&&
+          (m_root == other.m_root || ( m_root && other.m_root && m_root->isApprox(other.m_root.get())))&&
           m_contact_forces == other.m_contact_forces &&
           m_contact_normal_force == other.m_contact_normal_force &&
           m_effector_trajectories == other.m_effector_trajectories &&
@@ -556,7 +556,7 @@ bool operator==(const ContactPhase::CurveMap& a,const ContactPhase::CurveMap& b)
   for(ContactPhase::CurveMap::const_iterator it = a.begin() ; it != a.end() ; ++it){
     if(b.count(it->first) < 1)
       return false;
-    if((it->second != b.at(it->first)) && (*it->second != *b.at(it->first)))
+    if((it->second != b.at(it->first)) && !(it->second->isApprox(b.at(it->first).get())))
       return false;
   }
   return true;
@@ -568,7 +568,7 @@ bool operator==(const ContactPhase::CurveSE3Map& a,const ContactPhase::CurveSE3M
   for(ContactPhase::CurveSE3Map::const_iterator it = a.begin() ; it != a.end() ; ++it){
     if(b.count(it->first) < 1)
       return false;
-    if((it->second != b.at(it->first)) && (*it->second != *b.at(it->first)))
+    if((it->second != b.at(it->first)) && !(it->second->isApprox(b.at(it->first).get())))
       return false;
   }
   return true;
