@@ -51,8 +51,8 @@ struct SOCPythonVisitor : public boost::python::def_visitor<SOCPythonVisitor<SOC
         .def(SerializableVisitor<SOC>());
 
     // Expose related matrix types
-    eigenpy::enableEigenPySpecific<MatrixD, MatrixD>();
-    eigenpy::enableEigenPySpecific<VectorD, VectorD>();
+    ENABLE_SPECIFIC_MATRIX_TYPE(MatrixD);
+    ENABLE_SPECIFIC_MATRIX_TYPE(VectorD);
   }
 
  protected:
