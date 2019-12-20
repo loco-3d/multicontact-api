@@ -216,18 +216,18 @@ void explicitContactPhaseAssertEqual(ContactPhase& cp1, ContactPhase& cp2){
   BOOST_CHECK((*cp1.m_wrench)(cp2.m_wrench->min())==(*cp2.m_wrench)(cp2.m_wrench->min()));
   BOOST_CHECK((*cp1.m_zmp)(cp2.m_zmp->min())==(*cp2.m_zmp)(cp2.m_zmp->min()));
   BOOST_CHECK((*cp1.m_root)(cp2.m_root->min()).isApprox((*cp2.m_root)(cp2.m_root->min())));
-  BOOST_CHECK(*cp1.m_q == *cp2.m_q);
-  BOOST_CHECK(*cp1.m_dq == *cp2.m_dq);
-  BOOST_CHECK(*cp1.m_ddq == *cp2.m_ddq);
-  BOOST_CHECK(*cp1.m_tau == *cp2.m_tau);
-  BOOST_CHECK(*cp1.m_c == *cp2.m_c);
-  BOOST_CHECK(*cp1.m_dc == *cp2.m_dc);
-  BOOST_CHECK(*cp1.m_ddc == *cp2.m_ddc);
-  BOOST_CHECK(*cp1.m_L == *cp2.m_L);
-  BOOST_CHECK(*cp1.m_dL == *cp2.m_dL);
-  BOOST_CHECK(*cp1.m_wrench == *cp2.m_wrench);
-  BOOST_CHECK(*cp1.m_zmp == *cp2.m_zmp);
-  BOOST_CHECK(*cp1.m_root == *cp2.m_root);
+  BOOST_CHECK(cp1.m_q->isApprox(cp2.m_q.get()));
+  BOOST_CHECK(cp1.m_dq->isApprox(cp2.m_dq.get()));
+  BOOST_CHECK(cp1.m_ddq->isApprox(cp2.m_ddq.get()));
+  BOOST_CHECK(cp1.m_tau->isApprox(cp2.m_tau.get()));
+  BOOST_CHECK(cp1.m_c->isApprox(cp2.m_c.get()));
+  BOOST_CHECK(cp1.m_dc->isApprox(cp2.m_dc.get()));
+  BOOST_CHECK(cp1.m_ddc->isApprox(cp2.m_ddc.get()));
+  BOOST_CHECK(cp1.m_L->isApprox(cp2.m_L.get()));
+  BOOST_CHECK(cp1.m_dL->isApprox(cp2.m_dL.get()));
+  BOOST_CHECK(cp1.m_wrench->isApprox(cp2.m_wrench.get()));
+  BOOST_CHECK(cp1.m_zmp->isApprox(cp2.m_zmp.get()));
+  BOOST_CHECK(cp1.m_root->isApprox(cp2.m_root.get()));
   BOOST_CHECK(cp1.contactForces() == cp2.contactForces());
   BOOST_CHECK(cp1.contactNormalForces() == cp2.contactNormalForces());
   BOOST_CHECK(cp1.effectorTrajectories() == cp2.effectorTrajectories());
@@ -240,13 +240,13 @@ void explicitContactPhaseAssertEqual(ContactPhase& cp1, ContactPhase& cp2){
     BOOST_CHECK(cp1.contactPatch(*ee) == cp2.contactPatch(*ee));
     if(cp1.contactForces().count(*ee)){
       BOOST_CHECK(cp2.contactForces().count(*ee));
-      BOOST_CHECK(*cp1.contactForces(*ee) == *cp2.contactForces(*ee));
+      BOOST_CHECK(cp1.contactForces(*ee)->isApprox(cp2.contactForces(*ee).get()));
       BOOST_CHECK((*cp1.contactForces(*ee))(cp1.contactForces(*ee)->min()) == (*cp2.contactForces(*ee))(cp2.contactForces(*ee)->min()));
       BOOST_CHECK((*cp1.contactForces(*ee))(cp1.contactForces(*ee)->max()) == (*cp2.contactForces(*ee))(cp2.contactForces(*ee)->max()));
     }
     if(cp1.contactNormalForces().count(*ee)){
       BOOST_CHECK(cp2.contactNormalForces().count(*ee));
-      BOOST_CHECK(*cp1.contactNormalForces(*ee) == *cp2.contactNormalForces(*ee));
+      BOOST_CHECK(cp1.contactNormalForces(*ee)->isApprox(cp2.contactNormalForces(*ee).get()));
       BOOST_CHECK((*cp1.contactNormalForces(*ee))(cp1.contactNormalForces(*ee)->min()) == (*cp2.contactNormalForces(*ee))(cp2.contactNormalForces(*ee)->min()));
       BOOST_CHECK((*cp1.contactNormalForces(*ee))(cp1.contactNormalForces(*ee)->max()) == (*cp2.contactNormalForces(*ee))(cp2.contactNormalForces(*ee)->max()));
     }
@@ -256,7 +256,7 @@ void explicitContactPhaseAssertEqual(ContactPhase& cp1, ContactPhase& cp2){
   {
     std::cout<<"## For effector trajectory "<<mit->first<<std::endl;
     BOOST_CHECK(cp2.effectorTrajectories().count(mit->first));
-    BOOST_CHECK(*cp1.effectorTrajectories(mit->first) == *cp2.effectorTrajectories(mit->first));
+    BOOST_CHECK(cp1.effectorTrajectories(mit->first)->isApprox(cp2.effectorTrajectories(mit->first).get()));
     BOOST_CHECK((*cp1.effectorTrajectories(mit->first))(cp1.effectorTrajectories(mit->first)->min()).isApprox((*cp2.effectorTrajectories(mit->first))(cp2.effectorTrajectories(mit->first)->min())));
     BOOST_CHECK((*cp1.effectorTrajectories(mit->first))(cp1.effectorTrajectories(mit->first)->max()).isApprox((*cp2.effectorTrajectories(mit->first))(cp2.effectorTrajectories(mit->first)->max())));
   }
