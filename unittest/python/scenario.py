@@ -847,7 +847,6 @@ class ContactPhaseTest(unittest.TestCase):
     dq = createRandomPiecewisePolynomial(30)
     ddq = createRandomPiecewisePolynomial(30)
     tau = createRandomPiecewisePolynomial(30)
-    c = createRandomPiecewisePolynomial(3)
     dc = createRandomPiecewisePolynomial(3)
     ddc = createRandomPiecewisePolynomial(3)
     L = createRandomPiecewisePolynomial(3)
@@ -855,6 +854,9 @@ class ContactPhaseTest(unittest.TestCase):
     wrench = createRandomPiecewisePolynomial(6)
     zmp = createRandomPiecewisePolynomial(3)
     root = createRandomSE3Traj()
+    coefs = np.random.rand(3,7) # degree 3
+    c1 = polynomial(coefs,0,2)
+    c2 = polynomial(coefs,0,2)
     # assign trajectories :
     cp1.q_t = q
     self.assertTrue(cp1 != cp2)
@@ -862,23 +864,23 @@ class ContactPhaseTest(unittest.TestCase):
     self.assertTrue(cp1 == cp2)
     cp1.dq_t = dq
     self.assertTrue(cp1 != cp2)
-    cp2.dq_t = piecewise(dq)
+    cp2.dq_t = dq
     self.assertTrue(cp1 == cp2)
     cp1.ddq_t = ddq
     self.assertTrue(cp1 != cp2)
-    cp2.ddq_t = piecewise(ddq)
+    cp2.ddq_t = ddq
     self.assertTrue(cp1 == cp2)
     cp1.tau_t = tau
     self.assertTrue(cp1 != cp2)
     cp2.tau_t = tau
     self.assertTrue(cp1 == cp2)
-    cp1.c_t = c
+    cp1.c_t = c1
     self.assertTrue(cp1 != cp2)
-    cp2.c_t = piecewise(c)
+    cp2.c_t = c2
     self.assertTrue(cp1 == cp2)
     cp1.dc_t = dc
     self.assertTrue(cp1 != cp2)
-    dc2 = piecewise(dc)
+    dc2 = dc
     cp2.dc_t = dc2
     self.assertTrue(cp1 == cp2)
     cp1.ddc_t = ddc
@@ -903,7 +905,7 @@ class ContactPhaseTest(unittest.TestCase):
     self.assertTrue(cp1 == cp2)
     cp1.root_t = root
     self.assertTrue(cp1 != cp2)
-    cp2.root_t = piecewise_SE3(root)
+    cp2.root_t = root
     self.assertTrue(cp1 == cp2)
 
     # test contacts
