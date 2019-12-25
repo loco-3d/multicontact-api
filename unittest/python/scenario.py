@@ -222,9 +222,41 @@ class ContactPatchTest(unittest.TestCase):
     cp1.placement.setRandom()
     self.assertTrue(cp1 != cp2)
 
-  def test_serialization(self):
-    #TODO
-    pass
+
+
+  def test_serialization_no_friction(self):
+    p = SE3()
+    p.setRandom()
+    cp1 = ContactPatch(p)
+    cp1.saveAsText("cp_test.txt")
+    cp_txt = ContactPatch()
+    cp_txt.loadFromText("cp_test.txt")
+    self.assertEqual(cp1,cp_txt)
+    cp1.saveAsBinary("cp_test")
+    cp_bin = ContactPatch()
+    cp_bin.loadFromBinary("cp_test")
+    self.assertEqual(cp1,cp_bin)
+    cp1.saveAsXML("cp_test.xml",'ContactPatch')
+    cp_xml = ContactPatch()
+    cp_xml.loadFromXML("cp_test.xml",'ContactPatch')
+    self.assertEqual(cp1,cp_xml)
+
+  def test_serialization_full(self):
+    p = SE3()
+    p.setRandom()
+    cp1 = ContactPatch(p,0.9)
+    cp1.saveAsText("cp_test.txt")
+    cp_txt = ContactPatch()
+    cp_txt.loadFromText("cp_test.txt")
+    self.assertEqual(cp1,cp_txt)
+    cp1.saveAsBinary("cp_test")
+    cp_bin = ContactPatch()
+    cp_bin.loadFromBinary("cp_test")
+    self.assertEqual(cp1,cp_bin)
+    cp1.saveAsXML("cp_test.xml",'ContactPatch')
+    cp_xml = ContactPatch()
+    cp_xml.loadFromXML("cp_test.xml",'ContactPatch')
+    self.assertEqual(cp1,cp_xml)
 
 class ContactPhaseTest(unittest.TestCase):
 
