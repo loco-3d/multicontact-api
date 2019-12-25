@@ -165,6 +165,41 @@ class ContactModelTest(unittest.TestCase):
     self.assertTrue(mp1 != mp2)
 
 
+
+  def test_contact_model_serialization_default(self):
+    mp1 = ContactModelPlanar()
+    mp1.saveAsText("mp_test.txt")
+    mp_txt = ContactModelPlanar()
+    mp_txt.loadFromText("mp_test.txt")
+    self.assertEqual(mp1,mp_txt)
+    mp1.saveAsBinary("mp_test")
+    mp_bin = ContactModelPlanar()
+    mp_bin.loadFromBinary("mp_test")
+    self.assertEqual(mp1,mp_bin)
+    mp1.saveAsXML("mp_test.xml",'ContactModel')
+    mp_xml = ContactModelPlanar()
+    mp_xml.loadFromXML("mp_test.xml",'ContactPatch')
+    self.assertEqual(mp1,mp_xml)
+
+
+  def test_contact_model_serialization_full(self):
+    mu = 0.3
+    zmp_radius = 0.01
+    # constructor with both values
+    mp1 = ContactModelPlanar(mu,zmp_radius)
+    mp1.saveAsText("mp_test.txt")
+    mp_txt = ContactModelPlanar()
+    mp_txt.loadFromText("mp_test.txt")
+    self.assertEqual(mp1,mp_txt)
+    mp1.saveAsBinary("mp_test")
+    mp_bin = ContactModelPlanar()
+    mp_bin.loadFromBinary("mp_test")
+    self.assertEqual(mp1,mp_bin)
+    mp1.saveAsXML("mp_test.xml",'ContactModel')
+    mp_xml = ContactModelPlanar()
+    mp_xml.loadFromXML("mp_test.xml",'ContactPatch')
+    self.assertEqual(mp1,mp_xml)
+
 class ContactPatchTest(unittest.TestCase):
 
   def test_default_constructor(self):
