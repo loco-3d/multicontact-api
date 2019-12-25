@@ -183,7 +183,8 @@ namespace python{
                   "isConsistent check if all the members of the phase are consistent together.\n"
                   "if throw_if_invalid == True it raise an error instead of returning False."))
           .def(bp::self == bp::self)
-          .def(bp::self != bp::self);
+          .def(bp::self != bp::self)
+          .def("copy", &copy, "Returns a copy of *this.");
 
     }
 
@@ -249,6 +250,7 @@ namespace python{
     static bp::dict contactForcesAsDict(ContactPhase& self){return toPythonDict<curve_ptr>(self.contactForces());}
     static bp::dict contactNormalForcesAsDict(ContactPhase& self){return toPythonDict<curve_ptr>(self.contactNormalForces());}
     static bp::dict effectorTrajectoriesAsDict(ContactPhase& self){return toPythonDict<curve_SE3_ptr>(self.effectorTrajectories());}
+    static ContactPhase copy(const ContactPhase& self) { return ContactPhase(self); }
 
 
   };
