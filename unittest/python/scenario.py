@@ -1111,8 +1111,36 @@ class ContactPhaseTest(unittest.TestCase):
     self.assertEqual(cp1,cp2)
     self.assertEqual(cp1,cp3)
 
-  def test_contact_phase_serialization(self):
-    pass    #TODO
+  def test_contact_phase_serialization_no_timing(self):
+    cp1 = ContactPhase()
+    addRandomPointsValues(cp1)
+    cp1.saveAsText("cp_test.txt")
+    cp_txt = ContactPhase()
+    cp_txt.loadFromText("cp_test.txt")
+    self.assertEqual(cp1,cp_txt)
+    cp1.saveAsBinary("cp_test")
+    cp_bin = ContactPhase()
+    cp_bin.loadFromBinary("cp_test")
+    self.assertEqual(cp1,cp_bin)
+    cp1.saveAsXML("cp_test.xml",'ContactPhase')
+    cp_xml = ContactPhase()
+    cp_xml.loadFromXML("cp_test.xml",'ContactPhase')
+    self.assertEqual(cp1,cp_xml)
+
+  def test_contact_phase_serialization_full(self):
+    cp1 = buildRandomContactPhase()
+    cp1.saveAsText("cp_test.txt")
+    cp_txt = ContactPhase()
+    cp_txt.loadFromText("cp_test.txt")
+    self.assertEqual(cp1,cp_txt)
+    cp1.saveAsBinary("cp_test")
+    cp_bin = ContactPhase()
+    cp_bin.loadFromBinary("cp_test")
+    self.assertEqual(cp1,cp_bin)
+    cp1.saveAsXML("cp_test.xml",'ContactPhase')
+    cp_xml = ContactPhase()
+    cp_xml.loadFromXML("cp_test.xml",'ContactPhase')
+    self.assertEqual(cp1,cp_xml)
 
 if __name__ == '__main__':
   unittest.main()
