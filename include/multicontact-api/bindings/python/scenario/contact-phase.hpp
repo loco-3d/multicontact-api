@@ -6,7 +6,6 @@
 
 #include <pinocchio/fwd.hpp>
 #include <eigenpy/eigenpy.hpp>
-#include <eigenpy/memory.hpp>
 #include <typeinfo>
 
 #include "multicontact-api/scenario/contact-phase.hpp"
