@@ -47,6 +47,95 @@ def createRandomSE3Traj(t_min = 0,t_max = 2):
   curve = SE3Curve(p0,p1,t_min,t_max)
   return curve
 
+def buildRandomContactPhase():
+    cp1 = ContactPhase()
+    cp1.timeInitial = 1.
+    cp1.timeFinal =3.5
+    #check public members :
+    # points :
+    c_init= np.random.rand(3)
+    dc_init= np.random.rand(3)
+    ddc_init= np.random.rand(3)
+    L_init= np.random.rand(3)
+    dL_init= np.random.rand(3)
+    q_init= np.random.rand(35)
+    c_final= np.random.rand(3)
+    dc_final= np.random.rand(3)
+    ddc_final= np.random.rand(3)
+    L_final= np.random.rand(3)
+    dL_final= np.random.rand(3)
+    q_final= np.random.rand(35)
+    cp1.c_init = c_init
+    cp1.dc_init = dc_init
+    cp1.ddc_init = ddc_init
+    cp1.L_init = L_init
+    cp1.dL_init = dL_init
+    cp1.q_init = q_init
+    cp1.c_final = c_final
+    cp1.dc_final = dc_final
+    cp1.ddc_final = ddc_final
+    cp1.L_final = L_final
+    cp1.dL_final = dL_final
+    cp1.q_final = q_final
+    # curves :
+    q = createRandomPiecewisePolynomial(31)
+    dq = createRandomPiecewisePolynomial(30)
+    ddq = createRandomPiecewisePolynomial(30)
+    tau = createRandomPiecewisePolynomial(30)
+    dc = createRandomPiecewisePolynomial(3)
+    ddc = createRandomPiecewisePolynomial(3)
+    L = createRandomPiecewisePolynomial(3)
+    dL = createRandomPiecewisePolynomial(3)
+    wrench = createRandomPiecewisePolynomial(6)
+    zmp = createRandomPiecewisePolynomial(3)
+    root = createRandomSE3Traj()
+    coefs = np.random.rand(3,7) # degree 3
+    c1 = polynomial(coefs,0,2)
+    c2 = polynomial(coefs,0,2)
+    # assign trajectories :
+    cp1.q_t = q
+    cp1.dq_t = dq
+    cp1.ddq_t = ddq
+    cp1.tau_t = tau
+    cp1.c_t = c1
+    cp1.dc_t = dc
+    cp1.ddc_t = ddc
+    cp1.L_t = L
+    cp1.dL_t = dL
+    cp1.wrench_t = wrench
+    cp1.zmp_t = zmp
+    cp1.root_t = root
+
+    # test contacts
+    p = SE3()
+    p.setRandom()
+    patchRF = ContactPatch(p,0.5)
+    cp1.addContact("right-leg",patchRF)
+    p = SE3()
+    p.setRandom()
+    patchLF = ContactPatch(p,0.5)
+    patchLF2 = ContactPatch(p)
+    cp1.addContact("left-leg",patchLF)
+
+    # test force trajectories :
+    fR = createRandomPiecewisePolynomial(12)
+    fL = createRandomPiecewisePolynomial(12)
+    fL2 = createRandomPiecewisePolynomial(12)
+    cp1.addContactForceTrajectory("right-leg",fR)
+    cp1.addContactForceTrajectory("left-leg",fL)
+    fR = createRandomPiecewisePolynomial(1)
+    fL = createRandomPiecewisePolynomial(1)
+    fL2 = createRandomPiecewisePolynomial(1)
+    cp1.addContactNormalForceTrajectory("right-leg",fR)
+    cp1.addContactNormalForceTrajectory("left-leg",fL)
+    # test effector trajectories :
+    fR = createRandomSE3Traj()
+    fL = createRandomSE3Traj()
+    fL2 = createRandomSE3Traj()
+    cp1.addEffectorTrajectory("right-hand",fR)
+    cp1.addEffectorTrajectory("left-hand",fL)
+    return cp1
+
 class ContactModelTest(unittest.TestCase):
 
   def test_contact_model_planar(self):
@@ -977,7 +1066,11 @@ class ContactPhaseTest(unittest.TestCase):
     self.assertTrue(cp1 == cp2)
 
   def test_copy_constructor(self):
-    pass
+    cp1 = buildRandomContactPhase()
+    cp2 = ContactPhase(cp1)
+    cp3 = cp1.copy()
+    self.assertEqual(cp1,cp2)
+    self.assertEqual(cp1,cp3)
 
   def test_contact_phase_serialization(self):
     pass    #TODO
