@@ -6,13 +6,15 @@ import numpy as np
 from numpy import array,array_equal
 from random import uniform
 from math import sqrt,sin,cos
-import multicontact_api
-multicontact_api.switchToNumpyArray()
 
-from multicontact_api import ContactModelPlanar,ContactPatch,ContactPhase
+import pinocchio as pin
 from pinocchio import SE3,Quaternion
 import curves
 from curves import SE3Curve,polynomial,bezier,piecewise,piecewise_SE3
+pin.switchToNumpyArray()
+
+import multicontact_api
+from multicontact_api import ContactModelPlanar,ContactPatch,ContactPhase
 
 def randomQuaternion():
   u1 = uniform(0.,1.)
