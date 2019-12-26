@@ -32,7 +32,6 @@ SET(${PROJECT_NAME}_SCENARIO_HEADERS
   scenario/contact-phase.hpp
   scenario/contact-sequence.hpp
   scenario/fwd.hpp
-  scenario/ms-interval.hpp
   )
 
 SET(${PROJECT_NAME}_CONTAINER_HEADERS
@@ -53,9 +52,7 @@ SET(${PROJECT_NAME}_PYTHON_HEADERS
   bindings/python/scenario/contact-patch.hpp
   bindings/python/scenario/contact-phase.hpp
   bindings/python/scenario/contact-sequence.hpp
-  bindings/python/scenario/enums.hpp
   bindings/python/scenario/expose-scenario.hpp
-  bindings/python/scenario/ms-interval.hpp
   bindings/python/utils/base.hpp
   bindings/python/utils/printable.hpp
   )
