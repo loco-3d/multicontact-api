@@ -10,7 +10,7 @@
 #include "multicontact-api/scenario/contact-model-planar.hpp"
 #include "multicontact-api/scenario/contact-patch.hpp"
 #include "multicontact-api/scenario/contact-phase.hpp"
-//#include "multicontact-api/scenario/contact-sequence.hpp"
+#include "multicontact-api/scenario/contact-sequence.hpp"
 
 #include <curves/fwd.h>
 #include <curves/so3_linear.h>
@@ -20,6 +20,8 @@
 #include <curves/piecewise_curve.h>
 #include <curves/exact_cubic.h>
 #include <curves/cubic_hermite_spline.h>
+
+
 
 typedef Eigen::Matrix<double, 1, 1> point1_t;
 using curves::point3_t;
@@ -31,8 +33,8 @@ using curves::quaternion_t;
 using curves::t_pointX_t;
 using curves::curve_ptr_t;
 using curves::curve_SE3_ptr_t;
-
 using namespace multicontact_api::scenario;
+typedef ContactSequence::ContactPhaseVector ContactPhaseVector;
 
 template <typename Scalar>
 struct ATpl {
@@ -178,6 +180,86 @@ curve_SE3_ptr_t buildRandomSE3LinearTraj(const double min, const double max){
   return res;
 }
 
+void addRandomPointsValues(ContactPhase& cp){
+  point3_t c_init= point3_t::Random();
+  point3_t dc_init= point3_t::Random();
+  pointX_t ddc_init= point3_t::Random(); // test with point X for automatic conversion
+  pointX_t L_init= point3_t::Random();
+  point3_t dL_init= point3_t::Random();
+  pointX_t q_init= point12_t::Random();
+  pointX_t c_final= point3_t::Random();
+  pointX_t dc_final= point3_t::Random();
+  point3_t ddc_final= point3_t::Random();
+  pointX_t L_final= point3_t::Random();
+  point3_t dL_final= point3_t::Random();
+  pointX_t q_final= point12_t::Random();
+  cp.m_c_init = c_init;
+  cp.m_dc_init = dc_init;
+  cp.m_ddc_init = ddc_init;
+  cp.m_L_init = L_init;
+  cp.m_dL_init = dL_init;
+  cp.m_q_init = q_init;
+  cp.m_c_final = c_final;
+  cp.m_dc_final = dc_final;
+  cp.m_ddc_final = ddc_final;
+  cp.m_L_final = L_final;
+  cp.m_dL_final = dL_final;
+  cp.m_q_final = q_final;
+}
+
+void addRandomCurvesValues(ContactPhase& cp){
+  curve_ptr_t q = buildRandomPolynomial12D();
+  curve_ptr_t dq = buildRandomPolynomial12D();
+  curve_ptr_t ddq = buildRandomPolynomial12D();
+  curve_ptr_t tau = buildRandomPolynomial12D();
+  curve_ptr_t c = buildRandomPolynomial3D();
+  curve_ptr_t dc = buildRandomPolynomial3D();
+  curve_ptr_t ddc = buildRandomPolynomial3D();
+  curve_ptr_t L = buildRandomPolynomial3D();
+  curve_ptr_t dL = buildRandomPolynomial3D();
+  curve_ptr_t wrench = buildRandomPolynomial3D();
+  curve_ptr_t zmp = buildRandomPolynomial3D();
+  curve_SE3_ptr_t root = buildRandomSE3LinearTraj(1,5.5);
+  cp.m_q = q;
+  cp.m_dq = dq;
+  cp.m_ddq = ddq;
+  cp.m_tau = tau;
+  cp.m_c = c;
+  cp.m_dc = dc;
+  cp.m_ddc = ddc;
+  cp.m_L = L;
+  cp.m_dL = dL;
+  cp.m_wrench = wrench;
+  cp.m_zmp = zmp;
+  cp.m_root = root;
+}
+
+void addRandomContacts(ContactPhase& cp){
+  cp.addContact("right_hand",ContactPatch(SE3::Identity().setRandom()));
+  cp.addContact("left_foot",ContactPatch(SE3::Identity().setRandom()));
+}
+
+void addRandomForcesTrajs(ContactPhase& cp){
+  cp.addContactForceTrajectory("right_hand",buildRandomPolynomial12D());
+  cp.addContactForceTrajectory("left_foot",buildRandomPolynomial12D());
+  cp.addContactNormalForceTrajectory("right_hand",buildRandomPolynomial1D());
+  cp.addContactNormalForceTrajectory("left_foot",buildRandomPolynomial1D());
+}
+
+void addRandomEffectorTrajectories(ContactPhase& cp){
+  cp.addEffectorTrajectory("left_hand",buildRandomSE3LinearTraj(0,2));
+  cp.addEffectorTrajectory("right_foot",buildRandomSE3LinearTraj(0,2));
+}
+
+ContactPhase buildRandomContactPhase(const double min = 0. , const double max = 2.){
+    ContactPhase cp(min,max);
+    addRandomPointsValues(cp);
+    addRandomCurvesValues(cp);
+    addRandomContacts(cp);
+    addRandomForcesTrajs(cp);
+    addRandomEffectorTrajectories(cp);
+    return cp;
+}
 
 void explicitContactPhaseAssertEqual(ContactPhase& cp1, ContactPhase& cp2){
   BOOST_CHECK(cp1.m_c_init == cp2.m_c_init);
@@ -235,7 +317,6 @@ void explicitContactPhaseAssertEqual(ContactPhase& cp1, ContactPhase& cp2){
   BOOST_CHECK(cp1.contactPatches() == cp2.contactPatches());
   const ContactPhase::t_strings eeNames = cp2.effectorsInContact();
   for(ContactPhase::t_strings::const_iterator ee = eeNames.begin() ; ee != eeNames.end() ; ++ee){
-    std::cout<<"## For effector "<<*ee<<std::endl;
     BOOST_CHECK(cp2.isEffectorInContact(*ee));
     BOOST_CHECK(cp1.contactPatch(*ee) == cp2.contactPatch(*ee));
     if(cp1.contactForces().count(*ee)){
@@ -254,7 +335,6 @@ void explicitContactPhaseAssertEqual(ContactPhase& cp1, ContactPhase& cp2){
   const ContactPhase::CurveSE3Map trajMap = cp2.effectorTrajectories();
   for (ContactPhase::CurveSE3Map::const_iterator mit = trajMap.begin() ; mit != trajMap.end(); ++mit)
   {
-    std::cout<<"## For effector trajectory "<<mit->first<<std::endl;
     BOOST_CHECK(cp2.effectorTrajectories().count(mit->first));
     BOOST_CHECK(cp1.effectorTrajectories(mit->first)->isApprox(cp2.effectorTrajectories(mit->first).get()));
     BOOST_CHECK((*cp1.effectorTrajectories(mit->first))(cp1.effectorTrajectories(mit->first)->min()).isApprox((*cp2.effectorTrajectories(mit->first))(cp2.effectorTrajectories(mit->first)->min())));
@@ -951,17 +1031,78 @@ BOOST_AUTO_TEST_CASE(contact_phase)
 
 }
 
-//BOOST_AUTO_TEST_CASE(contact_sequence)
-//{
-//  ContactPhase4 cp;
-//  ContactSequence4 cs(1);
-//  ContactSequence4 cs_test(0);
-//  cs.m_contact_phases[0] = cp;
-//  // test serialization
-//  cs.saveAsText("serialization_cs_test.test");
-//  cs_test.loadFromText("serialization_cs_test.test");
-//  remove("serialization_cp_test.test");
-//  BOOST_CHECK(cs == cs_test);
-//}
+BOOST_AUTO_TEST_CASE(contact_sequence)
+{
+  // test without specifying size and using 'append' :
+  ContactSequence cs1 = ContactSequence(0);
+  BOOST_CHECK(cs1.size() == 0);
+  ContactPhase cp0 = buildRandomContactPhase(0,2);
+  ContactPhase cp1 = buildRandomContactPhase(2,4.);
+  size_t id = cs1.append(cp0);
+  BOOST_CHECK(cs1.size() == 1);
+  BOOST_CHECK(id == 0);
+  BOOST_CHECK(cs1.contactPhase(0) == cp0);
+  id = cs1.append(cp1);
+  BOOST_CHECK(cs1.size() == 2);
+  BOOST_CHECK(id == 1);
+  BOOST_CHECK(cs1.contactPhase(0) == cp0);
+  BOOST_CHECK(cs1.contactPhase(1) == cp1);
+  // check with accessor to the contact phases vector
+  ContactPhaseVector phases = cs1.contactPhases();
+  BOOST_CHECK(phases.size() == 2);
+  BOOST_CHECK(phases[0] == cp0);
+  BOOST_CHECK(phases[1] == cp1);
+
+  // check that the accessor to contactPhases() create a copy :
+  ContactPhase cp2 = buildRandomContactPhase(0,2);
+  phases.push_back(cp2);
+  BOOST_CHECK(phases.size() == 3);
+  BOOST_CHECK(cs1.size() == 2 ); // original contact sequence should not be modified
+  phases[1].duration(3.);
+  BOOST_CHECK(cs1.contactPhase(1) == cp1); // original contact sequence should not be modified
+
+  // check that contactPhase(id) getter return non const reference :
+  cs1.contactPhase(1).timeFinal(10.);
+  BOOST_CHECK(cs1.contactPhase(1) != cp1);
+  BOOST_CHECK(cs1.contactPhase(1).timeFinal() == 10.);
+
+  cs1.contactPhase(0) = cp2;
+  BOOST_CHECK(cs1.contactPhase(0) == cp2);
+
+  // check with creating a contact sequence with a given size :
+  ContactPhase cp_default;
+  ContactSequence cs2 = ContactSequence(3);
+  BOOST_CHECK(cs2.size() == 3);
+  for(size_t i = 0 ; i < 3 ; ++i)
+    BOOST_CHECK(cs2.contactPhase(i) == cp_default);
+
+  // try to modify the uninitialized contact phase inside the sequence from the reference
+  ContactPhase& cp2_0 = cs2.contactPhase(0);
+  point3_t c_init = point3_t::Random();
+  cp2_0.m_c_init = c_init;
+  cp2_0.duration(10);
+  BOOST_CHECK(cs2.contactPhase(0) != cp_default);
+  BOOST_CHECK(cs2.contactPhase(0).duration() == 10);
+  BOOST_CHECK(cs2.contactPhase(0).m_c_init == c_init);
+
+  cs2.contactPhase(1) = cp1;
+  BOOST_CHECK(cs2.contactPhase(1) == cp1);
+
+  // try resize method :
+  // with smaller value than current :
+  cs2.resize(1);
+  BOOST_CHECK(cs2.size() == 1);
+  BOOST_CHECK(cs2.contactPhase(0).duration() == 10);
+  BOOST_CHECK(cs2.contactPhase(0).m_c_init == c_init);
+
+  // check with greater size than current :
+  cs2.resize(4);
+  BOOST_CHECK(cs2.size() == 4);
+  BOOST_CHECK(cs2.contactPhase(0).duration() == 10);
+  BOOST_CHECK(cs2.contactPhase(0).m_c_init == c_init);
+  for(size_t i = 1 ; i < 4 ; ++i)
+    BOOST_CHECK(cs2.contactPhase(i) == cp_default);
+
+}
 
 BOOST_AUTO_TEST_SUITE_END()
