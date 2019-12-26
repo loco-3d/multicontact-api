@@ -18,8 +18,8 @@ namespace scenario{
   template<typename _Scalar> struct ContactPhaseTpl;
   typedef ContactPhaseTpl<double> ContactPhase;
 
-  template<typename _Scalar> struct ContactSequenceTpl;
-  typedef ContactSequenceTpl<double> ContactSequence;
+  template<typename _ContactPhase> struct ContactSequenceTpl;
+  typedef ContactSequenceTpl<ContactPhase> ContactSequence;
 
   template<class SOC> struct ContactConstraintSOC;
   typedef ContactConstraintSOC<geometry::SOC6d> ContactConstraintSOC6;
