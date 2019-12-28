@@ -4,6 +4,7 @@
 
 #include "multicontact-api/scenario/fwd.hpp"
 #include "multicontact-api/scenario/contact-patch.hpp"
+#include "multicontact-api/geometry/curve-map.hpp"
 
 #include "multicontact-api/serialization/archive.hpp"
 #include "multicontact-api/serialization/eigen-matrix.hpp"
@@ -48,8 +49,8 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
   typedef ContactPatchTpl<Scalar> ContactPatch;
   typedef typename ContactPatch::SE3 SE3;
   typedef std::map< std::string, ContactPatch > ContactPatchMap;
-  typedef std::map< std::string, curve_ptr > CurveMap;
-  typedef std::map< std::string, curve_SE3_ptr > CurveSE3Map;
+  typedef CurveMap<curve_ptr> CurveMap_t;
+  typedef CurveMap<curve_SE3_ptr> CurveSE3Map_t;
 
 
   /// \brief Default constructor
@@ -279,9 +280,9 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
   }
 
   // getter for the map trajectories
-  CurveMap contactForces() const{return m_contact_forces;}
-  CurveMap contactNormalForces() const{return m_contact_normal_force;}
-  CurveSE3Map effectorTrajectories() const{return m_effector_trajectories;}
+  CurveMap_t contactForces() const{return m_contact_forces;}
+  CurveMap_t contactNormalForces() const{return m_contact_normal_force;}
+  CurveSE3Map_t effectorTrajectories() const{return m_effector_trajectories;}
   curve_ptr contactForces(const std::string& eeName) {
     if(m_contact_forces.count(eeName) == 0){
       throw std::invalid_argument("This contact phase do not contain any contact force trajectory for the effector "+eeName);
@@ -422,7 +423,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    */
   t_strings effectorsWithTrajectory() const{
     t_strings effectors;
-    for(typename CurveSE3Map::const_iterator mit = m_effector_trajectories.begin() ; mit != m_effector_trajectories.end(); ++mit)
+    for(typename CurveSE3Map_t::const_iterator mit = m_effector_trajectories.begin() ; mit != m_effector_trajectories.end(); ++mit)
     {
       effectors.push_back(mit->first);
     }
@@ -490,11 +491,11 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
 protected:
   // private members
   /// \brief map with keys : effector name containing the contact forces
-  CurveMap m_contact_forces;
+  CurveMap_t m_contact_forces;
   /// \brief map with keys : effector name containing the contact normal force
-  CurveMap m_contact_normal_force;
+  CurveMap_t m_contact_normal_force;
   /// \brief map with keys : effector name containing the end effector trajectory
-  CurveSE3Map m_effector_trajectories;
+  CurveSE3Map_t m_effector_trajectories;
   /// \brief set of the name of all effector in contact for this phase
   t_strings m_effector_in_contact;
   /// \brief map effector name : contact patches. All the patches are actives
@@ -543,36 +544,10 @@ private:
    ar& boost::serialization::make_nvp("contact_patches", m_contact_patches);
    ar& boost::serialization::make_nvp("t_init", m_t_init);
    ar& boost::serialization::make_nvp("t_final", m_t_final);
- }
-
-
+ }  
 
 }; //struct contact phase
 
-// define operator == for map of shared ptr: start by checking if the ptr are same, otherwise check if the values are the sames
-bool operator==(const ContactPhase::CurveMap& a,const ContactPhase::CurveMap& b){
-  if(a.size() != b.size())
-    return false;
-  for(ContactPhase::CurveMap::const_iterator it = a.begin() ; it != a.end() ; ++it){
-    if(b.count(it->first) < 1)
-      return false;
-    if((it->second != b.at(it->first)) && !(it->second->isApprox(b.at(it->first).get())))
-      return false;
-  }
-  return true;
-}
-
-bool operator==(const ContactPhase::CurveSE3Map& a,const ContactPhase::CurveSE3Map& b){
-  if(a.size() != b.size())
-    return false;
-  for(ContactPhase::CurveSE3Map::const_iterator it = a.begin() ; it != a.end() ; ++it){
-    if(b.count(it->first) < 1)
-      return false;
-    if((it->second != b.at(it->first)) && !(it->second->isApprox(b.at(it->first).get())))
-      return false;
-  }
-  return true;
-}
 
 } //scenario
 }// multicontact-api

@@ -332,8 +332,8 @@ void explicitContactPhaseAssertEqual(ContactPhase& cp1, ContactPhase& cp2){
       BOOST_CHECK((*cp1.contactNormalForces(*ee))(cp1.contactNormalForces(*ee)->max()) == (*cp2.contactNormalForces(*ee))(cp2.contactNormalForces(*ee)->max()));
     }
   }
-  const ContactPhase::CurveSE3Map trajMap = cp2.effectorTrajectories();
-  for (ContactPhase::CurveSE3Map::const_iterator mit = trajMap.begin() ; mit != trajMap.end(); ++mit)
+  const ContactPhase::CurveSE3Map_t trajMap = cp2.effectorTrajectories();
+  for (ContactPhase::CurveSE3Map_t::const_iterator mit = trajMap.begin() ; mit != trajMap.end(); ++mit)
   {
     BOOST_CHECK(cp2.effectorTrajectories().count(mit->first));
     BOOST_CHECK(cp1.effectorTrajectories(mit->first)->isApprox(cp2.effectorTrajectories(mit->first).get()));
@@ -719,7 +719,7 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   cp2.addContactForceTrajectory("right_hand",buildRandomPolynomial12D());
   cp2.addContactNormalForceTrajectory("right_hand",buildRandomPolynomial1D());
   int num_ctc = 0;
-  for (ContactPhase::CurveMap::const_iterator mit = cp2.contactForces().begin() ; mit != cp2.contactForces().end(); ++mit)
+  for (ContactPhase::CurveMap_t::const_iterator mit = cp2.contactForces().begin() ; mit != cp2.contactForces().end(); ++mit)
   {
     BOOST_CHECK(mit->first == "right_hand" || mit->first == "left_leg");
     num_ctc ++;
@@ -738,8 +738,8 @@ BOOST_AUTO_TEST_CASE(contact_phase)
   BOOST_CHECK((*cp2.effectorTrajectories()["right_leg"])(1.2).isApprox((*effR)(1.2)));
   BOOST_CHECK(cp2.effectorTrajectories().size() == 2);
   int num_eff_traj = 0;
-  const ContactPhase::CurveSE3Map trajMap = cp2.effectorTrajectories();
-  for (ContactPhase::CurveSE3Map::const_iterator mit = trajMap.begin() ; mit != trajMap.end(); ++mit)
+  const ContactPhase::CurveSE3Map_t trajMap = cp2.effectorTrajectories();
+  for (ContactPhase::CurveSE3Map_t::const_iterator mit = trajMap.begin() ; mit != trajMap.end(); ++mit)
   {
     BOOST_CHECK(mit->first == "knee" || mit->first == "right_leg");
     num_eff_traj ++;
