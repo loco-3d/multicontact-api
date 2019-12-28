@@ -9,7 +9,7 @@ SET(${PROJECT_NAME}_PYTHON_SOURCES
   scenario/contact-model.cpp
   scenario/contact-patch.cpp
   scenario/contact-phase.cpp
-  #scenario/contact-sequence.cpp
+  scenario/contact-sequence.cpp
   scenario/enums.cpp
   )
 

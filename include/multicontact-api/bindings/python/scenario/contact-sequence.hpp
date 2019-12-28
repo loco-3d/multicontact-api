@@ -18,25 +18,23 @@ namespace python {
 namespace bp = boost::python;
 
 template <typename CS>
-struct ContactSequencePythonVisitor : public boost::python::def_visitor<ContactSequencePythonVisitor<CS> > {
+struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePythonVisitor<CS> > {
   typedef typename CS::ContactPhaseVector ContactPhaseVector;
 
-  typedef typename CS::MSIntervalDataVector MSIntervalDataVector;
-  typedef typename CS::MSIntervalData MSIntervalData;
+
 
   template <class PyClass>
   void visit(PyClass& cl) const {
     cl.def(bp::init<size_t>(bp::arg("size"), "Default constructor from a given size."))
+        .def(bp::init<>(bp::arg(""),"Default constructor."))
         .def(bp::init<CS>(bp::args("other"), "Copy contructor."))
-        .add_property("contact_phases", bp::make_getter(&CS::m_contact_phases, bp::return_internal_reference<>()))
+        .def("size", &CS::size, "Size of the contact sequence.")
+
 
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
-
-        .def("size", &CS::size, "Size of the contact sequence.")
-        .def_readwrite("ms_interval_data", &CS::m_ms_interval_data)
-
-        .def_readwrite("conic_type", &CS::m_conic_type);
+        .def("copy", &copy, "Returns a copy of *this.");
+        ;
   }
 
   static void expose(const std::string& class_name) {
@@ -45,10 +43,15 @@ struct ContactSequencePythonVisitor : public boost::python::def_visitor<ContactS
         .def(ContactSequencePythonVisitor<CS>())
         .def(SerializableVisitor<CS>());
 
-    // Expose related vector
-    VectorPythonVisitor<ContactPhaseVector>::expose("ContactPhaseVector");
-    pinocchio::python::StdAlignedVectorPythonVisitor<MSIntervalData, true>::expose("MSIntervalDataVector");
+    bp::class_<ContactPhaseVector>("ContactPhaseVector")
+        .def(bp::vector_indexing_suite<ContactPhaseVector>() );
   }
+
+  protected:
+
+    static CS copy(const CS& self) { return CS(self); }
+
+
 };
 }  // namespace python
 }  // namespace multicontact_api
