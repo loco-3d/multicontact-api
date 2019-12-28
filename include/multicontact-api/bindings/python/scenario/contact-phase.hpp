@@ -46,21 +46,6 @@ namespace python{
     {
 
 
-//      bp::class_<t_strings>("std_vector_strings")
-//          .def(bp::vector_indexing_suite<t_strings>() );
-
-      // define bindings for maps
-      bp::class_< typename ContactPhase::ContactPatchMap >("StdMap_string_contactPatch")
-          .def(bp::map_indexing_suite< typename ContactPhase::ContactPatchMap >() )
-          ;
-
-      bp::class_< typename ContactPhase::CurveMap >("StdMap_string_curve")
-          .def(bp::map_indexing_suite< typename ContactPhase::CurveMap >() )
-          ;
-
-      bp::class_< typename ContactPhase::CurveSE3Map >("StdMap_string_curveSE3")
-          .def(bp::map_indexing_suite< typename ContactPhase::CurveSE3Map >() )
-          ;
 
       cl
           .def(bp::init<>(bp::arg(""),"Default constructor."))
