@@ -1103,6 +1103,62 @@ BOOST_AUTO_TEST_CASE(contact_sequence)
   for(size_t i = 1 ; i < 4 ; ++i)
     BOOST_CHECK(cs2.contactPhase(i) == cp_default);
 
+  // test operator == :
+  ContactSequence cs3;
+  ContactSequence cs4;
+
+  BOOST_CHECK(cs3 == cs4);
+  ContactPhase cp3_0 = buildRandomContactPhase();
+  cs3.append(cp3_0);
+  BOOST_CHECK(cs3 != cs4);
+  BOOST_CHECK(!(cs3 == cs4));
+  cs4.append(cp3_0);
+  BOOST_CHECK(cs3 == cs4);
+  ContactPhase cp3_1 = buildRandomContactPhase();
+  cs3.append(cp3_1);
+  BOOST_CHECK(cs3 != cs4);
+  cs4.append(cp3_1);
+  BOOST_CHECK(cs3 == cs4);
+  cs4.contactPhase(1).duration(10);
+  BOOST_CHECK(cs4.contactPhase(1) != cp3_1);
+  BOOST_CHECK(cs3 != cs4);
+  ContactSequence cs5(2);
+  cs5.contactPhase(0) = cp3_0;
+  BOOST_CHECK(cs3 != cs5);
+  cs5.contactPhase(1) = cp3_1;
+  BOOST_CHECK(cs3 == cs5);
+
+
+  // test copy constructor :
+  ContactSequence cs6;
+  for(size_t i = 0 ; i < 10 ; ++i){
+    ContactPhase cp6 = buildRandomContactPhase();
+    cs6.append(cp6);
+  }
+  BOOST_CHECK(cs6.size() == 10);
+
+  ContactSequence cs7(cs6);
+  BOOST_CHECK(cs7 == cs6);
+  for(size_t i = 0 ; i < 10 ; ++i){
+    BOOST_CHECK(cs6.contactPhase(i) == cs7.contactPhase(i));
+  }
+
+
+  // test serialization :
+  std::string fileName("fileTest");
+  ContactSequence cs_from_txt,cs_from_xml,cs_from_bin;
+
+  cs6.saveAsText(fileName+".txt");
+  cs_from_txt.loadFromText(fileName+".txt");
+  BOOST_CHECK(cs6 == cs_from_txt);
+
+  cs6.saveAsXML(fileName+".xml","ContactSequence");
+  cs_from_xml.loadFromXML(fileName+".xml","ContactSequence");
+  BOOST_CHECK(cs6 == cs_from_xml);
+
+  cs6.saveAsBinary(fileName);
+  cs_from_bin.loadFromBinary(fileName);
+  BOOST_CHECK(cs6 == cs_from_bin);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
