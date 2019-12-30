@@ -39,10 +39,6 @@ SET(${PROJECT_NAME}_CONTAINER_HEADERS
   )
 
 SET(${PROJECT_NAME}_PYTHON_HEADERS
-  bindings/python/container/array.hpp
-  bindings/python/container/reference-wrapper.hpp
-  bindings/python/container/visitor.hpp
-  bindings/python/fwd.hpp
   bindings/python/geometry/ellipsoid.hpp
   bindings/python/geometry/expose-geometry.hpp
   bindings/python/geometry/linear-cone.hpp
@@ -53,7 +49,6 @@ SET(${PROJECT_NAME}_PYTHON_HEADERS
   bindings/python/scenario/contact-phase.hpp
   bindings/python/scenario/contact-sequence.hpp
   bindings/python/scenario/expose-scenario.hpp
-  bindings/python/utils/base.hpp
   bindings/python/utils/printable.hpp
   )
 
