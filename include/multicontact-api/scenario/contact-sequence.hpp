@@ -103,12 +103,14 @@ struct ContactSequenceTpl : public serialization::Serializable< ContactSequenceT
 
     /* End Helpers */
 
+     /*Public Attributes*/
+    ContactPhaseVector m_contact_phases;
+    /*Public Attributes*/
+
   private:
 
 
-    /*Public Attributes*/
-    ContactPhaseVector m_contact_phases;
-    /*Public Attributes*/
+
 
     // Serialization of the class
     friend class boost::serialization::access;
