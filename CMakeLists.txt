@@ -3,6 +3,11 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
+SET(PROJECT_NAMESPACE loco-3d)
+SET(PROJECT_NAME multicontact-api)
+SET(PROJECT_DESCRIPTION "API to define and store Contact phases and Contact Sequences")
+SET(PROJECT_URL "https://gepgitlab.laas.fr/${PROJECT_NAMESPACE}/${PROJECT_NAME}")
+
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/boost.cmake)
 INCLUDE(cmake/eigen.cmake)
@@ -10,10 +15,6 @@ INCLUDE(cmake/python.cmake)
 INCLUDE(cmake/ide.cmake)
 INCLUDE(cmake/test.cmake)
 
-SET(PROJECT_NAMESPACE loco-3d)
-SET(PROJECT_NAME multicontact-api)
-SET(PROJECT_DESCRIPTION "Multi-contact locomotion for multi-body systems")
-SET(PROJECT_URL "https://gepgitlab.laas.fr/${PROJECT_NAMESPACE}/${PROJECT_NAME}")
 
 OPTION(BUILD_PYTHON_INTERFACE "Build the python binding" ON)
 OPTION (INSTALL_PYTHON_INTERFACE_ONLY "Install *ONLY* the python binding" OFF)
