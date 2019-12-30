@@ -1,9 +1,3 @@
-SET(${PROJECT_NAME}_MATH_HEADERS
-  math/cumsum.hpp
-  math/factorial.hpp
-  math/nrand.hpp
-  math/search.hpp
-  )
 
 SET(${PROJECT_NAME}_GEOMETRY_HEADERS
   geometry/ellipsoid.hpp
@@ -29,9 +23,6 @@ SET(${PROJECT_NAME}_SCENARIO_HEADERS
   scenario/fwd.hpp
   )
 
-SET(${PROJECT_NAME}_CONTAINER_HEADERS
-  container/ref.hpp
-  )
 
 SET(${PROJECT_NAME}_PYTHON_HEADERS
   bindings/python/geometry/ellipsoid.hpp
@@ -48,11 +39,9 @@ SET(${PROJECT_NAME}_PYTHON_HEADERS
   )
 
 SET(${PROJECT_NAME}_HEADERS
-  ${${PROJECT_NAME}_MATH_HEADERS}
   ${${PROJECT_NAME}_GEOMETRY_HEADERS}
   ${${PROJECT_NAME}_SERIALIZATION_HEADERS}
   ${${PROJECT_NAME}_SCENARIO_HEADERS}
-  ${${PROJECT_NAME}_CONTAINER_HEADERS}
   ${${PROJECT_NAME}_PYTHON_HEADERS}
   )
 
