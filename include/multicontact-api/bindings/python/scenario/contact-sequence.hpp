@@ -28,9 +28,14 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
     cl.def(bp::init<size_t>(bp::arg("size"), "Default constructor from a given size."))
         .def(bp::init<>(bp::arg(""),"Default constructor."))
         .def(bp::init<CS>(bp::args("other"), "Copy contructor."))
-        .def("size", &CS::size, "Size of the contact sequence.")
-
-
+        .def("size", &CS::size, "Return the size of the contact sequence.")
+        .def("resize", &CS::resize,bp::arg("size"), "Resize the vector of ContactPhases.")
+        .def("append",&CS::append,bp::arg("ContactPhase"),
+        "Add the given ContactPhase at the end of the sequence. \n"
+        "Return the new id of this ContactPhase inside the sequence.")
+        .add_property("contactPhases",
+        bp::make_getter(&CS::m_contact_phases,bp::return_internal_reference<>()),
+        "Vector of Contact Phases contained in the sequence")
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
         .def("copy", &copy, "Returns a copy of *this.");
