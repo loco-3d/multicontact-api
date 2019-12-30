@@ -14,7 +14,7 @@ from curves import SE3Curve,polynomial,bezier,piecewise,piecewise_SE3
 pin.switchToNumpyArray()
 
 import multicontact_api
-from multicontact_api import ContactModelPlanar,ContactPatch,ContactPhase
+from multicontact_api import ContactModelPlanar,ContactPatch,ContactPhase,ContactSequence
 
 def randomQuaternion():
   u1 = uniform(0.,1.)
@@ -132,10 +132,10 @@ def addRandomEffectorTrajectories(cp):
     cp.addEffectorTrajectory("left-hand",fL)
 
 
-def buildRandomContactPhase():
+def buildRandomContactPhase(min=0.,max=2.):
     cp = ContactPhase()
-    cp.timeInitial = 1.
-    cp.timeFinal =3.5
+    cp.timeInitial = min
+    cp.timeFinal =max
     addRandomPointsValues(cp)
     addRandomCurvesValues(cp)
     addRandomContacts(cp)
@@ -1176,6 +1176,174 @@ class ContactPhaseTest(unittest.TestCase):
     cp_xml = ContactPhase()
     cp_xml.loadFromXML("cp_test.xml",'ContactPhase')
     self.assertEqual(cp1,cp_xml)
+
+class ContactSequenceTest(unittest.TestCase):
+
+  def test_append(self):
+    cs = ContactSequence(0)
+    self.assertTrue(cs.size() == 0)
+    cp0 = buildRandomContactPhase(0,2)
+    cp1 = buildRandomContactPhase(2,4.)
+    id = cs.append(cp0)
+    self.assertTrue(cs.size() == 1)
+    self.assertTrue(id == 0)
+    self.assertTrue(cs.contactPhases[0] == cp0)
+    id = cs.append(cp1)
+    self.assertTrue(cs.size() == 2)
+    self.assertTrue(id == 1)
+    self.assertTrue(cs.contactPhases[0] == cp0)
+    self.assertTrue(cs.contactPhases[1] == cp1)
+
+  """ # test copied from c++, but the same behaviour cannot be obtained in python
+  def test_accessor_phase_vector(self):
+    cs = ContactSequence(0)
+    cp0 = buildRandomContactPhase(0,2)
+    cp1 = buildRandomContactPhase(2,4.)
+    cs.append(cp0)
+    cs.append(cp1)
+    phases = cs.contactPhases()
+    self.assertTrue(type(phases) is list)
+    self.assertTrue(len(phases) == 2)
+    self.assertTrue(phases[0] == cp0)
+    self.assertTrue(phases[1] == cp1)
+
+    # check that the accessor to contactPhases() create a copy :
+    cp2 = buildRandomContactPhase(0,2)
+    phases += [cp2]
+    self.assertTrue(len(phases) == 3)
+    self.assertTrue(cs.size() == 2 ) # original contact sequence should not be modified
+    phases[1].duration = 3.
+    self.assertTrue(cs.contactPhase(1) == cp1) # original contact sequence should not be modified
+  """
+
+  def test_accessor_phase_reference(self):
+    cs = ContactSequence(0)
+    cp0 = buildRandomContactPhase(0,2)
+    cp1 = buildRandomContactPhase(2,4.)
+    cp2 = buildRandomContactPhase(2,4.)
+    cs.append(cp0)
+    cs.append(cp1)
+    cs.contactPhases[1].timeFinal = 10.
+    self.assertTrue(cs.contactPhases[1] != cp1)
+    self.assertTrue(cs.contactPhases[1].timeFinal == 10.)
+
+    cs.contactPhases[0] = cp2
+    self.assertTrue(cs.contactPhases[0] == cp2)
+
+    # try with a variable :
+    cp_ref = cs.contactPhases[0]
+    c_init= np.random.rand(3)
+    cp_ref.c_init = c_init
+    cp_ref.duration = 10
+    self.assertTrue(cs.contactPhases[0].duration == 10)
+    self.assertTrue(array_equal(cs.contactPhases[0].c_init, c_init))
+
+  def test_constructor_with_size(self):
+    cp_default = ContactPhase()
+    cs = ContactSequence(3)
+    self.assertTrue(cs.size() == 3)
+    for i in range(3):
+        self.assertTrue(cs.contactPhases[i] == cp_default)
+
+    # try to modify the uninitialized contact phase inside the sequence from the reference
+    cp_0 = cs.contactPhases[0]
+    c_init= np.random.rand(3)
+    cp_0.c_init = c_init
+    cp_0.duration = 10
+    self.assertTrue(cs.contactPhases[0] != cp_default)
+    self.assertTrue(cs.contactPhases[0].duration == 10)
+    self.assertTrue(array_equal(cs.contactPhases[0].c_init,c_init))
+
+    cp1 = buildRandomContactPhase(2,4.)
+    cs.contactPhases[1] = cp1
+    self.assertTrue(cs.contactPhases[1] == cp1)
+
+  def test_resize(self):
+    cp_default = ContactPhase()
+    cs = ContactSequence(3)
+    cp_0 = cs.contactPhases[0]
+    c_init= np.random.rand(3)
+    cp_0.c_init = c_init
+    cp_0.duration = 10
+    cp1 = buildRandomContactPhase(2,4.)
+    cs.contactPhases[1] = cp1
+    # with smaller value than current :
+    cs.resize(1)
+    self.assertTrue(cs.size() == 1)
+    self.assertTrue(cs.contactPhases[0].duration == 10)
+    self.assertTrue(array_equal(cs.contactPhases[0].c_init, c_init))
+
+    # check with greater size than current :
+    cs.resize(4)
+    self.assertTrue(cs.size() == 4)
+    self.assertTrue(cs.contactPhases[0].duration == 10)
+    self.assertTrue(array_equal(cs.contactPhases[0].c_init, c_init))
+    for i in range(1,4):
+        self.assertTrue(cs.contactPhases[i] == cp_default)
+
+  def test_operator_equal(self):
+    cs3 = ContactSequence()
+    cs4 = ContactSequence()
+
+    self.assertTrue(cs3 == cs4)
+    cp3_0 = buildRandomContactPhase()
+    cs3.append(cp3_0)
+    self.assertTrue(cs3 != cs4)
+    self.assertFalse(cs3 == cs4)
+    cs4.append(cp3_0)
+    self.assertTrue(cs3 == cs4)
+    cp3_1 = buildRandomContactPhase()
+    cs3.append(cp3_1)
+    self.assertTrue(cs3 != cs4)
+    cs4.append(cp3_1)
+    self.assertTrue(cs3 == cs4)
+    cs4.contactPhases[1].duration = 10
+    self.assertTrue(cs4.contactPhases[1] != cp3_1)
+    self.assertTrue(cs3 != cs4)
+    cs5 = ContactSequence(2)
+    cs5.contactPhases[0] = cp3_0
+    self.assertTrue(cs3 != cs5)
+    cs5.contactPhases[1] = cp3_1
+    self.assertTrue(cs3 == cs5)
+
+
+  def test_copy_constructor(self):
+    cs = ContactSequence()
+    for i in range(10):
+      cp = buildRandomContactPhase()
+      cs.append(cp)
+    self.assertTrue(cs.size() == 10)
+
+    cs1 = ContactSequence(cs)
+    self.assertTrue(cs == cs1)
+    for i in range(10):
+      self.assertTrue(cs.contactPhases[i] == cs1.contactPhases[i])
+
+    # check that it's a copy and not the same object :
+    cs.contactPhases[0].duration = 15.
+    self.assertFalse(cs == cs1)
+    self.assertFalse(cs.contactPhases[0] == cs1.contactPhases[0])
+
+
+
+  def test_serialization(self):
+    cs = ContactSequence()
+    for i in range(10):
+      cp = buildRandomContactPhase()
+      cs.append(cp)
+
+    cs.saveAsText("cs_test.txt")
+    cs_txt = ContactSequence()
+    cs_txt.loadFromText("cs_test.txt")
+    self.assertEqual(cs,cs_txt)
+    cs.saveAsBinary("cs_test")
+    cs_bin = ContactSequence()
+    cs_bin.loadFromBinary("cs_test")
+    self.assertEqual(cs,cs_bin)
+    cs.saveAsXML("cs_test.xml",'ContactSequence')
+    cs_xml = ContactSequence()
+    cs_xml.loadFromXML("cs_test.xml",'ContactPatch')
+    self.assertEqual(cs,cs_xml)
 
 if __name__ == '__main__':
   unittest.main()
