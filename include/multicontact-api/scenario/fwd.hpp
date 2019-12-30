@@ -21,14 +21,8 @@ namespace scenario{
   template<typename _ContactPhase> struct ContactSequenceTpl;
   typedef ContactSequenceTpl<ContactPhase> ContactSequence;
 
-  template<class SOC> struct ContactConstraintSOC;
-  typedef ContactConstraintSOC<geometry::SOC6d> ContactConstraintSOC6;
-
   template<typename Scalar> struct ContactModelPlanarTpl;
   typedef ContactModelPlanarTpl<double> ContactModelPlanar;
-
-  template<typename Scalar> struct ContactConstraintPlanarTpl;
-  typedef ContactConstraintPlanarTpl<double> ContactConstraintPlanar;
 
   enum ConicType { CONIC_SOWC, CONIC_DOUBLE_DESCRIPTION, CONIC_UNDEFINED };
 

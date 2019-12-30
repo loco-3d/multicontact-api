@@ -22,11 +22,6 @@ SET(${PROJECT_NAME}_SERIALIZATION_HEADERS
   )
 
 SET(${PROJECT_NAME}_SCENARIO_HEADERS
-  scenario/constraint.hpp
-  scenario/constraint-gmm.hpp
-  scenario/constraint-soc.hpp
-  scenario/contact-constraint.hpp
-  scenario/contact-constraint-planar.hpp
   scenario/contact-model-planar.hpp
   scenario/contact-patch.hpp
   scenario/contact-phase.hpp
