@@ -10,9 +10,7 @@ SET(${PROJECT_NAME}_SERIALIZATION_HEADERS
   serialization/aligned-vector.hpp
   serialization/archive.hpp
   serialization/eigen-matrix.hpp
-  serialization/fwd.hpp
   serialization/spatial.hpp
-  serialization/xml.hpp
   )
 
 SET(${PROJECT_NAME}_SCENARIO_HEADERS
