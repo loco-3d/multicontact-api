@@ -1,5 +1,6 @@
 
 SET(${PROJECT_NAME}_GEOMETRY_HEADERS
+  geometry/curve-map.hpp
   geometry/ellipsoid.hpp
   geometry/fwd.hpp
   geometry/linear-cone.hpp
