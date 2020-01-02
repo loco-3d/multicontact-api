@@ -10,7 +10,9 @@
 #include "multicontact-api/serialization/eigen-matrix.hpp"
 #include "multicontact-api/serialization/spatial.hpp"
 
+#include <curves/fwd.h>
 #include <curves/curve_abc.h>
+#include <curves/piecewise_curve.h>
 #include <map>
 #include <vector>
 #include <string>
@@ -31,19 +33,26 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   typedef _Scalar Scalar;
+
   // Eigen types
-  typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> pointX_t;
-  typedef Eigen::Matrix<Scalar,3, 1> point3_t;
-  typedef Eigen::Matrix<Scalar, 6, 1> point6_t;
-  typedef Eigen::Transform<Scalar, 3, Eigen::Affine> transform_t;
+  typedef curves::pointX_t pointX_t;
+  typedef curves::point3_t point3_t;
+  typedef curves::point6_t point6_t;
+  typedef curves::t_point3_t t_point3_t;
+  typedef curves::t_pointX_t t_pointX_t;
+  typedef curves::transform_t transform_t;
 
   // Curves types
-  typedef curves::curve_abc<Scalar, Scalar, true, pointX_t> curve_t;
+  typedef curves::curve_abc_t curve_t;
   //typedef curves::curve_abc<Scalar, Scalar, true, point3_t> curve_3_t;
-  typedef curves::curve_abc<Scalar, Scalar, true, transform_t,point6_t> curve_SE3_t;
+  typedef curves::curve_SE3_t curve_SE3_t;
   typedef boost::shared_ptr<curve_t> curve_ptr;
   //typedef boost::shared_ptr<curve_3_t> curve_3_ptr;
   typedef boost::shared_ptr<curve_SE3_t> curve_SE3_ptr;
+  typedef curves::piecewise3_t piecewise3_t;
+  typedef curves::piecewise_t piecewise_t;
+  typedef piecewise_t::t_time_t t_time_t;
+
 
   typedef std::vector<std::string> t_strings;
   typedef ContactPatchTpl<Scalar> ContactPatch;
@@ -438,6 +447,9 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
   bool effectorHaveAtrajectory(const std::string& eeName) const {
     return m_effector_trajectories.count(eeName);
   }
+
+  /* Helpers */
+
   /**
    * @brief isConsistent check if all the members of the phase are consistent together:
    * - There is a contact patch defined for all effector in contact
@@ -448,11 +460,111 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    * @param throw_if_inconsistent if true, throw an runtime_error if not consistent
    * @return true if consistent, false otherwise
    */
-  bool isConsistent(const bool throw_if_inconsistent = false){
+  bool isConsistent(const bool throw_if_inconsistent = false) const {
     std::cout<<"WARNING : not implemented yet, return True"<<std::endl;
     (void)throw_if_inconsistent;
     return true;
   }
+
+  /**
+   * @brief setCOMtrajectoryFromPoints set the c,dc and ddc curves from a list of discrete
+   * COM positions, velocity and accelerations.
+   * The trajectories are build with 5th order polynomials connecting each discrete points given.
+   * If the initial/final values for c, dc and ddc are not set,
+   * this method also set them from the first and last discrete point given.
+   * Otherwise it do not modify them.
+   * @param points list of discrete CoM positions
+   * @param points_derivative list of discrete CoM velocities
+   * @param points_second_derivative list of discrete CoM accelerations
+   * @param time_points list of times corresponding to each discrete point given.
+   */
+  void setCOMtrajectoryFromPoints(const t_pointX_t& points,
+                                 const t_pointX_t& points_derivative,
+                                 const t_pointX_t& points_second_derivative,
+                                 const t_time_t& time_points){
+    piecewise_t c_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points,points_derivative,points_second_derivative,time_points);
+    if(c_t.dim() != 3)
+      throw std::invalid_argument("Dimension of the points must be 3.");
+    m_c = curve_ptr(new piecewise_t(c_t));
+    m_dc = curve_ptr(c_t.compute_derivate_ptr(1));
+    m_ddc = curve_ptr(c_t.compute_derivate_ptr(2));
+
+    if(m_c_init.isZero())
+      m_c_init = point3_t(points.front());
+    if(m_c_final.isZero())
+      m_c_final =  point3_t(points.back());
+    if(m_dc_init.isZero())
+      m_dc_init =  point3_t(points_derivative.front());
+    if(m_dc_final.isZero())
+      m_dc_final =  point3_t(points_derivative.back());
+    if(m_ddc_init.isZero())
+      m_ddc_init =  point3_t(points_second_derivative.front());
+    if(m_ddc_final.isZero())
+      m_ddc_final =  point3_t(points_second_derivative.back());
+    return;
+  }
+
+  /**
+   * @brief setAMtrajectoryFromPoints set the L and d_L curves from a list of discrete
+   * Angular velocity values and their derivatives
+   * The trajectories are build with 3th order polynomials connecting each discrete points given.
+   * If the initial/final values for c, dc and ddc are not set,
+   * this method also set them from the first and last discrete point given.
+   * Otherwise it do not modify them.
+   * @param points list of discrete Angular Momentum values
+   * @param points_derivative list of discrete Angular momentum derivative
+   * @param time_points list of times corresponding to each discrete point given.
+   */
+  void setAMtrajectoryFromPoints(const t_pointX_t& points,
+                                 const t_pointX_t& points_derivative,
+                                 const t_time_t& time_points){
+    piecewise_t L_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points,points_derivative,time_points);
+    if(L_t.dim() != 3)
+      throw std::invalid_argument("Dimension of the points must be 3.");
+    m_L = curve_ptr(new piecewise_t(L_t));
+    m_dL = curve_ptr(L_t.compute_derivate_ptr(1));
+
+    if(m_L_init.isZero())
+      m_L_init =  point3_t(points.front());
+    if(m_L_final.isZero())
+      m_L_final =  point3_t(points.back());
+    if(m_dL_init.isZero())
+      m_dL_init =  point3_t(points_derivative.front());
+    if(m_dL_final.isZero())
+     m_dL_final =  point3_t(points_derivative.back());
+    return;
+  }
+
+  /**
+   * @brief setJointsTrajectoryFromPoints set the q,dq and ddq curves from a list of discrete
+   * joints positions, velocity and accelerations.
+   * The trajectories are build with 5th order polynomials connecting each discrete points given.
+   * If the initial/final values for q are not set,
+   * this method also set them from the first and last discrete point given.
+   * Otherwise it do not modify them.
+   * @param points list of discrete joints positions
+   * @param points_derivative list of discrete joints velocities
+   * @param points_second_derivative list of discrete joints accelerations
+   * @param time_points list of times corresponding to each discrete point given.
+   */
+  void setJointsTrajectoryFromPoints(const t_pointX_t& points,
+                                     const t_pointX_t& points_derivative,
+                                     const t_pointX_t& points_second_derivative,
+                                     const t_time_t& time_points){
+
+    piecewise_t q_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points,points_derivative,points_second_derivative,time_points);
+    m_q = curve_ptr(new piecewise_t(q_t));
+    m_dq = curve_ptr(q_t.compute_derivate_ptr(1));
+    m_ddq = curve_ptr(q_t.compute_derivate_ptr(2));
+    if(m_q_init.isZero())
+    m_q_init = points.front();
+    if(m_q_final.isZero())
+      m_q_final = points.back();
+
+    return;
+  }
+
+  /* End Helpers */
 
   void disp(std::ostream& os) const {
     Eigen::Matrix<Scalar,3, 5> state0(Eigen::Matrix<Scalar,3, 5>::Zero());
