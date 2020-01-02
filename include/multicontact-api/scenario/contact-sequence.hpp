@@ -6,9 +6,7 @@
 #include "multicontact-api/scenario/contact-phase.hpp"
 
 #include "multicontact-api/serialization/archive.hpp"
-#include "multicontact-api/serialization/aligned-vector.hpp"
 
-#include <pinocchio/container/aligned-vector.hpp>
 
 #include <vector>
 #include <boost/serialization/vector.hpp>
@@ -23,7 +21,7 @@ struct ContactSequenceTpl : public serialization::Serializable< ContactSequenceT
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   typedef _ContactPhase ContactPhase;
   typedef typename ContactPhase::Scalar Scalar;
-  typedef pinocchio::container::aligned_vector<ContactPhase> ContactPhaseVector;
+  typedef std::vector<ContactPhase> ContactPhaseVector;
 
 
     ContactSequenceTpl(const size_t size = 0)
