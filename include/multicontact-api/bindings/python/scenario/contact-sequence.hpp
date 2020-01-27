@@ -10,7 +10,6 @@
 
 #include "multicontact-api/scenario/contact-sequence.hpp"
 #include "multicontact-api/bindings/python/serialization/archive.hpp"
-#include "multicontact-api/bindings/python/container/visitor.hpp"
 
 namespace multicontact_api {
 namespace python {
