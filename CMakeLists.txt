@@ -15,6 +15,7 @@ INCLUDE(cmake/python.cmake)
 INCLUDE(cmake/ide.cmake)
 INCLUDE(cmake/test.cmake)
 
+SET(CMAKE_CXX_STANDARD 11)
 
 OPTION(BUILD_PYTHON_INTERFACE "Build the python binding" ON)
 OPTION(INSTALL_PYTHON_INTERFACE_ONLY "Install *ONLY* the python binding" OFF)
