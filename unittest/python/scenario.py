@@ -15,7 +15,6 @@ from multicontact_api import ContactModelPlanar, ContactPatch, ContactPhase, Con
 pin.switchToNumpyArray()
 
 
-
 def randomQuaternion():
     u1 = uniform(0., 1.)
     u2 = uniform(0., 2. * np.pi)
@@ -135,7 +134,7 @@ def addRandomEffectorTrajectories(cp):
 
 
 def buildRandomContactPhase(min=-1, max=-1):
-    if min > 0 and max > 0:
+    if min >= 0 and max >= 0:
         cp = ContactPhase(min, max)
     else:
         cp = ContactPhase()
@@ -1481,6 +1480,39 @@ class ContactSequenceTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             cs1.createContact("left-leg", ContactPatch(placement), 2.)  # time interval not defined
         self.assertTrue(cs1.size() == 4)
+
+    def test_is_consistent(self):
+        cs1 = ContactSequence(0)
+        cp0 = buildRandomContactPhase(0, 2)
+        cp1 = buildRandomContactPhase(2, 4.)
+        cs1.append(cp0)
+        cs1.append(cp1)
+        consistent = cs1.isTimeConsistent()
+        self.assertTrue(consistent)
+
+        cs2 = ContactSequence(0)
+        cp2 = buildRandomContactPhase(0, 2)
+        cp3 = buildRandomContactPhase(1.5, 4.)
+        cs2.append(cp2)
+        cs2.append(cp3)
+        consistent = cs2.isTimeConsistent()
+        self.assertFalse(consistent)
+
+        cs3 = ContactSequence(0)
+        cp4 = buildRandomContactPhase(0, 2)
+        cp5 = buildRandomContactPhase()
+        cs3.append(cp4)
+        cs3.append(cp5)
+        consistent = cs3.isTimeConsistent()
+        self.assertFalse(consistent)
+
+        cs4 = ContactSequence(0)
+        cp6 = buildRandomContactPhase()
+        cp7 = buildRandomContactPhase(1, 3)
+        cs4.append(cp6)
+        cs4.append(cp7)
+        consistent = cs4.isTimeConsistent()
+        self.assertFalse(consistent)
 
 
 if __name__ == '__main__':
