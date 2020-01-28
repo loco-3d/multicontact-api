@@ -19,8 +19,6 @@ void exposeEnumConicType() {
       .value("CONIC_UNDEFINED", CONIC_UNDEFINED);
 }
 
-void exposeScenarioEnums() {
-  exposeEnumConicType();
-}
+void exposeScenarioEnums() { exposeEnumConicType(); }
 }  // namespace python
 }  // namespace multicontact_api

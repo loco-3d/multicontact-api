@@ -14,7 +14,6 @@
 #include <curves/exact_cubic.h>
 #include <curves/cubic_hermite_spline.h>
 
-
 namespace multicontact_api {
 namespace python {
 void exposeContactSequence() {

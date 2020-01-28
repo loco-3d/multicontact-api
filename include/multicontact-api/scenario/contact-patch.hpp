@@ -18,28 +18,22 @@ struct ContactPatchTpl : public serialization::Serializable<ContactPatchTpl<_Sca
   typedef pinocchio::SE3Tpl<Scalar, 0> SE3;
 
   /// \brief Default constructor.
-  ContactPatchTpl()
-      : m_placement(SE3::Identity()), m_mu(-1.) {}
+  ContactPatchTpl() : m_placement(SE3::Identity()), m_mu(-1.) {}
 
   /// \brief Init contact patch from a given placement.
-  explicit ContactPatchTpl(const SE3& placement)
-      : m_placement(placement), m_mu(-1.) {}
+  explicit ContactPatchTpl(const SE3& placement) : m_placement(placement), m_mu(-1.) {}
 
   /// \brief Init contact patch from a given placement and a friction coefficient
-  ContactPatchTpl(const SE3& placement, const Scalar mu)
-      : m_placement(placement), m_mu(mu) {}
+  ContactPatchTpl(const SE3& placement, const Scalar mu) : m_placement(placement), m_mu(mu) {}
 
   /// \brief Copy constructor
-  ContactPatchTpl(const ContactPatchTpl& other)
-      : m_placement(other.m_placement),
-        m_mu(other.m_mu) {}
+  ContactPatchTpl(const ContactPatchTpl& other) : m_placement(other.m_placement), m_mu(other.m_mu) {}
 
   const SE3& placement() const { return m_placement; }
   SE3& placement() { return m_placement; }
 
   const Scalar& friction() const { return m_mu; }
   Scalar& friction() { return m_mu; }
-
 
   template <typename S2>
   bool operator==(const ContactPatchTpl<S2>& other) const {
@@ -51,11 +45,8 @@ struct ContactPatchTpl : public serialization::Serializable<ContactPatchTpl<_Sca
     return !(*this == other);
   }
 
-
   void disp(std::ostream& os) const {
-    os <<"Placement:\n"
-       << m_placement << std::endl
-       <<"Friction coefficient : "<<m_mu<<std::endl;
+    os << "Placement:\n" << m_placement << std::endl << "Friction coefficient : " << m_mu << std::endl;
   }
 
   template <typename S2>
@@ -64,35 +55,33 @@ struct ContactPatchTpl : public serialization::Serializable<ContactPatchTpl<_Sca
     return os;
   }
 
+ protected:
+  /// \brief Placement of the contact patch
+  SE3 m_placement;
+  /// \brief friction coefficient for this contact
+  Scalar m_mu;
 
-protected:
- /// \brief Placement of the contact patch
- SE3 m_placement;
- /// \brief friction coefficient for this contact
- Scalar m_mu;
+ private:
+  // Serialization of the class
+  friend class boost::serialization::access;
 
-private:
- // Serialization of the class
- friend class boost::serialization::access;
+  template <class Archive>
+  void save(Archive& ar, const unsigned int /*version*/) const {
+    ar& boost::serialization::make_nvp("placement", m_placement);
+    ar& boost::serialization::make_nvp("mu", m_mu);
+  }
 
- template <class Archive>
- void save(Archive& ar, const unsigned int /*version*/) const {
-   ar& boost::serialization::make_nvp("placement", m_placement);
-   ar& boost::serialization::make_nvp("mu", m_mu);
- }
+  template <class Archive>
+  void load(Archive& ar, const unsigned int /*version*/) {
+    ar >> boost::serialization::make_nvp("placement", m_placement);
+    ar >> boost::serialization::make_nvp("mu", m_mu);
+  }
 
- template <class Archive>
- void load(Archive& ar, const unsigned int /*version*/) {
-   ar >> boost::serialization::make_nvp("placement", m_placement);
-   ar >> boost::serialization::make_nvp("mu", m_mu);
+  BOOST_SERIALIZATION_SPLIT_MEMBER()  // why is it required ? using only serialize() lead to compilation error,
+                                      // probably because of the SE3
 
- }
+};  // struct ContactPatchTpl
+}  // namespace scenario
+}  // namespace multicontact_api
 
- BOOST_SERIALIZATION_SPLIT_MEMBER() // why is it required ? using only serialize() lead to compilation error, probably because of the SE3
-
-}; // struct ContactPatchTpl
-}//scenario
-}//multicontact_api
-
-
-#endif // __multicontact_api_scenario_contact_patch_hpp__
+#endif  // __multicontact_api_scenario_contact_patch_hpp__

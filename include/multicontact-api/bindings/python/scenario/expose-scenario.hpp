@@ -19,7 +19,6 @@ inline void exposeScenario() {
   exposeContactPatch();
   exposeContactPhase();
   exposeContactSequence();
-
 }
 
 }  // namespace python

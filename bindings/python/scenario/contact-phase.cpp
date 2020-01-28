@@ -14,14 +14,12 @@
 #include <curves/exact_cubic.h>
 #include <curves/cubic_hermite_spline.h>
 
-
 namespace multicontact_api {
 namespace python {
 void exposeContactPhase() {
   ContactPhasePythonVisitor<multicontact_api::scenario::ContactPhase>::expose("ContactPhase");
 }
-}
-
+}  // namespace python
 
 // namespace python
 }  // namespace multicontact_api

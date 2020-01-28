@@ -1,7 +1,6 @@
 #ifndef __multicontact_api_scenario_contact_phase_hpp__
 #define __multicontact_api_scenario_contact_phase_hpp__
 
-
 #include "multicontact-api/scenario/fwd.hpp"
 #include "multicontact-api/scenario/contact-patch.hpp"
 #include "multicontact-api/geometry/curve-map.hpp"
@@ -24,12 +23,11 @@
 #include <boost/serialization/vector.hpp>
 #include <curves/serialization/registeration.hpp>
 
-namespace multicontact_api{
-namespace scenario  {
+namespace multicontact_api {
+namespace scenario {
 
-template<typename _Scalar>
-struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Scalar> >
-{
+template <typename _Scalar>
+struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Scalar> > {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   typedef _Scalar Scalar;
@@ -44,59 +42,55 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
 
   // Curves types
   typedef curves::curve_abc_t curve_t;
-  //typedef curves::curve_abc<Scalar, Scalar, true, point3_t> curve_3_t;
+  // typedef curves::curve_abc<Scalar, Scalar, true, point3_t> curve_3_t;
   typedef curves::curve_SE3_t curve_SE3_t;
   typedef boost::shared_ptr<curve_t> curve_ptr;
-  //typedef boost::shared_ptr<curve_3_t> curve_3_ptr;
+  // typedef boost::shared_ptr<curve_3_t> curve_3_ptr;
   typedef boost::shared_ptr<curve_SE3_t> curve_SE3_ptr;
   typedef curves::piecewise3_t piecewise3_t;
   typedef curves::piecewise_t piecewise_t;
   typedef piecewise_t::t_time_t t_time_t;
 
-
   typedef std::vector<std::string> t_strings;
   typedef ContactPatchTpl<Scalar> ContactPatch;
   typedef typename ContactPatch::SE3 SE3;
-  typedef std::map< std::string, ContactPatch > ContactPatchMap;
+  typedef std::map<std::string, ContactPatch> ContactPatchMap;
   typedef CurveMap<curve_ptr> CurveMap_t;
   typedef CurveMap<curve_SE3_ptr> CurveSE3Map_t;
 
-
   /// \brief Default constructor
   ContactPhaseTpl()
-    : m_c_init(point3_t::Zero()),
-      m_dc_init(point3_t::Zero()),
-      m_ddc_init(point3_t::Zero()),
-      m_L_init(point3_t::Zero()),
-      m_dL_init(point3_t::Zero()),
-      m_q_init(),
-      m_c_final(point3_t::Zero()),
-      m_dc_final(point3_t::Zero()),
-      m_ddc_final(point3_t::Zero()),
-      m_L_final(point3_t::Zero()),
-      m_dL_final(point3_t::Zero()),
-      m_q_final(),
-      m_q(),
-      m_dq(),
-      m_ddq(),
-      m_tau(),
-      m_c(),
-      m_dc(),
-      m_ddc(),
-      m_L(),
-      m_dL(),
-      m_wrench(),
-      m_zmp(),
-      m_root(),
-      m_contact_forces(),
-      m_contact_normal_force(),
-      m_effector_trajectories(),
-      m_effector_in_contact(),
-      m_contact_patches(),
-      m_t_init(-1),
-      m_t_final(-1)
-  {}
-
+      : m_c_init(point3_t::Zero()),
+        m_dc_init(point3_t::Zero()),
+        m_ddc_init(point3_t::Zero()),
+        m_L_init(point3_t::Zero()),
+        m_dL_init(point3_t::Zero()),
+        m_q_init(),
+        m_c_final(point3_t::Zero()),
+        m_dc_final(point3_t::Zero()),
+        m_ddc_final(point3_t::Zero()),
+        m_L_final(point3_t::Zero()),
+        m_dL_final(point3_t::Zero()),
+        m_q_final(),
+        m_q(),
+        m_dq(),
+        m_ddq(),
+        m_tau(),
+        m_c(),
+        m_dc(),
+        m_ddc(),
+        m_L(),
+        m_dL(),
+        m_wrench(),
+        m_zmp(),
+        m_root(),
+        m_contact_forces(),
+        m_contact_normal_force(),
+        m_effector_trajectories(),
+        m_effector_in_contact(),
+        m_contact_patches(),
+        m_t_init(-1),
+        m_t_final(-1) {}
 
   /**
    * @brief ContactPhaseTpl Constructor with time interval
@@ -105,121 +99,107 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    * @throw invalid_argument if t_final < t_init
    */
   ContactPhaseTpl(const Scalar t_init, const Scalar t_final)
-    : m_c_init(point3_t::Zero()),
-      m_dc_init(point3_t::Zero()),
-      m_ddc_init(point3_t::Zero()),
-      m_L_init(point3_t::Zero()),
-      m_dL_init(point3_t::Zero()),
-      m_q_init(),
-      m_c_final(point3_t::Zero()),
-      m_dc_final(point3_t::Zero()),
-      m_ddc_final(point3_t::Zero()),
-      m_L_final(point3_t::Zero()),
-      m_dL_final(point3_t::Zero()),
-      m_q_final(),
-      m_q(),
-      m_dq(),
-      m_ddq(),
-      m_tau(),
-      m_c(),
-      m_dc(),
-      m_ddc(),
-      m_L(),
-      m_dL(),
-      m_wrench(),
-      m_zmp(),
-      m_root(),
-      m_contact_forces(),
-      m_contact_normal_force(),
-      m_effector_trajectories(),
-      m_effector_in_contact(),
-      m_contact_patches(),
-      m_t_init(t_init),
-      m_t_final(t_final)
-  {
-    if(t_final < t_init)
-      throw std::invalid_argument("t_final cannot be inferior to t_initial");
+      : m_c_init(point3_t::Zero()),
+        m_dc_init(point3_t::Zero()),
+        m_ddc_init(point3_t::Zero()),
+        m_L_init(point3_t::Zero()),
+        m_dL_init(point3_t::Zero()),
+        m_q_init(),
+        m_c_final(point3_t::Zero()),
+        m_dc_final(point3_t::Zero()),
+        m_ddc_final(point3_t::Zero()),
+        m_L_final(point3_t::Zero()),
+        m_dL_final(point3_t::Zero()),
+        m_q_final(),
+        m_q(),
+        m_dq(),
+        m_ddq(),
+        m_tau(),
+        m_c(),
+        m_dc(),
+        m_ddc(),
+        m_L(),
+        m_dL(),
+        m_wrench(),
+        m_zmp(),
+        m_root(),
+        m_contact_forces(),
+        m_contact_normal_force(),
+        m_effector_trajectories(),
+        m_effector_in_contact(),
+        m_contact_patches(),
+        m_t_init(t_init),
+        m_t_final(t_final) {
+    if (t_final < t_init) throw std::invalid_argument("t_final cannot be inferior to t_initial");
   }
 
-
-
   /// \brief Copy constructor
-  template<typename S2>
-  ContactPhaseTpl(const ContactPhaseTpl<S2> & other)
-    : m_c_init(other.m_c_init),
-      m_dc_init(other.m_dc_init),
-      m_ddc_init(other.m_ddc_init),
-      m_L_init(other.m_L_init),
-      m_dL_init(other.m_dL_init),
-      m_q_init(other.m_q_init),
-      m_c_final(other.m_c_final),
-      m_dc_final(other.m_dc_final),
-      m_ddc_final(other.m_ddc_final),
-      m_L_final(other.m_L_final),
-      m_dL_final(other.m_dL_final),
-      m_q_final(other.m_q_final),
-      m_q(other.m_q),
-      m_dq(other.m_dq),
-      m_ddq(other.m_ddq),
-      m_tau(other.m_tau),
-      m_c(other.m_c),
-      m_dc(other.m_dc),
-      m_ddc(other.m_ddc),
-      m_L(other.m_L),
-      m_dL(other.m_dL),
-      m_wrench(other.m_wrench),
-      m_zmp(other.m_zmp),
-      m_root(other.m_root),
-      m_contact_forces(other.m_contact_forces),
-      m_contact_normal_force(other.m_contact_normal_force),
-      m_effector_trajectories(other.m_effector_trajectories),
-      m_effector_in_contact(other.m_effector_in_contact),
-      m_contact_patches(other.m_contact_patches),
-      m_t_init(other.m_t_init),
-      m_t_final(other.m_t_final)
-  {}
-
+  template <typename S2>
+  ContactPhaseTpl(const ContactPhaseTpl<S2>& other)
+      : m_c_init(other.m_c_init),
+        m_dc_init(other.m_dc_init),
+        m_ddc_init(other.m_ddc_init),
+        m_L_init(other.m_L_init),
+        m_dL_init(other.m_dL_init),
+        m_q_init(other.m_q_init),
+        m_c_final(other.m_c_final),
+        m_dc_final(other.m_dc_final),
+        m_ddc_final(other.m_ddc_final),
+        m_L_final(other.m_L_final),
+        m_dL_final(other.m_dL_final),
+        m_q_final(other.m_q_final),
+        m_q(other.m_q),
+        m_dq(other.m_dq),
+        m_ddq(other.m_ddq),
+        m_tau(other.m_tau),
+        m_c(other.m_c),
+        m_dc(other.m_dc),
+        m_ddc(other.m_ddc),
+        m_L(other.m_L),
+        m_dL(other.m_dL),
+        m_wrench(other.m_wrench),
+        m_zmp(other.m_zmp),
+        m_root(other.m_root),
+        m_contact_forces(other.m_contact_forces),
+        m_contact_normal_force(other.m_contact_normal_force),
+        m_effector_trajectories(other.m_effector_trajectories),
+        m_effector_in_contact(other.m_effector_in_contact),
+        m_contact_patches(other.m_contact_patches),
+        m_t_init(other.m_t_init),
+        m_t_final(other.m_t_final) {}
 
   template <typename S2>
   bool operator==(const ContactPhaseTpl<S2>& other) const {
-    return m_c_init == other.m_c_init &&
-          m_dc_init == other.m_dc_init &&
-          m_ddc_init == other.m_ddc_init &&
-          m_L_init == other.m_L_init &&
-          m_dL_init == other.m_dL_init &&
-          (m_q_init.rows() == other.m_q_init.rows() && m_q_init.cols() == other.m_q_init.cols() && m_q_init == other.m_q_init) &&
-          m_c_final == other.m_c_final &&
-          m_dc_final == other.m_dc_final &&
-          m_ddc_final == other.m_ddc_final &&
-          m_L_final == other.m_L_final &&
-          m_dL_final == other.m_dL_final &&
-          (m_q_final.rows() == other.m_q_final.rows() && m_q_final.cols() == other.m_q_final.cols() && m_q_final == other.m_q_final) &&
-          (m_q == other.m_q || ( m_q && other.m_q && m_q->isApprox(other.m_q.get())))&&
-          (m_dq == other.m_dq || ( m_dq && other.m_dq && m_dq->isApprox(other.m_dq.get())))&&
-          (m_ddq == other.m_ddq || ( m_ddq && other.m_ddq && m_ddq->isApprox(other.m_ddq.get())))&&
-          (m_tau == other.m_tau || ( m_tau && other.m_tau && m_tau->isApprox(other.m_tau.get())))&&
-          (m_c == other.m_c || ( m_c && other.m_c && m_c->isApprox(other.m_c.get())))&&
-          (m_dc == other.m_dc || ( m_dc && other.m_dc && m_dc->isApprox(other.m_dc.get())))&&
-          (m_ddc == other.m_ddc || ( m_ddc && other.m_ddc && m_ddc->isApprox(other.m_ddc.get())))&&
-          (m_L == other.m_L || ( m_L && other.m_L && m_L->isApprox(other.m_L.get())))&&
-          (m_dL == other.m_dL || ( m_dL && other.m_dL && m_dL->isApprox(other.m_dL.get())))&&
-          (m_wrench == other.m_wrench || ( m_wrench && other.m_wrench && m_wrench->isApprox(other.m_wrench.get())))&&
-          (m_zmp == other.m_zmp || ( m_zmp && other.m_zmp && m_zmp->isApprox(other.m_zmp.get())))&&
-          (m_root == other.m_root || ( m_root && other.m_root && m_root->isApprox(other.m_root.get())))&&
-          m_contact_forces == other.m_contact_forces &&
-          m_contact_normal_force == other.m_contact_normal_force &&
-          m_effector_trajectories == other.m_effector_trajectories &&
-          m_effector_in_contact == other.m_effector_in_contact &&
-          m_contact_patches == other.m_contact_patches &&
-          m_t_init == other.m_t_init &&
-          m_t_final == other.m_t_final;
+    return m_c_init == other.m_c_init && m_dc_init == other.m_dc_init && m_ddc_init == other.m_ddc_init &&
+           m_L_init == other.m_L_init && m_dL_init == other.m_dL_init &&
+           (m_q_init.rows() == other.m_q_init.rows() && m_q_init.cols() == other.m_q_init.cols() &&
+            m_q_init == other.m_q_init) &&
+           m_c_final == other.m_c_final && m_dc_final == other.m_dc_final && m_ddc_final == other.m_ddc_final &&
+           m_L_final == other.m_L_final && m_dL_final == other.m_dL_final &&
+           (m_q_final.rows() == other.m_q_final.rows() && m_q_final.cols() == other.m_q_final.cols() &&
+            m_q_final == other.m_q_final) &&
+           (m_q == other.m_q || (m_q && other.m_q && m_q->isApprox(other.m_q.get()))) &&
+           (m_dq == other.m_dq || (m_dq && other.m_dq && m_dq->isApprox(other.m_dq.get()))) &&
+           (m_ddq == other.m_ddq || (m_ddq && other.m_ddq && m_ddq->isApprox(other.m_ddq.get()))) &&
+           (m_tau == other.m_tau || (m_tau && other.m_tau && m_tau->isApprox(other.m_tau.get()))) &&
+           (m_c == other.m_c || (m_c && other.m_c && m_c->isApprox(other.m_c.get()))) &&
+           (m_dc == other.m_dc || (m_dc && other.m_dc && m_dc->isApprox(other.m_dc.get()))) &&
+           (m_ddc == other.m_ddc || (m_ddc && other.m_ddc && m_ddc->isApprox(other.m_ddc.get()))) &&
+           (m_L == other.m_L || (m_L && other.m_L && m_L->isApprox(other.m_L.get()))) &&
+           (m_dL == other.m_dL || (m_dL && other.m_dL && m_dL->isApprox(other.m_dL.get()))) &&
+           (m_wrench == other.m_wrench || (m_wrench && other.m_wrench && m_wrench->isApprox(other.m_wrench.get()))) &&
+           (m_zmp == other.m_zmp || (m_zmp && other.m_zmp && m_zmp->isApprox(other.m_zmp.get()))) &&
+           (m_root == other.m_root || (m_root && other.m_root && m_root->isApprox(other.m_root.get()))) &&
+           m_contact_forces == other.m_contact_forces && m_contact_normal_force == other.m_contact_normal_force &&
+           m_effector_trajectories == other.m_effector_trajectories &&
+           m_effector_in_contact == other.m_effector_in_contact && m_contact_patches == other.m_contact_patches &&
+           m_t_init == other.m_t_init && m_t_final == other.m_t_final;
   }
 
   template <typename S2>
   bool operator!=(const ContactPhaseTpl<S2>& other) const {
     return !(*this == other);
   }
-
 
   // public members :
   /// \brief Initial position of the center of mass for this contact phase
@@ -273,43 +253,44 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
   curve_SE3_ptr m_root;
 
   // getter and setter for the timings
-  Scalar timeInitial() const {return m_t_init;}
-  void timeInitial(const Scalar t){m_t_init = t;}
-  Scalar timeFinal() const {return m_t_final;}
-  void timeFinal(const Scalar t){
-    if(t<m_t_init)
-      throw std::invalid_argument("t_final cannot be inferior to t_initial");
+  Scalar timeInitial() const { return m_t_init; }
+  void timeInitial(const Scalar t) { m_t_init = t; }
+  Scalar timeFinal() const { return m_t_final; }
+  void timeFinal(const Scalar t) {
+    if (t < m_t_init) throw std::invalid_argument("t_final cannot be inferior to t_initial");
     m_t_final = t;
   }
-  Scalar duration() const {return m_t_final - m_t_init;}
-  void duration(const Scalar d){
-    if(d <= 0 )
-      throw std::invalid_argument("Duration of the phase cannot be negative.");
+  Scalar duration() const { return m_t_final - m_t_init; }
+  void duration(const Scalar d) {
+    if (d <= 0) throw std::invalid_argument("Duration of the phase cannot be negative.");
     m_t_final = m_t_init + d;
   }
 
   // getter for the map trajectories
-  CurveMap_t contactForces() const{return m_contact_forces;}
-  CurveMap_t contactNormalForces() const{return m_contact_normal_force;}
-  CurveSE3Map_t effectorTrajectories() const{return m_effector_trajectories;}
+  CurveMap_t contactForces() const { return m_contact_forces; }
+  CurveMap_t contactNormalForces() const { return m_contact_normal_force; }
+  CurveSE3Map_t effectorTrajectories() const { return m_effector_trajectories; }
   curve_ptr contactForces(const std::string& eeName) {
-    if(m_contact_forces.count(eeName) == 0){
-      throw std::invalid_argument("This contact phase do not contain any contact force trajectory for the effector "+eeName);
-    }else{
+    if (m_contact_forces.count(eeName) == 0) {
+      throw std::invalid_argument("This contact phase do not contain any contact force trajectory for the effector " +
+                                  eeName);
+    } else {
       return m_contact_forces.at(eeName);
     }
   }
-  curve_ptr contactNormalForces(const std::string& eeName){
-    if(m_contact_normal_force.count(eeName) == 0){
-      throw std::invalid_argument("This contact phase do not contain any normal contact force trajectory for the effector "+eeName);
-    }else{
+  curve_ptr contactNormalForces(const std::string& eeName) {
+    if (m_contact_normal_force.count(eeName) == 0) {
+      throw std::invalid_argument(
+          "This contact phase do not contain any normal contact force trajectory for the effector " + eeName);
+    } else {
       return m_contact_normal_force.at(eeName);
     }
   }
   curve_SE3_ptr effectorTrajectories(const std::string& eeName) {
-    if(m_effector_trajectories.count(eeName) == 0){
-      throw std::invalid_argument("This contact phase do not contain any effector trajectory for the effector "+eeName);
-    }else{
+    if (m_effector_trajectories.count(eeName) == 0) {
+      throw std::invalid_argument("This contact phase do not contain any effector trajectory for the effector " +
+                                  eeName);
+    } else {
       return m_effector_trajectories.at(eeName);
     }
   }
@@ -321,13 +302,13 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    * @throw invalid_argument if eeName is not defined in contact for this phase
    * @return false if a trajectory already existed (and have been overwrited) true otherwise
    */
-  bool addContactForceTrajectory(const std::string& eeName, const curve_ptr trajectory){
-    if(!isEffectorInContact(eeName))
-      throw std::invalid_argument("Cannot add a contact force trajectory for effector "+eeName+" as it is not in contact for the current phase.");
+  bool addContactForceTrajectory(const std::string& eeName, const curve_ptr trajectory) {
+    if (!isEffectorInContact(eeName))
+      throw std::invalid_argument("Cannot add a contact force trajectory for effector " + eeName +
+                                  " as it is not in contact for the current phase.");
     bool alreadyExist(m_contact_forces.count(eeName));
-    if(alreadyExist)
-      m_contact_forces.erase(eeName);
-    m_contact_forces.insert(std::pair<std::string,curve_ptr>(eeName,trajectory));
+    if (alreadyExist) m_contact_forces.erase(eeName);
+    m_contact_forces.insert(std::pair<std::string, curve_ptr>(eeName, trajectory));
     return !alreadyExist;
   }
   /**
@@ -339,15 +320,14 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    * @throw invalid_argument if trajectory is not of dimension 1
    * @return false if a trajectory already existed (and have been overwrited) true otherwise
    */
-  bool addContactNormalForceTrajectory(const std::string& eeName, const curve_ptr trajectory){
-    if(!isEffectorInContact(eeName))
-      throw std::invalid_argument("Cannot add a contact normal trajectory for effector "+eeName+" as it is not in contact for the current phase.");
-    if(trajectory->dim() != 1)
-      throw std::invalid_argument("Contact normal force trajectory must be of dimension 1");
+  bool addContactNormalForceTrajectory(const std::string& eeName, const curve_ptr trajectory) {
+    if (!isEffectorInContact(eeName))
+      throw std::invalid_argument("Cannot add a contact normal trajectory for effector " + eeName +
+                                  " as it is not in contact for the current phase.");
+    if (trajectory->dim() != 1) throw std::invalid_argument("Contact normal force trajectory must be of dimension 1");
     bool alreadyExist(m_contact_normal_force.count(eeName));
-    if(alreadyExist)
-      m_contact_normal_force.erase(eeName);
-    m_contact_normal_force.insert(std::pair<std::string,curve_ptr>(eeName,trajectory));
+    if (alreadyExist) m_contact_normal_force.erase(eeName);
+    m_contact_normal_force.insert(std::pair<std::string, curve_ptr>(eeName, trajectory));
     return !alreadyExist;
   }
   /**
@@ -358,21 +338,21 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    * @throw invalid_argument if eeName is defined in contact for this phase
    * @return false if a trajectory already existed (and have been overwrited) true otherwise
    */
-  bool addEffectorTrajectory(const std::string& eeName, const curve_SE3_ptr trajectory){
-    if(isEffectorInContact(eeName))
-      throw std::invalid_argument("Cannot add an effector trajectory for effector "+eeName+" as it is in contact for the current phase.");
+  bool addEffectorTrajectory(const std::string& eeName, const curve_SE3_ptr trajectory) {
+    if (isEffectorInContact(eeName))
+      throw std::invalid_argument("Cannot add an effector trajectory for effector " + eeName +
+                                  " as it is in contact for the current phase.");
     bool alreadyExist(m_effector_trajectories.count(eeName));
-    if(alreadyExist)
-      m_effector_trajectories.erase(eeName);
-    m_effector_trajectories.insert(std::pair<std::string,curve_SE3_ptr>(eeName,trajectory));
+    if (alreadyExist) m_effector_trajectories.erase(eeName);
+    m_effector_trajectories.insert(std::pair<std::string, curve_SE3_ptr>(eeName, trajectory));
     return !alreadyExist;
   }
 
-  ContactPatchMap contactPatches() const {return m_contact_patches;}
+  ContactPatchMap contactPatches() const { return m_contact_patches; }
   ContactPatch& contactPatch(const std::string& eeName) {
-    if(m_contact_patches.count(eeName) == 0){
-      throw std::invalid_argument("This contact phase do not contain any contact patch for the effector "+eeName);
-    }else{
+    if (m_contact_patches.count(eeName) == 0) {
+      throw std::invalid_argument("This contact phase do not contain any contact patch for the effector " + eeName);
+    } else {
       return m_contact_patches.at(eeName);
     }
   }
@@ -384,13 +364,13 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    * @param patch the contact patch
    * @return false if a contact for this effector already existed (and have been overwrited) true otherwise
    */
-  bool addContact(const std::string& eeName, const ContactPatch& patch){
+  bool addContact(const std::string& eeName, const ContactPatch& patch) {
     bool alreadyExist(isEffectorInContact(eeName));
-    if(m_contact_patches.count(eeName))
+    if (m_contact_patches.count(eeName))
       m_contact_patches.erase(eeName);
     else
       m_effector_in_contact.push_back(eeName);
-    m_contact_patches.insert(std::pair<std::string,ContactPatch>(eeName,patch));
+    m_contact_patches.insert(std::pair<std::string, ContactPatch>(eeName, patch));
     m_effector_trajectories.erase(eeName);
     return !alreadyExist;
   }
@@ -401,9 +381,9 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    * @param eeName the name of the effector to remove
    * @return true if the effector was in contact, false otherwise
    */
-  bool removeContact(const std::string& eeName){
+  bool removeContact(const std::string& eeName) {
     bool existed(isEffectorInContact(eeName));
-    if(existed)
+    if (existed)
       m_effector_in_contact.erase(std::find(m_effector_in_contact.begin(), m_effector_in_contact.end(), eeName));
     m_contact_patches.erase(eeName);
     m_contact_forces.erase(eeName);
@@ -411,29 +391,26 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
     return existed;
   }
 
-  std::size_t numContacts() const{
-    return m_effector_in_contact.size();
-  }
+  std::size_t numContacts() const { return m_effector_in_contact.size(); }
 
-  t_strings effectorsInContact() const{
-    return m_effector_in_contact;
-  }
+  t_strings effectorsInContact() const { return m_effector_in_contact; }
 
   bool isEffectorInContact(const std::string& eeName) const {
-    if(m_effector_in_contact.empty())
+    if (m_effector_in_contact.empty())
       return false;
     else
-      return (std::find(m_effector_in_contact.begin(), m_effector_in_contact.end(), eeName) != m_effector_in_contact.end());
+      return (std::find(m_effector_in_contact.begin(), m_effector_in_contact.end(), eeName) !=
+              m_effector_in_contact.end());
   }
 
   /**
    * @brief effectorsWithTrajectory return a set of all effectors for which an effector trajectory have been defined
    * @return a set of all effectors for which an effector trajectory have been defined
    */
-  t_strings effectorsWithTrajectory() const{
+  t_strings effectorsWithTrajectory() const {
     t_strings effectors;
-    for(typename CurveSE3Map_t::const_iterator mit = m_effector_trajectories.begin() ; mit != m_effector_trajectories.end(); ++mit)
-    {
+    for (typename CurveSE3Map_t::const_iterator mit = m_effector_trajectories.begin();
+         mit != m_effector_trajectories.end(); ++mit) {
       effectors.push_back(mit->first);
     }
     return effectors;
@@ -444,9 +421,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    * @param eeName the effector name
    * @return true if there is a trajectory defined, false otherwise
    */
-  bool effectorHaveAtrajectory(const std::string& eeName) const {
-    return m_effector_trajectories.count(eeName);
-  }
+  bool effectorHaveAtrajectory(const std::string& eeName) const { return m_effector_trajectories.count(eeName); }
 
   /* Helpers */
 
@@ -461,7 +436,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    * @return true if consistent, false otherwise
    */
   bool isConsistent(const bool throw_if_inconsistent = false) const {
-    std::cout<<"WARNING : not implemented yet, return True"<<std::endl;
+    std::cout << "WARNING : not implemented yet, return True" << std::endl;
     (void)throw_if_inconsistent;
     return true;
   }
@@ -478,29 +453,21 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    * @param points_second_derivative list of discrete CoM accelerations
    * @param time_points list of times corresponding to each discrete point given.
    */
-  void setCOMtrajectoryFromPoints(const t_pointX_t& points,
-                                 const t_pointX_t& points_derivative,
-                                 const t_pointX_t& points_second_derivative,
-                                 const t_time_t& time_points){
-    piecewise_t c_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points,points_derivative,points_second_derivative,time_points);
-    if(c_t.dim() != 3)
-      throw std::invalid_argument("Dimension of the points must be 3.");
+  void setCOMtrajectoryFromPoints(const t_pointX_t& points, const t_pointX_t& points_derivative,
+                                  const t_pointX_t& points_second_derivative, const t_time_t& time_points) {
+    piecewise_t c_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+        points, points_derivative, points_second_derivative, time_points);
+    if (c_t.dim() != 3) throw std::invalid_argument("Dimension of the points must be 3.");
     m_c = curve_ptr(new piecewise_t(c_t));
     m_dc = curve_ptr(c_t.compute_derivate_ptr(1));
     m_ddc = curve_ptr(c_t.compute_derivate_ptr(2));
 
-    if(m_c_init.isZero())
-      m_c_init = point3_t(points.front());
-    if(m_c_final.isZero())
-      m_c_final =  point3_t(points.back());
-    if(m_dc_init.isZero())
-      m_dc_init =  point3_t(points_derivative.front());
-    if(m_dc_final.isZero())
-      m_dc_final =  point3_t(points_derivative.back());
-    if(m_ddc_init.isZero())
-      m_ddc_init =  point3_t(points_second_derivative.front());
-    if(m_ddc_final.isZero())
-      m_ddc_final =  point3_t(points_second_derivative.back());
+    if (m_c_init.isZero()) m_c_init = point3_t(points.front());
+    if (m_c_final.isZero()) m_c_final = point3_t(points.back());
+    if (m_dc_init.isZero()) m_dc_init = point3_t(points_derivative.front());
+    if (m_dc_final.isZero()) m_dc_final = point3_t(points_derivative.back());
+    if (m_ddc_init.isZero()) m_ddc_init = point3_t(points_second_derivative.front());
+    if (m_ddc_final.isZero()) m_ddc_final = point3_t(points_second_derivative.back());
     return;
   }
 
@@ -515,23 +482,18 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    * @param points_derivative list of discrete Angular momentum derivative
    * @param time_points list of times corresponding to each discrete point given.
    */
-  void setAMtrajectoryFromPoints(const t_pointX_t& points,
-                                 const t_pointX_t& points_derivative,
-                                 const t_time_t& time_points){
-    piecewise_t L_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points,points_derivative,time_points);
-    if(L_t.dim() != 3)
-      throw std::invalid_argument("Dimension of the points must be 3.");
+  void setAMtrajectoryFromPoints(const t_pointX_t& points, const t_pointX_t& points_derivative,
+                                 const t_time_t& time_points) {
+    piecewise_t L_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+        points, points_derivative, time_points);
+    if (L_t.dim() != 3) throw std::invalid_argument("Dimension of the points must be 3.");
     m_L = curve_ptr(new piecewise_t(L_t));
     m_dL = curve_ptr(L_t.compute_derivate_ptr(1));
 
-    if(m_L_init.isZero())
-      m_L_init =  point3_t(points.front());
-    if(m_L_final.isZero())
-      m_L_final =  point3_t(points.back());
-    if(m_dL_init.isZero())
-      m_dL_init =  point3_t(points_derivative.front());
-    if(m_dL_final.isZero())
-     m_dL_final =  point3_t(points_derivative.back());
+    if (m_L_init.isZero()) m_L_init = point3_t(points.front());
+    if (m_L_final.isZero()) m_L_final = point3_t(points.back());
+    if (m_dL_init.isZero()) m_dL_init = point3_t(points_derivative.front());
+    if (m_dL_final.isZero()) m_dL_final = point3_t(points_derivative.back());
     return;
   }
 
@@ -547,19 +509,15 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
    * @param points_second_derivative list of discrete joints accelerations
    * @param time_points list of times corresponding to each discrete point given.
    */
-  void setJointsTrajectoryFromPoints(const t_pointX_t& points,
-                                     const t_pointX_t& points_derivative,
-                                     const t_pointX_t& points_second_derivative,
-                                     const t_time_t& time_points){
-
-    piecewise_t q_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points,points_derivative,points_second_derivative,time_points);
+  void setJointsTrajectoryFromPoints(const t_pointX_t& points, const t_pointX_t& points_derivative,
+                                     const t_pointX_t& points_second_derivative, const t_time_t& time_points) {
+    piecewise_t q_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+        points, points_derivative, points_second_derivative, time_points);
     m_q = curve_ptr(new piecewise_t(q_t));
     m_dq = curve_ptr(q_t.compute_derivate_ptr(1));
     m_ddq = curve_ptr(q_t.compute_derivate_ptr(2));
-    if(m_q_init.isZero())
-    m_q_init = points.front();
-    if(m_q_final.isZero())
-      m_q_final = points.back();
+    if (m_q_init.isZero()) m_q_init = points.front();
+    if (m_q_final.isZero()) m_q_final = points.back();
 
     return;
   }
@@ -567,29 +525,31 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
   /* End Helpers */
 
   void disp(std::ostream& os) const {
-    Eigen::Matrix<Scalar,3, 5> state0(Eigen::Matrix<Scalar,3, 5>::Zero());
-    Eigen::Matrix<Scalar,3, 5> state1(Eigen::Matrix<Scalar,3, 5>::Zero());
-    state0.block(0,0,3,1) = m_c_init;
-    state0.block(0,1,3,1) = m_dc_init;
-    state0.block(0,2,3,1) = m_ddc_init;
-    state0.block(0,3,3,1) = m_L_init;
-    state0.block(0,4,3,1) = m_dL_init;
-    state1.block(0,0,3,1) = m_c_final;
-    state1.block(0,1,3,1) = m_dc_final;
-    state1.block(0,2,3,1) = m_ddc_final;
-    state1.block(0,3,3,1) = m_L_final;
-    state1.block(0,4,3,1) = m_dL_final;
+    Eigen::Matrix<Scalar, 3, 5> state0(Eigen::Matrix<Scalar, 3, 5>::Zero());
+    Eigen::Matrix<Scalar, 3, 5> state1(Eigen::Matrix<Scalar, 3, 5>::Zero());
+    state0.block(0, 0, 3, 1) = m_c_init;
+    state0.block(0, 1, 3, 1) = m_dc_init;
+    state0.block(0, 2, 3, 1) = m_ddc_init;
+    state0.block(0, 3, 3, 1) = m_L_init;
+    state0.block(0, 4, 3, 1) = m_dL_init;
+    state1.block(0, 0, 3, 1) = m_c_final;
+    state1.block(0, 1, 3, 1) = m_dc_final;
+    state1.block(0, 2, 3, 1) = m_ddc_final;
+    state1.block(0, 3, 3, 1) = m_L_final;
+    state1.block(0, 4, 3, 1) = m_dL_final;
 
-    os<<"Contact phase defined for t \\in ["<<m_t_init<<";"<<m_t_final<<"]"<<std::endl
-     << "Conecting (c0,dc0,ddc0,L0,dL0) = "<<std::endl<<state0<<std::endl
-     << "to        (c0,dc0,ddc0,L0,dL0) = "<<std::endl<<state1<<std::endl;
-    os << "Effectors in contact "<<m_effector_in_contact.size()<<" : "<<std::endl;
-    for(t_strings::const_iterator ee = m_effector_in_contact.begin() ; ee != m_effector_in_contact.end() ; ++ee){
-      os << "______________________________________________"<<std::endl
-         << "Effector "<<*ee<<" contact patch:"<<std::endl
-         << m_contact_patches.at(*ee) <<std::endl
-         << "Has contact force trajectory : "<<bool(m_contact_forces.count(*ee))<<std::endl
-         << "Has contact normal force trajectory : "<<bool(m_contact_normal_force.count(*ee))<<std::endl;
+    os << "Contact phase defined for t \\in [" << m_t_init << ";" << m_t_final << "]" << std::endl
+       << "Conecting (c0,dc0,ddc0,L0,dL0) = " << std::endl
+       << state0 << std::endl
+       << "to        (c0,dc0,ddc0,L0,dL0) = " << std::endl
+       << state1 << std::endl;
+    os << "Effectors in contact " << m_effector_in_contact.size() << " : " << std::endl;
+    for (t_strings::const_iterator ee = m_effector_in_contact.begin(); ee != m_effector_in_contact.end(); ++ee) {
+      os << "______________________________________________" << std::endl
+         << "Effector " << *ee << " contact patch:" << std::endl
+         << m_contact_patches.at(*ee) << std::endl
+         << "Has contact force trajectory : " << bool(m_contact_forces.count(*ee)) << std::endl
+         << "Has contact normal force trajectory : " << bool(m_contact_normal_force.count(*ee)) << std::endl;
     }
   }
 
@@ -599,8 +559,7 @@ struct ContactPhaseTpl : public serialization::Serializable< ContactPhaseTpl<_Sc
     return os;
   }
 
-
-protected:
+ protected:
   // private members
   /// \brief map with keys : effector name containing the contact forces
   CurveMap_t m_contact_forces;
@@ -617,52 +576,50 @@ protected:
   /// \brief time at the end of the contact phase
   Scalar m_t_final;
 
-private:
- // Serialization of the class
- friend class boost::serialization::access;
+ private:
+  // Serialization of the class
+  friend class boost::serialization::access;
 
- template <class Archive>
- void serialize(Archive& ar, const unsigned int /*version*/) {
-   //ar& boost::serialization::make_nvp("placement", m_placement);
-   curves::serialization::register_types<Archive>(ar);
-   ar& boost::serialization::make_nvp("c_init", m_c_init);
-   ar& boost::serialization::make_nvp("dc_init", m_dc_init);
-   ar& boost::serialization::make_nvp("ddc_init", m_ddc_init);
-   ar& boost::serialization::make_nvp("L_init", m_L_init);
-   ar& boost::serialization::make_nvp("dL_init", m_dL_init);
-   ar& boost::serialization::make_nvp("q_init", m_q_init);
-   ar& boost::serialization::make_nvp("c_final", m_c_final);
-   ar& boost::serialization::make_nvp("dc_final", m_dc_final);
-   ar& boost::serialization::make_nvp("ddc_final", m_ddc_final);
-   ar& boost::serialization::make_nvp("L_final", m_L_final);
-   ar& boost::serialization::make_nvp("dL_final", m_dL_final);
-   ar& boost::serialization::make_nvp("q_final", m_q_final);
-   ar& boost::serialization::make_nvp("q", m_q);
-   ar& boost::serialization::make_nvp("dq", m_dq);
-   ar& boost::serialization::make_nvp("ddq", m_ddq);
-   ar& boost::serialization::make_nvp("tau", m_tau);
-   ar& boost::serialization::make_nvp("c", m_c);
-   ar& boost::serialization::make_nvp("dc", m_dc);
-   ar& boost::serialization::make_nvp("ddc", m_ddc);
-   ar& boost::serialization::make_nvp("L", m_L);
-   ar& boost::serialization::make_nvp("dL", m_dL);
-   ar& boost::serialization::make_nvp("wrench", m_wrench);
-   ar& boost::serialization::make_nvp("zmp", m_zmp);
-   ar& boost::serialization::make_nvp("root", m_root);
-   ar& boost::serialization::make_nvp("contact_forces", m_contact_forces);
-   ar& boost::serialization::make_nvp("contact_normal_force", m_contact_normal_force);
-   ar& boost::serialization::make_nvp("effector_trajectories", m_effector_trajectories);
-   ar& boost::serialization::make_nvp("effector_in_contact", m_effector_in_contact);
-   ar& boost::serialization::make_nvp("contact_patches", m_contact_patches);
-   ar& boost::serialization::make_nvp("t_init", m_t_init);
-   ar& boost::serialization::make_nvp("t_final", m_t_final);
- }  
+  template <class Archive>
+  void serialize(Archive& ar, const unsigned int /*version*/) {
+    // ar& boost::serialization::make_nvp("placement", m_placement);
+    curves::serialization::register_types<Archive>(ar);
+    ar& boost::serialization::make_nvp("c_init", m_c_init);
+    ar& boost::serialization::make_nvp("dc_init", m_dc_init);
+    ar& boost::serialization::make_nvp("ddc_init", m_ddc_init);
+    ar& boost::serialization::make_nvp("L_init", m_L_init);
+    ar& boost::serialization::make_nvp("dL_init", m_dL_init);
+    ar& boost::serialization::make_nvp("q_init", m_q_init);
+    ar& boost::serialization::make_nvp("c_final", m_c_final);
+    ar& boost::serialization::make_nvp("dc_final", m_dc_final);
+    ar& boost::serialization::make_nvp("ddc_final", m_ddc_final);
+    ar& boost::serialization::make_nvp("L_final", m_L_final);
+    ar& boost::serialization::make_nvp("dL_final", m_dL_final);
+    ar& boost::serialization::make_nvp("q_final", m_q_final);
+    ar& boost::serialization::make_nvp("q", m_q);
+    ar& boost::serialization::make_nvp("dq", m_dq);
+    ar& boost::serialization::make_nvp("ddq", m_ddq);
+    ar& boost::serialization::make_nvp("tau", m_tau);
+    ar& boost::serialization::make_nvp("c", m_c);
+    ar& boost::serialization::make_nvp("dc", m_dc);
+    ar& boost::serialization::make_nvp("ddc", m_ddc);
+    ar& boost::serialization::make_nvp("L", m_L);
+    ar& boost::serialization::make_nvp("dL", m_dL);
+    ar& boost::serialization::make_nvp("wrench", m_wrench);
+    ar& boost::serialization::make_nvp("zmp", m_zmp);
+    ar& boost::serialization::make_nvp("root", m_root);
+    ar& boost::serialization::make_nvp("contact_forces", m_contact_forces);
+    ar& boost::serialization::make_nvp("contact_normal_force", m_contact_normal_force);
+    ar& boost::serialization::make_nvp("effector_trajectories", m_effector_trajectories);
+    ar& boost::serialization::make_nvp("effector_in_contact", m_effector_in_contact);
+    ar& boost::serialization::make_nvp("contact_patches", m_contact_patches);
+    ar& boost::serialization::make_nvp("t_init", m_t_init);
+    ar& boost::serialization::make_nvp("t_final", m_t_final);
+  }
 
-}; //struct contact phase
+};  // struct contact phase
 
+}  // namespace scenario
+}  // namespace multicontact_api
 
-} //scenario
-}// multicontact-api
-
-
-#endif // CONTACTPHASE_HPP
+#endif  // CONTACTPHASE_HPP
