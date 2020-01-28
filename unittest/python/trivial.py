@@ -9,7 +9,7 @@ class TrivialTest(unittest.TestCase):
         comopla = multicontact_api.ContactModelPlanar()
         epsilon = 0.00001
         value_wanted = -1.0
-        self.assertTrue((comopla.mu-value_wanted)<epsilon)
+        self.assertTrue((comopla.mu - value_wanted) < epsilon)
 
 
 if __name__ == '__main__':
