@@ -84,19 +84,18 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * @param eeName the name of the effector to remove from contact
    * @param phaseDuration if provided, the duration of the previous last phase of the sequence is set to this value
    * (it is thus the duration BEFORE breaking the contact)
-   * @return true if the last phase had eeName in contact, false otherwise
    * @throw invalid_argument if the phaseDuration is provided but the last phase do not have a time-range defined
    * @throw invalid_argument if eeName is not in contact in the last phase of the sequence
    */
-  void breakContact(const std::string& eeName, const double phaseDuration = -1){
+  void breakContact(const std::string& eeName, const double phaseDuration = -1) {
     ContactPhase& lastPhase = m_contact_phases.back();
-    if(!lastPhase.isEffectorInContact(eeName))
-      throw std::invalid_argument("In breakContact : effector is not currently in contact : "+eeName);
-    if(phaseDuration > 0){
-      if(lastPhase.timeInitial() < 0){
-        throw std::invalid_argument("In breakContact : duration is specified but current phase interval in not initialised.");
-      }
-      else {
+    if (!lastPhase.isEffectorInContact(eeName))
+      throw std::invalid_argument("In breakContact : effector is not currently in contact : " + eeName);
+    if (phaseDuration > 0) {
+      if (lastPhase.timeInitial() < 0) {
+        throw std::invalid_argument(
+            "In breakContact : duration is specified but current phase interval in not initialised.");
+      } else {
         lastPhase.duration(phaseDuration);
       }
     }
@@ -111,9 +110,9 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     phase.m_q_init = lastPhase.m_q_final;
 
     // copy contact patchs :
-    for(std::string name : lastPhase.effectorsInContact()){
-      if(name != eeName){
-        phase.addContact(name,lastPhase.contactPatch(name));
+    for (std::string name : lastPhase.effectorsInContact()) {
+      if (name != eeName) {
+        phase.addContact(name, lastPhase.contactPatch(name));
       }
     }
     // add new phase at the end of the sequence
@@ -132,15 +131,15 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * @throw invalid_argument if the phaseDuration is provided but the last phase do not have a time-range defined
    * @throw invalid_argument if eeName is already in contact in the last phase of the sequence
    */
-  void createContact(const std::string& eeName, const ContactPatch& patch, const double phaseDuration = -1){
+  void createContact(const std::string& eeName, const ContactPatch& patch, const double phaseDuration = -1) {
     ContactPhase& lastPhase = m_contact_phases.back();
-    if(lastPhase.isEffectorInContact(eeName))
-      throw std::invalid_argument("In createContact : effector is already in contact : "+eeName);
-    if(phaseDuration > 0){
-      if(lastPhase.timeInitial() < 0){
-        throw std::invalid_argument("In createContact : duration is specified but current phase interval in not initialised.");
-      }
-      else {
+    if (lastPhase.isEffectorInContact(eeName))
+      throw std::invalid_argument("In createContact : effector is already in contact : " + eeName);
+    if (phaseDuration > 0) {
+      if (lastPhase.timeInitial() < 0) {
+        throw std::invalid_argument(
+            "In createContact : duration is specified but current phase interval in not initialised.");
+      } else {
         lastPhase.duration(phaseDuration);
       }
     }
@@ -155,16 +154,15 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     phase.m_q_init = lastPhase.m_q_final;
 
     // copy contact patchs :
-    for(std::string name : lastPhase.effectorsInContact()){
-        phase.addContact(name,lastPhase.contactPatch(name));
+    for (std::string name : lastPhase.effectorsInContact()) {
+      phase.addContact(name, lastPhase.contactPatch(name));
     }
     // add new contact to new phase :
-    phase.addContact(eeName,patch);
+    phase.addContact(eeName, patch);
     // add new phase at the end of the sequence
     append(phase);
     return;
   }
-
 
   /**
    * @brief moveEffectorToPlacement Add two new phases at the end of the current ContactSequence,
@@ -182,12 +180,12 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * @throw invalid_argument if eeName is not in contact in the last phase of the sequence
    */
   void moveEffectorToPlacement(const std::string& eeName, const ContactPatch::SE3& placement,
-   const double durationBreak = -1, const double durationCreate = -1 ){
-    if(!m_contact_phases.back().isEffectorInContact(eeName))
-      throw std::invalid_argument("In moveEffectorToPlacement : effector is not currently in contact : "+eeName);
+                               const double durationBreak = -1, const double durationCreate = -1) {
+    if (!m_contact_phases.back().isEffectorInContact(eeName))
+      throw std::invalid_argument("In moveEffectorToPlacement : effector is not currently in contact : " + eeName);
     ContactPatch target(m_contact_phases.back().contactPatch(eeName));
     target.placement() = placement;
-    breakContact(eeName,durationBreak);
+    breakContact(eeName, durationBreak);
     // copy all "init" value to "final" for the current last phase :
     ContactPhase& lastPhase = m_contact_phases.back();
     lastPhase.m_c_final = lastPhase.m_c_init;
@@ -196,15 +194,15 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     lastPhase.m_L_final = lastPhase.m_L_init;
     lastPhase.m_dL_final = lastPhase.m_dL_init;
     lastPhase.m_q_final = lastPhase.m_q_init;
-    createContact(eeName,target,durationCreate);
+    createContact(eeName, target, durationCreate);
     return;
   }
 
-    /**
+  /**
    * @brief moveEffectorOf similar to moveEffectorToPlacement
    * exept that the new placement is defined from the previous placement and a given transform applied.
    * @param eeName the name of the effector used to create contact
-   * @param transform the new placement for the contact of eeName
+   * @param transform the transform applied to the placement of the contact in the last phase of the sequence
    * @param durationBreak the duration of the previous last phase of the sequence
    *  (it is thus the duration BEFORE breaking the contact)
    * @param durationCreate the duration of the first new ContactPhase
@@ -212,15 +210,14 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * @throw invalid_argument if the phaseDuration is provided but the last phase do not have a time-range defined
    * @throw invalid_argument if eeName is not in contact in the last phase of the sequence
    */
-  void moveEffectorOf(const std::string& eeName, const ContactPatch::SE3& transform,
-   const double durationBreak = -1, const double durationCreate = -1 ){
-    if(!m_contact_phases.back().isEffectorInContact(eeName))
-      throw std::invalid_argument("In moveEffectorToPlacement : effector is not currently in contact : "+eeName);
+  void moveEffectorOf(const std::string& eeName, const ContactPatch::SE3& transform, const double durationBreak = -1,
+                      const double durationCreate = -1) {
+    if (!m_contact_phases.back().isEffectorInContact(eeName))
+      throw std::invalid_argument("In moveEffectorToPlacement : effector is not currently in contact : " + eeName);
     ContactPatch::SE3 previous(m_contact_phases.back().contactPatch(eeName).placement());
     ContactPatch::SE3 target = previous.act(transform);
-    return moveEffectorToPlacement(eeName,target,durationBreak,durationCreate);
+    return moveEffectorToPlacement(eeName, target, durationBreak, durationCreate);
   }
-
 
   /* End Helpers */
 

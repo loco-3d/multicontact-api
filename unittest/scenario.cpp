@@ -1115,7 +1115,7 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers) {
   BOOST_CHECK(cp.m_ddc_final.isApprox(dd3));
 
   // check that init/final are not modified if they ere already set :
-  ContactPhase cp2 = buildRandomContactPhase(0,2);
+  ContactPhase cp2 = buildRandomContactPhase(0, 2);
   point3_t c_init, c_final, dc_init, dc_final, ddc_init, ddc_final;
   c_init = cp2.m_c_init;
   dc_init = cp2.m_dc_init;
@@ -1369,13 +1369,13 @@ BOOST_AUTO_TEST_CASE(contact_sequence) {
   ContactSequence cs4;
 
   BOOST_CHECK(cs3 == cs4);
-  ContactPhase cp3_0 = buildRandomContactPhase(0,2);
+  ContactPhase cp3_0 = buildRandomContactPhase(0, 2);
   cs3.append(cp3_0);
   BOOST_CHECK(cs3 != cs4);
   BOOST_CHECK(!(cs3 == cs4));
   cs4.append(cp3_0);
   BOOST_CHECK(cs3 == cs4);
-  ContactPhase cp3_1 = buildRandomContactPhase(0,2);
+  ContactPhase cp3_1 = buildRandomContactPhase(0, 2);
   cs3.append(cp3_1);
   BOOST_CHECK(cs3 != cs4);
   cs4.append(cp3_1);
@@ -1392,7 +1392,7 @@ BOOST_AUTO_TEST_CASE(contact_sequence) {
   // test copy constructor :
   ContactSequence cs6;
   for (size_t i = 0; i < 10; ++i) {
-    ContactPhase cp6 = buildRandomContactPhase(0,2);
+    ContactPhase cp6 = buildRandomContactPhase(0, 2);
     cs6.append(cp6);
   }
   BOOST_CHECK(cs6.size() == 10);
@@ -1430,9 +1430,9 @@ BOOST_AUTO_TEST_CASE(contact_sequence_helper) {
   // # test break contact :
   BOOST_CHECK(cs1.size() == 2);
   cs1.breakContact("left_foot");
-  BOOST_CHECK(cs1.size() == 3 );
-  BOOST_CHECK( ! cs1.contactPhase(2).isEffectorInContact("left_foot") );
-  BOOST_CHECK(cs1.contactPhase(1).timeFinal() == 4.); // time final of previous phase should not have been modified
+  BOOST_CHECK(cs1.size() == 3);
+  BOOST_CHECK(!cs1.contactPhase(2).isEffectorInContact("left_foot"));
+  BOOST_CHECK(cs1.contactPhase(1).timeFinal() == 4.);  // time final of previous phase should not have been modified
   // check that the final value of the previous phase have been copied in the initial value of the new one
   BOOST_CHECK(cs1.contactPhase(1).m_c_final == cs1.contactPhase(2).m_c_init);
   BOOST_CHECK(cs1.contactPhase(1).m_dc_final == cs1.contactPhase(2).m_dc_init);
@@ -1446,9 +1446,9 @@ BOOST_AUTO_TEST_CASE(contact_sequence_helper) {
 
   // # test create contact :
   ContactPatch target(SE3::Identity().setRandom());
-  cs1.createContact("left_foot",target,2.5);
-  BOOST_CHECK(cs1.size() == 4 );
-  BOOST_CHECK(cs1.contactPhase(2).timeFinal() == 6.5); // time final of previous phase should have been modified
+  cs1.createContact("left_foot", target, 2.5);
+  BOOST_CHECK(cs1.size() == 4);
+  BOOST_CHECK(cs1.contactPhase(2).timeFinal() == 6.5);  // time final of previous phase should have been modified
   BOOST_CHECK(cs1.contactPhase(3).contactPatch("left_foot") == target);
   // check that the final value of the previous phase have been copied in the initial value of the new one
   BOOST_CHECK(cs1.contactPhase(2).m_c_final == cs1.contactPhase(3).m_c_init);
@@ -1462,27 +1462,26 @@ BOOST_AUTO_TEST_CASE(contact_sequence_helper) {
   BOOST_CHECK(cs1.contactPhase(2).contactPatch("right_hand") == cs1.contactPhase(3).contactPatch("right_hand"));
 
   // # test break with duration :
-  cs1.breakContact("left_foot",1.);
-  BOOST_CHECK(cs1.size() == 5 );
-  BOOST_CHECK( ! cs1.contactPhase(4).isEffectorInContact("left_foot") );
-  BOOST_CHECK(cs1.contactPhase(3).timeFinal() == 7.5); // time final of previous phase should have been modified
+  cs1.breakContact("left_foot", 1.);
+  BOOST_CHECK(cs1.size() == 5);
+  BOOST_CHECK(!cs1.contactPhase(4).isEffectorInContact("left_foot"));
+  BOOST_CHECK(cs1.contactPhase(3).timeFinal() == 7.5);  // time final of previous phase should have been modified
 
   // # test  create contact with no duration:
   cs1.contactPhase(4).duration(1.);
-  BOOST_CHECK(cs1.contactPhase(4).timeFinal() == 8.5); // time final of previous phase should have been modified
+  BOOST_CHECK(cs1.contactPhase(4).timeFinal() == 8.5);  // time final of previous phase should have been modified
   target = ContactPatch(SE3::Identity().setRandom());
-  cs1.createContact("left_foot",target);
-  BOOST_CHECK(cs1.size() == 6 );
-  BOOST_CHECK(cs1.contactPhase(4).timeFinal() == 8.5); // time final of previous phase should have been modified
-  BOOST_CHECK(cs1.contactPhase(5).timeInitial() == 8.5); // time final of previous phase should have been modified
-
+  cs1.createContact("left_foot", target);
+  BOOST_CHECK(cs1.size() == 6);
+  BOOST_CHECK(cs1.contactPhase(4).timeFinal() == 8.5);    // time final of previous phase should have been modified
+  BOOST_CHECK(cs1.contactPhase(5).timeInitial() == 8.5);  // time final of previous phase should have been modified
 
   // # test move effector to placement :
-  SE3 target_placement =SE3::Identity().setRandom();
+  SE3 target_placement = SE3::Identity().setRandom();
   addRandomPointsValues(cs1.contactPhase(5));
   cs1.contactPhase(5).contactPatch("right_hand").friction() = 2.;
-  cs1.moveEffectorToPlacement("right_hand",target_placement,1.,1.5);
-  BOOST_CHECK(cs1.size() == 8 );
+  cs1.moveEffectorToPlacement("right_hand", target_placement, 1., 1.5);
+  BOOST_CHECK(cs1.size() == 8);
   BOOST_CHECK(!cs1.contactPhase(6).isEffectorInContact("right_hand"));
   BOOST_CHECK(cs1.contactPhase(7).isEffectorInContact("right_hand"));
   BOOST_CHECK(cs1.contactPhase(7).contactPatch("right_hand").placement() == target_placement);
@@ -1518,12 +1517,10 @@ BOOST_AUTO_TEST_CASE(contact_sequence_helper) {
   BOOST_CHECK(cs1.contactPhase(5).contactPatch("left_foot") == cs1.contactPhase(6).contactPatch("left_foot"));
   BOOST_CHECK(cs1.contactPhase(6).contactPatch("left_foot") == cs1.contactPhase(7).contactPatch("left_foot"));
 
-
-
   // # test move effector of:
-  SE3 target_transform =SE3::Identity().setRandom();
+  SE3 target_transform = SE3::Identity().setRandom();
   cs1.contactPhase(7).contactPatch("left_foot").friction() = 10.;
-  cs1.moveEffectorOf("left_foot",target_transform,1.,1.5);
+  cs1.moveEffectorOf("left_foot", target_transform, 1., 1.5);
   BOOST_CHECK(cs1.size() == 10);
   BOOST_CHECK(!cs1.contactPhase(8).isEffectorInContact("left_foot"));
   BOOST_CHECK(cs1.contactPhase(9).isEffectorInContact("left_foot"));
@@ -1533,8 +1530,6 @@ BOOST_AUTO_TEST_CASE(contact_sequence_helper) {
   // check that the other contactPatch have been copied :
   BOOST_CHECK(cs1.contactPhase(7).contactPatch("right_hand") == cs1.contactPhase(8).contactPatch("right_hand"));
   BOOST_CHECK(cs1.contactPhase(8).contactPatch("right_hand") == cs1.contactPhase(9).contactPatch("right_hand"));
-
-
 }
 
 BOOST_AUTO_TEST_CASE(contact_sequence_helper_throw) {
@@ -1548,25 +1543,22 @@ BOOST_AUTO_TEST_CASE(contact_sequence_helper_throw) {
   cs1.append(cp0);
   cs1.append(cp1);
   BOOST_CHECK(cs1.size() == 2);
-  BOOST_CHECK_THROW(cs1.breakContact("left_foot"), invalid_argument); // contact do not exist
+  BOOST_CHECK_THROW(cs1.breakContact("left_foot"), invalid_argument);  // contact do not exist
   BOOST_CHECK(cs1.size() == 2);
   ContactPhase cp2 = buildRandomContactPhase();
   cs1.append(cp2);
   BOOST_CHECK(cs1.size() == 3);
-  BOOST_CHECK_THROW(cs1.breakContact("left_foot",1.5), invalid_argument); // time interval not defined for last phase
+  BOOST_CHECK_THROW(cs1.breakContact("left_foot", 1.5), invalid_argument);  // time interval not defined for last phase
   BOOST_CHECK(cs1.size() == 3);
-
 
   // # check that create contact correctly throw error when needed :
   ContactPatch target(SE3::Identity().setRandom());
-  BOOST_CHECK_THROW(cs1.createContact("left_foot",target), invalid_argument); // contact already exist
+  BOOST_CHECK_THROW(cs1.createContact("left_foot", target), invalid_argument);  // contact already exist
   BOOST_CHECK(cs1.size() == 3);
   cs1.breakContact("left_foot");
   BOOST_CHECK(cs1.size() == 4);
-  BOOST_CHECK_THROW(cs1.createContact("left_foot",target,2.), invalid_argument); // time interval not defined
+  BOOST_CHECK_THROW(cs1.createContact("left_foot", target, 2.), invalid_argument);  // time interval not defined
   BOOST_CHECK(cs1.size() == 4);
-
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
