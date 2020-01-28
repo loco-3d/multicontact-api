@@ -219,6 +219,32 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     return moveEffectorToPlacement(eeName, target, durationBreak, durationCreate);
   }
 
+  /**
+   * @brief isTimeConsistent Check if all the time intervals are defined and consistent
+   * (ie. the time always increase and the final time of one phase is equal to the initial one of the newt phase)
+   * @return true if the sequence is consistent, false otherwise
+   */
+  bool isTimeConsistent() const {
+    double current_t = m_contact_phases.front().timeInitial();
+    if (current_t < 0.) {
+      std::cout << "Initial time is negative." << std::endl;
+      return false;
+    }
+    for (size_t i = 0; i < size(); ++i) {
+      const ContactPhase& phase = m_contact_phases.at(i);
+      if (phase.timeInitial() != current_t) {
+        std::cout << "For phase " << i << " initial time is not equal to previous final time." << std::endl;
+        return false;
+      }
+      if (phase.timeInitial() > phase.timeFinal()) {
+        std::cout << "For phase " << i << " final time is before initial time." << std::endl;
+        return false;
+      }
+      current_t = phase.timeFinal();
+    }
+    return true;
+  }
+
   /* End Helpers */
 
   /*Public Attributes*/
