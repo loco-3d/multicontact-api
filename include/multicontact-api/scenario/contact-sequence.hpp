@@ -75,6 +75,76 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
   /* End Accessors to the contact Phases */
 
   /* Helpers */
+  /**
+   * @brief breakContact Add a new contactPhase at the end of the current ContactSequence,
+   * The new ContactPhase have the same ContactPatchs as the last phase of the sequence,
+   * with the exeption of the given contact removed.
+   * It copy all the 'final' values of the last phase as 'initial' values of the new phase.
+   * It also set the duration of the previous last phase.
+   * @param eeName the name of the effector to remove from contact
+   * @param phaseDuration if provided, the duration of the previous last phase of the sequence is set to this value
+   * (it is thus the duration BEFORE breaking the contact)
+   * @return true if the last phase had eeName in contact, false otherwise
+   * @throw invalid_argument if the phaseDuration is provided but the last phase do not have a time-range defined
+   */
+  bool breakContact(const std::string& eeName, const double phaseDuration = -1){
+  
+  }
+
+  /**
+   * @brief createContact Add a new contactPhase at the end of the current ContactSequence,
+   * The new ContactPhase have the same ContactPatchs as the last phase of the sequence,
+   * with the exeption of the given contact added.
+   * @param eeName the name of the effector used to create contact
+   * @param patch the ContactPatch of the new contact
+   * @param phaseDuration if provided, the duration of the previous last phase of the sequence is set to this value
+   * (it is thus the duration BEFORE creating the contact)
+   * @throw invalid_argument if the phaseDuration is provided but the last phase do not have a time-range defined
+   * @throw invalid_argument if eeName is already in contact in the last phase of the sequence
+   */
+  void createContact(const std::string& eeName, const ContactPatch& patch, const double phaseDuration = -1){
+
+  }
+
+  /**
+   * @brief moveEffectorToPlacement Add two new phases at the end of the current ContactSequence,
+   *  - it break the contact with eeName
+   *  - it create the contact with eeName at the given placement.
+   * It copy all the 'final' values of the last phase as 'initial' values of the new phase.
+   * It also set the duration of the previous last phase.
+   * @param eeName the name of the effector used to create contact
+   * @param placement the new placement for the contact of eeName
+   * @param durationBreak the duration of the previous last phase of the sequence
+   *  (it is thus the duration BEFORE breaking the contact)
+   * @param durationCreate the duration of the first new ContactPhase
+   *  (it is thus the duration BEFORE creating the contact)
+   * @throw invalid_argument if the phaseDuration is provided but the last phase do not have a time-range defined
+   * @throw invalid_argument if eeName is not in contact in the last phase of the sequence
+   */
+  void moveEffectorToPlacement(const std::string& eeName, const ContactPatch::SE3& placement,
+   const double durationBreak = -1, const double durationCreate = -1 ){
+
+  }
+
+    /**
+   * @brief moveEffectorOf similar to moveEffectorToPlacement
+   * exept that the new placement is defined from the previous placement and a given transform applied.
+   * @param eeName the name of the effector used to create contact
+   * @param transform the new placement for the contact of eeName
+   * @param durationBreak the duration of the previous last phase of the sequence
+   *  (it is thus the duration BEFORE breaking the contact)
+   * @param durationCreate the duration of the first new ContactPhase
+   *  (it is thus the duration BEFORE creating the contact)
+   * @throw invalid_argument if the phaseDuration is provided but the last phase do not have a time-range defined
+   * @throw invalid_argument if eeName is not in contact in the last phase of the sequence
+   */
+  void moveEffectorOf(const std::string& eeName, const ContactPatch::SE3& transform,
+   const double durationBreak = -1, const double durationCreate = -1 ){
+
+  }
+
+
+
 
   /* End Helpers */
 
