@@ -29,7 +29,7 @@ def randomQuaternion():
 
 
 # build random piecewise polynomial with 2 polynomial of degree 3
-# between 0;1 and 1;2
+# between 01 and 12
 def createRandomPiecewisePolynomial(dim, t_min=0, t_max=2):
     t_mid = (t_min + t_max) / 2.
     coefs0 = np.random.rand(dim, 4)  # degree 3
@@ -138,10 +138,11 @@ def addRandomEffectorTrajectories(cp):
     cp.addEffectorTrajectory("left-hand", fL)
 
 
-def buildRandomContactPhase(min=0., max=2.):
-    cp = ContactPhase()
-    cp.timeInitial = min
-    cp.timeFinal = max
+def buildRandomContactPhase(min=-1, max=-1):
+    if min > 0 and max > 0:
+        cp = ContactPhase(min, max)
+    else:
+        cp = ContactPhase()
     addRandomPointsValues(cp)
     addRandomCurvesValues(cp)
     addRandomContacts(cp)
@@ -1125,7 +1126,7 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertTrue(cp1 == cp2)
 
     def test_copy_constructor(self):
-        cp1 = buildRandomContactPhase()
+        cp1 = buildRandomContactPhase(0., 2.)
         cp2 = ContactPhase(cp1)
         cp3 = cp1.copy()
         self.assertEqual(cp1, cp2)
@@ -1148,7 +1149,7 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertEqual(cp1, cp_xml)
 
     def test_contact_phase_serialization_full(self):
-        cp1 = buildRandomContactPhase()
+        cp1 = buildRandomContactPhase(0., 2.)
         cp1.saveAsText("cp_test.txt")
         cp_txt = ContactPhase()
         cp_txt.loadFromText("cp_test.txt")
@@ -1198,7 +1199,7 @@ class ContactSequenceTest(unittest.TestCase):
     self.assertTrue(len(phases) == 3)
     self.assertTrue(cs.size() == 2 ) # original contact sequence should not be modified
     phases[1].duration = 3.
-    self.assertTrue(cs.contactPhase(1) == cp1) # original contact sequence should not be modified
+    self.assertTrue(cs.contactPhases[1) == cp1) # original contact sequence should not be modified
   """
 
     def test_accessor_phase_reference(self):
@@ -1271,13 +1272,13 @@ class ContactSequenceTest(unittest.TestCase):
         cs4 = ContactSequence()
 
         self.assertTrue(cs3 == cs4)
-        cp3_0 = buildRandomContactPhase()
+        cp3_0 = buildRandomContactPhase(0., 2.)
         cs3.append(cp3_0)
         self.assertTrue(cs3 != cs4)
         self.assertFalse(cs3 == cs4)
         cs4.append(cp3_0)
         self.assertTrue(cs3 == cs4)
-        cp3_1 = buildRandomContactPhase()
+        cp3_1 = buildRandomContactPhase(0., 2.)
         cs3.append(cp3_1)
         self.assertTrue(cs3 != cs4)
         cs4.append(cp3_1)
@@ -1294,7 +1295,7 @@ class ContactSequenceTest(unittest.TestCase):
     def test_copy_constructor(self):
         cs = ContactSequence()
         for i in range(10):
-            cp = buildRandomContactPhase()
+            cp = buildRandomContactPhase(0., 2.)
             cs.append(cp)
         self.assertTrue(cs.size() == 10)
 
@@ -1311,7 +1312,7 @@ class ContactSequenceTest(unittest.TestCase):
     def test_serialization(self):
         cs = ContactSequence()
         for i in range(10):
-            cp = buildRandomContactPhase()
+            cp = buildRandomContactPhase(0., 2.)
             cs.append(cp)
 
         cs.saveAsText("cs_test.txt")
@@ -1326,6 +1327,164 @@ class ContactSequenceTest(unittest.TestCase):
         cs_xml = ContactSequence()
         cs_xml.loadFromXML("cs_test.xml", 'ContactPatch')
         self.assertEqual(cs, cs_xml)
+
+    def test_contact_sequence_helpers(self):
+        cs1 = ContactSequence()
+        self.assertTrue(cs1.size() == 0)
+        cp0 = buildRandomContactPhase(0, 2)
+        cp1 = buildRandomContactPhase(2, 4.)
+        cs1.append(cp0)
+        cs1.append(cp1)
+        # # test break contact :
+        self.assertTrue(cs1.size() == 2)
+        cs1.breakContact("left-leg")
+        self.assertTrue(cs1.size() == 3)
+        self.assertFalse(cs1.contactPhases[2].isEffectorInContact("left-leg"))
+        self.assertTrue(
+            cs1.contactPhases[1].timeFinal == 4.)  # time final of previous phase should not have been modified
+        # check that the final value of the previous phase have been copied in the initial value of the new one
+        self.assertTrue(array_equal(cs1.contactPhases[1].c_final, cs1.contactPhases[2].c_init))
+        self.assertTrue(array_equal(cs1.contactPhases[1].dc_final, cs1.contactPhases[2].dc_init))
+        self.assertTrue(array_equal(cs1.contactPhases[1].ddc_final, cs1.contactPhases[2].ddc_init))
+        self.assertTrue(array_equal(cs1.contactPhases[1].L_final, cs1.contactPhases[2].L_init))
+        self.assertTrue(array_equal(cs1.contactPhases[1].dL_final, cs1.contactPhases[2].dL_init))
+        self.assertTrue(array_equal(cs1.contactPhases[1].q_final, cs1.contactPhases[2].q_init))
+        self.assertTrue(cs1.contactPhases[1].timeFinal == cs1.contactPhases[2].timeInitial)
+        # check that the other contactPatch have been copied :
+        self.assertTrue(
+            cs1.contactPhases[1].contactPatch("right-leg") == cs1.contactPhases[2].contactPatch("right-leg"))
+
+        # # test create contact :
+        placement_random = SE3.Identity()
+        placement_random.setRandom()
+        target = ContactPatch(placement_random)
+        cs1.createContact("left-leg", target, 2.5)
+        self.assertTrue(cs1.size() == 4)
+        self.assertTrue(
+            cs1.contactPhases[2].timeFinal == 6.5)  # time final of previous phase should have been modified
+        self.assertTrue(cs1.contactPhases[3].contactPatch("left-leg") == target)
+        # check that the final value of the previous phase have been copied in the initial value of the new one
+        self.assertTrue(array_equal(cs1.contactPhases[2].c_final, cs1.contactPhases[3].c_init))
+        self.assertTrue(array_equal(cs1.contactPhases[2].dc_final, cs1.contactPhases[3].dc_init))
+        self.assertTrue(array_equal(cs1.contactPhases[2].ddc_final, cs1.contactPhases[3].ddc_init))
+        self.assertTrue(array_equal(cs1.contactPhases[2].L_final, cs1.contactPhases[3].L_init))
+        self.assertTrue(array_equal(cs1.contactPhases[2].dL_final, cs1.contactPhases[3].dL_init))
+        self.assertTrue(array_equal(cs1.contactPhases[2].q_final, cs1.contactPhases[3].q_init))
+        self.assertTrue(cs1.contactPhases[2].timeFinal == cs1.contactPhases[3].timeInitial)
+        # check that the other contactPatch have been copied :
+        self.assertTrue(
+            cs1.contactPhases[2].contactPatch("right-leg") == cs1.contactPhases[3].contactPatch("right-leg"))
+
+        # # test break with duration :
+        cs1.breakContact("left-leg", 1.)
+        self.assertTrue(cs1.size() == 5)
+        self.assertFalse(cs1.contactPhases[4].isEffectorInContact("left-leg"))
+        self.assertTrue(
+            cs1.contactPhases[3].timeFinal == 7.5)  # time final of previous phase should have been modified
+
+        # # test  create contact with no duration:
+        cs1.contactPhases[4].duration = 1.
+        self.assertTrue(
+            cs1.contactPhases[4].timeFinal == 8.5)  # time final of previous phase should have been modified
+        placement_random.setRandom()
+        target = ContactPatch(placement_random)
+        cs1.createContact("left-leg", target)
+        self.assertTrue(cs1.size() == 6)
+        self.assertTrue(
+            cs1.contactPhases[4].timeFinal == 8.5)  # time final of previous phase should have been modified
+        self.assertTrue(
+            cs1.contactPhases[5].timeInitial == 8.5)  # time final of previous phase should have been modified
+
+        # # test move effector to placement :
+        target_placement = SE3.Identity()
+        target_placement.setRandom()
+        addRandomPointsValues(cs1.contactPhases[5])
+        cs1.contactPhases[5].contactPatch("right-leg").friction = 2.
+        cs1.moveEffectorToPlacement("right-leg", target_placement, 1., 1.5)
+        self.assertTrue(cs1.size() == 8)
+        self.assertFalse(cs1.contactPhases[6].isEffectorInContact("right-leg"))
+        self.assertTrue(cs1.contactPhases[7].isEffectorInContact("right-leg"))
+        self.assertTrue(cs1.contactPhases[7].contactPatch("right-leg").placement == target_placement)
+        # check that previous patch have not been modified :
+        self.assertTrue(cs1.contactPhases[5].contactPatch("right-leg").placement != target_placement)
+        self.assertTrue(cs1.contactPhases[7].contactPatch("right-leg").friction == 2.)
+        self.assertTrue(cs1.contactPhases[5].timeFinal == 9.5)
+        self.assertTrue(cs1.contactPhases[6].timeInitial == 9.5)
+        self.assertTrue(cs1.contactPhases[6].timeFinal == 11.)
+        self.assertTrue(cs1.contactPhases[7].timeInitial == 11.)
+        # check that the final value of the previous phase have been copied in the initial value of the new one
+        self.assertTrue(array_equal(cs1.contactPhases[5].c_final, cs1.contactPhases[6].c_init))
+        self.assertTrue(array_equal(cs1.contactPhases[5].dc_final, cs1.contactPhases[6].dc_init))
+        self.assertTrue(array_equal(cs1.contactPhases[5].ddc_final, cs1.contactPhases[6].ddc_init))
+        self.assertTrue(array_equal(cs1.contactPhases[5].L_final, cs1.contactPhases[6].L_init))
+        self.assertTrue(array_equal(cs1.contactPhases[5].dL_final, cs1.contactPhases[6].dL_init))
+        self.assertTrue(array_equal(cs1.contactPhases[5].q_final, cs1.contactPhases[6].q_init))
+        # with MoveEffector, the middle phase should have the same initial and final point :
+        self.assertTrue(array_equal(cs1.contactPhases[6].c_final, cs1.contactPhases[6].c_init))
+        self.assertTrue(array_equal(cs1.contactPhases[6].dc_final, cs1.contactPhases[6].dc_init))
+        self.assertTrue(array_equal(cs1.contactPhases[6].ddc_final, cs1.contactPhases[6].ddc_init))
+        self.assertTrue(array_equal(cs1.contactPhases[6].L_final, cs1.contactPhases[6].L_init))
+        self.assertTrue(array_equal(cs1.contactPhases[6].dL_final, cs1.contactPhases[6].dL_init))
+        self.assertTrue(array_equal(cs1.contactPhases[6].q_final, cs1.contactPhases[6].q_init))
+        # check that the final value of the previous phase have been copied in the initial value of the new one
+        self.assertTrue(array_equal(cs1.contactPhases[6].c_final, cs1.contactPhases[7].c_init))
+        self.assertTrue(array_equal(cs1.contactPhases[6].dc_final, cs1.contactPhases[7].dc_init))
+        self.assertTrue(array_equal(cs1.contactPhases[6].ddc_final, cs1.contactPhases[7].ddc_init))
+        self.assertTrue(array_equal(cs1.contactPhases[6].L_final, cs1.contactPhases[7].L_init))
+        self.assertTrue(array_equal(cs1.contactPhases[6].dL_final, cs1.contactPhases[7].dL_init))
+        self.assertTrue(array_equal(cs1.contactPhases[6].q_final, cs1.contactPhases[7].q_init))
+        # check that the other contactPatch have been copied :
+        self.assertTrue(cs1.contactPhases[5].contactPatch("left-leg") == cs1.contactPhases[6].contactPatch("left-leg"))
+        self.assertTrue(cs1.contactPhases[6].contactPatch("left-leg") == cs1.contactPhases[7].contactPatch("left-leg"))
+
+        # # test move effector of:
+        target_transform = SE3.Identity()
+        target_transform.setRandom()
+        cs1.contactPhases[7].contactPatch("left-leg").friction = 10.
+        cs1.moveEffectorOf("left-leg", target_transform, 1., 1.5)
+        self.assertTrue(cs1.size() == 10)
+        self.assertFalse(cs1.contactPhases[8].isEffectorInContact("left-leg"))
+        self.assertTrue(cs1.contactPhases[9].isEffectorInContact("left-leg"))
+        target_placement = cs1.contactPhases[7].contactPatch("left-leg").placement.act(target_transform)
+        self.assertTrue(cs1.contactPhases[9].contactPatch("left-leg").placement == target_placement)
+        self.assertTrue(cs1.contactPhases[9].contactPatch("left-leg").friction == 10.)
+        # check that the other contactPatch have been copied :
+        self.assertTrue(
+            cs1.contactPhases[7].contactPatch("right-leg") == cs1.contactPhases[8].contactPatch("right-leg"))
+        self.assertTrue(
+            cs1.contactPhases[8].contactPatch("right-leg") == cs1.contactPhases[9].contactPatch("right-leg"))
+
+    def test_contact_sequence_helpers_errors(self):
+        cs1 = ContactSequence()
+        self.assertTrue(cs1.size() == 0)
+        cp0 = buildRandomContactPhase(0, 2)
+        cp1 = buildRandomContactPhase(2, 4.)
+        cp1.removeContact("left-leg")
+        cs1.append(cp0)
+        cs1.append(cp1)
+        self.assertTrue(cs1.size() == 2)
+        with self.assertRaises(ValueError):
+            cs1.breakContact("left-leg")  # contact do not exist
+        self.assertTrue(cs1.size() == 2)
+        cp2 = buildRandomContactPhase()
+        cs1.append(cp2)
+        self.assertTrue(cs1.size() == 3)
+        with self.assertRaises(ValueError):
+            cs1.breakContact("left-leg", 1.5)  # time interval not defined for last phase
+        self.assertTrue(cs1.size() == 3)
+
+        # # check that create contact correctly throw error when needed :
+        placement = SE3.Identity()
+        placement.setRandom()
+
+        with self.assertRaises(ValueError):
+            cs1.createContact("left-leg", ContactPatch(placement))  # contact already exist
+        self.assertTrue(cs1.size() == 3)
+        cs1.breakContact("left-leg")
+        self.assertTrue(cs1.size() == 4)
+        with self.assertRaises(ValueError):
+            cs1.createContact("left-leg", ContactPatch(placement), 2.)  # time interval not defined
+        self.assertTrue(cs1.size() == 4)
 
 
 if __name__ == '__main__':
