@@ -9,12 +9,11 @@ from math import sqrt, sin, cos
 
 import pinocchio as pin
 from pinocchio import SE3, Quaternion
-import curves
 from curves import SE3Curve, polynomial, bezier, piecewise, piecewise_SE3
+from multicontact_api import ContactModelPlanar, ContactPatch, ContactPhase, ContactSequence
+
 pin.switchToNumpyArray()
 
-import multicontact_api
-from multicontact_api import ContactModelPlanar, ContactPatch, ContactPhase, ContactSequence
 
 
 def randomQuaternion():
@@ -113,7 +112,6 @@ def addRandomContacts(cp):
     p = SE3()
     p.setRandom()
     patchLF = ContactPatch(p, 0.5)
-    patchLF2 = ContactPatch(p)
     cp.addContact("left-leg", patchLF)
 
 
@@ -125,7 +123,6 @@ def addRandomForcesTrajs(cp):
     cp.addContactForceTrajectory("left-leg", fL)
     fR = createRandomPiecewisePolynomial(1)
     fL = createRandomPiecewisePolynomial(1)
-    fL2 = createRandomPiecewisePolynomial(1)
     cp.addContactNormalForceTrajectory("right-leg", fR)
     cp.addContactNormalForceTrajectory("left-leg", fL)
 
@@ -133,7 +130,6 @@ def addRandomForcesTrajs(cp):
 def addRandomEffectorTrajectories(cp):
     fR = createRandomSE3Traj()
     fL = createRandomSE3Traj()
-    fL2 = createRandomSE3Traj()
     cp.addEffectorTrajectory("right-hand", fR)
     cp.addEffectorTrajectory("left-hand", fL)
 
@@ -435,10 +431,10 @@ class ContactPhaseTest(unittest.TestCase):
         p.setRandom()
         patchLF = ContactPatch(p, 0.5)
         cp.addContact("left-leg", patchLF)
-        #check that it's not a pointer :
+        # check that it's not a pointer :
         self.assertEqual(len(dict.keys()), 1)
         self.assertFalse("left-leg" in dict.keys())
-        #check that the contact have been added
+        # check that the contact have been added
         dict = cp.contactPatches()
         self.assertTrue("right-leg" in dict.keys())
         self.assertTrue("left-leg" in dict.keys())
@@ -644,7 +640,7 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertTrue("right-leg" in dict.keys())
         self.assertTrue("left-leg" in dict.keys())
 
-        #check that changing the dict doesn"t change the contact phase
+        # check that changing the dict doesn"t change the contact phase
         f2 = createRandomPiecewisePolynomial(12)
         dict.update({"hand": f2})
         self.assertFalse("hand" in cp.contactForces().keys())
@@ -731,7 +727,7 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertTrue("right-leg" in dict.keys())
         self.assertTrue("left-leg" in dict.keys())
 
-        #check that changing the dict doesn"t change the contact phase
+        # check that changing the dict doesn"t change the contact phase
         f2 = createRandomPiecewisePolynomial(1)
         dict.update({"hand": f2})
         self.assertFalse("hand" in cp.contactNormalForces().keys())
@@ -789,7 +785,7 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertTrue(array_equal(cp.L_final, L_final))
         self.assertTrue(array_equal(cp.dL_final, dL_final))
         self.assertTrue(array_equal(cp.q_final, q_final))
-        #check that it's not a pointer :
+        # check that it's not a pointer :
         ci = cp.c_init
         ci = np.random.rand(3)
         self.assertFalse(array_equal(cp.c_init, ci))
@@ -919,7 +915,7 @@ class ContactPhaseTest(unittest.TestCase):
     def test_operator_equal(self):
         cp1 = ContactPhase()
         cp2 = ContactPhase()
-        #check timings
+        # check timings
         self.assertTrue(cp1 == cp2)
         cp1.timeInitial = 1.
         self.assertTrue(cp1 != cp2)
@@ -929,7 +925,7 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertTrue(cp1 != cp2)
         cp2.duration = 2.5
         self.assertTrue(cp1 == cp2)
-        #check public members :
+        # check public members :
         # points :
         c_init = np.random.rand(3)
         dc_init = np.random.rand(3)
