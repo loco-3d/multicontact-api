@@ -1044,7 +1044,7 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   explicitContactPhaseAssertEqual(cp2, cp_from_txt);
 }
 
-BOOST_AUTO_TEST_CASE(contact_phase_helpers) {
+BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
   point3_t p0(0., 0., 0.);
   point3_t p1(1., 2., 3.);
   point3_t p2(4., 4., 4.);
@@ -1293,6 +1293,49 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers) {
   BOOST_CHECK_THROW(
       cp.setJointsTrajectoryFromPoints(points_q, points_derivative_q, points_second_derivative_q, time_points2),
       std::invalid_argument);
+}
+
+BOOST_AUTO_TEST_CASE(contact_phase_helper_contact_variation){
+  typedef ContactPhase::t_strings t_strings;
+  // # contacts repositioned :
+  ContactPhase cp1 = buildRandomContactPhase();
+  ContactPhase cp2 = buildRandomContactPhase();
+  t_strings repo = cp1.getContactsRepositioned(cp2);
+  BOOST_CHECK(repo.size() == 2);
+  BOOST_CHECK(repo[0] == "right_hand");
+  BOOST_CHECK(repo[1] == "left_foot");
+  t_strings repo1 = cp2.getContactsRepositioned(cp1);
+  BOOST_CHECK(repo1.size() == 2);
+  BOOST_CHECK(repo1[0] == "right_hand");
+  BOOST_CHECK(repo1[1] == "left_foot");
+  t_strings vars = cp1.getContactsVariations(cp2);
+  BOOST_CHECK(vars.size() == 2);
+
+  // # contacts broken :
+  ContactPhase cp3;
+  ContactPatch RH_patch(SE3::Identity().setRandom());
+  cp3.addContact("right_hand", RH_patch);
+  cp3.addContact("left_foot", ContactPatch(SE3::Identity().setRandom()));
+  ContactPhase cp4;
+  cp4.addContact("right_hand", RH_patch);
+  t_strings broken = cp3.getContactsBroken(cp4);
+  BOOST_CHECK(broken.size() == 1);
+  BOOST_CHECK(broken[0] == "left_foot");
+  t_strings broken1 = cp4.getContactsBroken(cp3);
+  BOOST_CHECK(broken1.size() == 0);
+
+  t_strings created = cp4.getContactsCreated(cp3);
+  BOOST_CHECK(created.size() == 1);
+  BOOST_CHECK(created[0] == "left_foot");
+  t_strings created1 = cp3.getContactsCreated(cp4);
+  BOOST_CHECK(created1.size() == 0);
+
+  vars = cp3.getContactsVariations(cp4);
+  BOOST_CHECK(vars.size() == 1);
+  BOOST_CHECK(vars[0] == "left_foot");
+  vars = cp4.getContactsVariations(cp3);
+  BOOST_CHECK(vars.size() == 1);
+  BOOST_CHECK(vars[0] == "left_foot");
 }
 
 BOOST_AUTO_TEST_CASE(contact_sequence) {
