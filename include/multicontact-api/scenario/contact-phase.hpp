@@ -444,7 +444,7 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
   /**
    * @brief setCOMtrajectoryFromPoints set the c,dc and ddc curves from a list of discrete
    * COM positions, velocity and accelerations.
-   * The trajectories are build with 5th order polynomials connecting each discrete points given.
+   * The trajectories are build with first order polynomials connecting each discrete points given.
    * If the initial/final values for c, dc and ddc are not set,
    * this method also set them from the first and last discrete point given.
    * Otherwise it do not modify them.
@@ -455,12 +455,22 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
    */
   void setCOMtrajectoryFromPoints(const t_pointX_t& points, const t_pointX_t& points_derivative,
                                   const t_pointX_t& points_second_derivative, const t_time_t& time_points) {
+    /*
     piecewise_t c_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
         points, points_derivative, points_second_derivative, time_points);
     if (c_t.dim() != 3) throw std::invalid_argument("Dimension of the points must be 3.");
     m_c = curve_ptr(new piecewise_t(c_t));
     m_dc = curve_ptr(c_t.compute_derivate_ptr(1));
     m_ddc = curve_ptr(c_t.compute_derivate_ptr(2));
+    */
+    m_c = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+                      points, time_points)));
+    m_dc = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+                                       points_derivative, time_points)));
+    m_ddc = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+                                        points_second_derivative, time_points)));
+    if(m_c->dim() != 3 || m_dc->dim() != 3 || m_ddc->dim() != 3)
+      throw std::invalid_argument("Dimension of the points must be 3.");
 
     if (m_c_init.isZero()) m_c_init = point3_t(points.front());
     if (m_c_final.isZero()) m_c_final = point3_t(points.back());
@@ -474,8 +484,8 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
   /**
    * @brief setAMtrajectoryFromPoints set the L and d_L curves from a list of discrete
    * Angular velocity values and their derivatives
-   * The trajectories are build with 3th order polynomials connecting each discrete points given.
-   * If the initial/final values for c, dc and ddc are not set,
+   * The trajectories are build with first order polynomials connecting each discrete points given.
+   * If the initial/final values for L, and dL are not set,
    * this method also set them from the first and last discrete point given.
    * Otherwise it do not modify them.
    * @param points list of discrete Angular Momentum values
@@ -484,11 +494,19 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
    */
   void setAMtrajectoryFromPoints(const t_pointX_t& points, const t_pointX_t& points_derivative,
                                  const t_time_t& time_points) {
+    /*
     piecewise_t L_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
         points, points_derivative, time_points);
     if (L_t.dim() != 3) throw std::invalid_argument("Dimension of the points must be 3.");
     m_L = curve_ptr(new piecewise_t(L_t));
     m_dL = curve_ptr(L_t.compute_derivate_ptr(1));
+    */
+    m_L = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+                      points, time_points)));
+    m_dL = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+                                       points_derivative, time_points)));
+    if(m_L->dim() != 3 || m_dL->dim() != 3 )
+      throw std::invalid_argument("Dimension of the points must be 3.");
 
     if (m_L_init.isZero()) m_L_init = point3_t(points.front());
     if (m_L_final.isZero()) m_L_final = point3_t(points.back());
@@ -500,7 +518,7 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
   /**
    * @brief setJointsTrajectoryFromPoints set the q,dq and ddq curves from a list of discrete
    * joints positions, velocity and accelerations.
-   * The trajectories are build with 5th order polynomials connecting each discrete points given.
+   * The trajectories are build with first order polynomials connecting each discrete points given.
    * If the initial/final values for q are not set,
    * this method also set them from the first and last discrete point given.
    * Otherwise it do not modify them.
@@ -511,14 +529,21 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
    */
   void setJointsTrajectoryFromPoints(const t_pointX_t& points, const t_pointX_t& points_derivative,
                                      const t_pointX_t& points_second_derivative, const t_time_t& time_points) {
+    /*
     piecewise_t q_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
         points, points_derivative, points_second_derivative, time_points);
     m_q = curve_ptr(new piecewise_t(q_t));
     m_dq = curve_ptr(q_t.compute_derivate_ptr(1));
     m_ddq = curve_ptr(q_t.compute_derivate_ptr(2));
+    */
+    m_q = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+                      points, time_points)));
+    m_dq = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+                                       points_derivative, time_points)));
+    m_ddq = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+                                        points_second_derivative, time_points)));
     if (m_q_init.isZero()) m_q_init = points.front();
     if (m_q_final.isZero()) m_q_final = points.back();
-
     return;
   }
 
