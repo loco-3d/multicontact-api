@@ -95,8 +95,8 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
                 "Raise value_error if the phaseDuration is provided but the last phase do not have a time-range "
                 "defined\n"
                 "Raise value_error if eeName is not in contact in the last phase of the sequence\n"))
-        .def("isTimeConsistent", &CS::isTimeConsistent,
-             "isTimeConsistent Check if all the time intervals are defined and consistent"
+        .def("haveTimings", &CS::haveTimings,
+             "Check if all the time intervals are defined and consistent"
              "(ie. the time always increase and the final time of one phase is equal to the initial one of the newt "
              "phase) \n"
              "Return true if the sequence is consistent, false otherwise")

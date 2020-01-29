@@ -220,11 +220,11 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
   }
 
   /**
-   * @brief isTimeConsistent Check if all the time intervals are defined and consistent
+   * @brief haveTimings Check if all the time intervals are defined and consistent
    * (ie. the time always increase and the final time of one phase is equal to the initial one of the newt phase)
    * @return true if the sequence is consistent, false otherwise
    */
-  bool isTimeConsistent() const {
+  bool haveTimings() const {
     double current_t = m_contact_phases.front().timeInitial();
     if (current_t < 0.) {
       std::cout << "Initial time is negative." << std::endl;

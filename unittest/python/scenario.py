@@ -1533,7 +1533,7 @@ class ContactSequenceTest(unittest.TestCase):
         cp1 = buildRandomContactPhase(2, 4.)
         cs1.append(cp0)
         cs1.append(cp1)
-        consistent = cs1.isTimeConsistent()
+        consistent = cs1.haveTimings()
         self.assertTrue(consistent)
 
         cs2 = ContactSequence(0)
@@ -1541,7 +1541,7 @@ class ContactSequenceTest(unittest.TestCase):
         cp3 = buildRandomContactPhase(1.5, 4.)
         cs2.append(cp2)
         cs2.append(cp3)
-        consistent = cs2.isTimeConsistent()
+        consistent = cs2.haveTimings()
         self.assertFalse(consistent)
 
         cs3 = ContactSequence(0)
@@ -1549,7 +1549,7 @@ class ContactSequenceTest(unittest.TestCase):
         cp5 = buildRandomContactPhase()
         cs3.append(cp4)
         cs3.append(cp5)
-        consistent = cs3.isTimeConsistent()
+        consistent = cs3.haveTimings()
         self.assertFalse(consistent)
 
         cs4 = ContactSequence(0)
@@ -1557,7 +1557,7 @@ class ContactSequenceTest(unittest.TestCase):
         cp7 = buildRandomContactPhase(1, 3)
         cs4.append(cp6)
         cs4.append(cp7)
-        consistent = cs4.isTimeConsistent()
+        consistent = cs4.haveTimings()
         self.assertFalse(consistent)
 
 

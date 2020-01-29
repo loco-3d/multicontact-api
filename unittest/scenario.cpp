@@ -1610,7 +1610,7 @@ BOOST_AUTO_TEST_CASE(contact_sequence_is_time_consistent) {
   ContactPhase cp1 = buildRandomContactPhase(2, 4.);
   cs1.append(cp0);
   cs1.append(cp1);
-  bool consistent = cs1.isTimeConsistent();
+  bool consistent = cs1.haveTimings();
   BOOST_CHECK(consistent);
 
   ContactSequence cs2 = ContactSequence(0);
@@ -1618,7 +1618,7 @@ BOOST_AUTO_TEST_CASE(contact_sequence_is_time_consistent) {
   ContactPhase cp3 = buildRandomContactPhase(1.5, 4.);
   cs2.append(cp2);
   cs2.append(cp3);
-  consistent = cs2.isTimeConsistent();
+  consistent = cs2.haveTimings();
   BOOST_CHECK(!consistent);
 
   ContactSequence cs3 = ContactSequence(0);
@@ -1626,7 +1626,7 @@ BOOST_AUTO_TEST_CASE(contact_sequence_is_time_consistent) {
   ContactPhase cp5 = buildRandomContactPhase();
   cs3.append(cp4);
   cs3.append(cp5);
-  consistent = cs3.isTimeConsistent();
+  consistent = cs3.haveTimings();
   BOOST_CHECK(!consistent);
 
   ContactSequence cs4 = ContactSequence(0);
@@ -1634,7 +1634,7 @@ BOOST_AUTO_TEST_CASE(contact_sequence_is_time_consistent) {
   ContactPhase cp7 = buildRandomContactPhase(1, 3);
   cs4.append(cp6);
   cs4.append(cp7);
-  consistent = cs4.isTimeConsistent();
+  consistent = cs4.haveTimings();
   BOOST_CHECK(!consistent);
 }
 
