@@ -163,6 +163,14 @@ struct ContactPhasePythonVisitor : public bp::def_visitor<ContactPhasePythonVisi
              isConsistent_overloads(bp::arg("throw_if_invalid"),
                                     "isConsistent check if all the members of the phase are consistent together.\n"
                                     "if throw_if_invalid == True it raise an error instead of returning False."))
+        .def("getContactsBroken", &getContactsBrokenAsList, bp::arg("to"),
+             "return the list of effectors in contact in '*this' but not in contact in 'to'")
+        .def("getContactsCreated", &getContactsCreatedAsList, bp::arg("to"),
+             "getContactsCreated return the list of effectors in contact in 'to' but not in contact in '*this'")
+        .def("getContactsRepositioned", &getContactsRepositionedAsList, bp::arg("to"),
+             "return the list of effectors in contact both in 'to' and '*this' but not at the same placement")
+        .def("getContactsVariations", &getContactsVariationsAsList, bp::arg("to"),
+             "return the list of all the effectors whose contacts differ between *this and to")
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
         .def("copy", &copy, "Returns a copy of *this.");
@@ -221,6 +229,19 @@ struct ContactPhasePythonVisitor : public bp::def_visitor<ContactPhasePythonVisi
   static bp::list effectorsWithTrajectoryAsList(ContactPhase& self) {
     return toPythonList<std::string>(self.effectorsWithTrajectory());
   }
+  static bp::list getContactsBrokenAsList(ContactPhase& self, const ContactPhase& to) {
+    return toPythonList<std::string>(self.getContactsBroken(to));
+  }
+  static bp::list getContactsCreatedAsList(ContactPhase& self, const ContactPhase& to) {
+    return toPythonList<std::string>(self.getContactsCreated(to));
+  }
+  static bp::list getContactsRepositionedAsList(ContactPhase& self, const ContactPhase& to) {
+    return toPythonList<std::string>(self.getContactsRepositioned(to));
+  }
+  static bp::list getContactsVariationsAsList(ContactPhase& self, const ContactPhase& to) {
+    return toPythonList<std::string>(self.getContactsVariations(to));
+  }
+
 
   // Converts a C++ map to a python dict
   // Note : lot of overhead, should not be used for large map and/or operations called frequently.
