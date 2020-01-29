@@ -1158,6 +1158,52 @@ class ContactPhaseTest(unittest.TestCase):
         cp_xml.loadFromXML("cp_test.xml", 'ContactPhase')
         self.assertEqual(cp1, cp_xml)
 
+    def test_contact_phase_contacts_variation(self):
+        # # contacts repositioned :
+        cp1 = buildRandomContactPhase()
+        cp2 = buildRandomContactPhase()
+        repo = cp1.getContactsRepositioned(cp2)
+        self.assertTrue(len(repo) == 2)
+        self.assertTrue(repo[0] == "right-leg")
+        self.assertTrue(repo[1] == "left-leg")
+        repo1 = cp2.getContactsRepositioned(cp1)
+        self.assertTrue(len(repo1) == 2)
+        self.assertTrue(repo1[0] == "right-leg")
+        self.assertTrue(repo1[1] == "left-leg")
+        vars = cp1.getContactsVariations(cp2)
+        self.assertTrue(len(vars) == 2)
+
+        # # contacts broken :
+
+        RH_placement = SE3.Identity()
+        RH_placement.setRandom()
+        RH_patch = ContactPatch(RH_placement)
+        cp3 = ContactPhase()
+        cp3.addContact("right-leg", RH_patch)
+        p = SE3.Identity()
+        p.setRandom()
+        cp3.addContact("left-leg", ContactPatch(p))
+        cp4 = ContactPhase()
+        cp4.addContact("right-leg", RH_patch)
+        broken = cp3.getContactsBroken(cp4)
+        self.assertTrue(len(broken) == 1)
+        self.assertTrue(broken[0] == "left-leg")
+        broken1 = cp4.getContactsBroken(cp3)
+        self.assertTrue(len(broken1) == 0)
+
+        created = cp4.getContactsCreated(cp3)
+        self.assertTrue(len(created) == 1)
+        self.assertTrue(created[0] == "left-leg")
+        created1 = cp3.getContactsCreated(cp4)
+        self.assertTrue(len(created1) == 0)
+
+        vars = cp3.getContactsVariations(cp4)
+        self.assertTrue(len(vars) == 1)
+        self.assertTrue(vars[0] == "left-leg")
+        vars = cp4.getContactsVariations(cp3)
+        self.assertTrue(len(vars) == 1)
+        self.assertTrue(vars[0] == "left-leg")
+
 
 class ContactSequenceTest(unittest.TestCase):
     def test_append(self):
