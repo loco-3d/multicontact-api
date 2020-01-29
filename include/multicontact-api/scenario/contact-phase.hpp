@@ -14,6 +14,7 @@
 #include <curves/piecewise_curve.h>
 #include <map>
 #include <vector>
+#include <set>
 #include <string>
 #include <sstream>
 #include <boost/shared_ptr.hpp>
@@ -546,6 +547,71 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
     if (m_q_final.isZero()) m_q_final = points.back();
     return;
   }
+
+  /**
+   * @brief getContactsBroken return the list of effectors in contact in '*this' but not in contact in 'to'
+   * @param to the other ContactPhase
+   * @return a list of string containing the effectors names
+   */
+  t_strings getContactsBroken(const ContactPhase& to) const {
+    t_strings res;
+    for(std::string eeName : m_effector_in_contact){
+      if(!to.isEffectorInContact(eeName))
+        res.push_back(eeName);
+    }
+    return res;
+  }
+
+  /**
+   * @brief getContactsCreated return the list of effectors in contact in 'to' but not in contact in '*this'
+   * @param to the other ContactPhase
+   * @return a list of string containing the effectors names
+   */
+  t_strings getContactsCreated(const ContactPhase& to) const {
+    t_strings res;
+    for(std::string eeName : to.effectorsInContact()){
+      if(!isEffectorInContact(eeName))
+        res.push_back(eeName);
+    }
+    return res;
+  }
+
+  /**
+   * @brief getContactsRepositioned return the list of effectors in contact both in 'to' and '*this'
+   * but not at the same placement
+   * @param to the other ContactPhase
+   * @return a list of string containing the effectors names
+   */
+  t_strings getContactsRepositioned(const ContactPhase& to) const {
+    t_strings res;
+    const ContactPatchMap& to_patch_map = to.contactPatches();
+    for(std::string eeName : m_effector_in_contact){
+      if(to.isEffectorInContact(eeName))
+        if(m_contact_patches.at(eeName).placement() != to_patch_map.at(eeName).placement())
+          res.push_back(eeName);
+    }
+    return res;
+  }
+
+  /**
+   * @brief getContactsVariations return the list of all the effectors whose contacts differ between *this and to
+   * @param to the other ContactPhase
+   * @return a list of string containing the effectors names
+   */
+  t_strings getContactsVariations(const ContactPhase& to) const {
+    std::set<std::string> set_res; // use intermediate set to guarantee uniqueness of element
+    for(std::string eeName : getContactsBroken(to)){
+      set_res.insert(eeName);
+    }
+    for(std::string eeName : getContactsCreated(to)){
+      set_res.insert(eeName);
+    }
+    for(std::string eeName : getContactsRepositioned(to)){
+      set_res.insert(eeName);
+    }
+    return t_strings(set_res.begin(), set_res.end());
+  }
+
 
   /* End Helpers */
 
