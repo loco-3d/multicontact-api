@@ -245,6 +245,468 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     return true;
   }
 
+  /**
+   * @brief haveConsistentContacts check that there is always one contact change between adjacent phases in the sequence
+   * and that there isn't any phase without any contact.
+   * @return
+   */
+  bool haveConsistentContacts() const{
+    size_t variations;
+    if(m_contact_phases.front().numContacts() == 0){
+      // FIXME : may want to test this in a separate method in the future
+      std::cout<<"Phase without any contact at id : 0"<<std::endl;
+      return false;
+    }
+    for(size_t i = 1 ; i < m_contact_phases.size() ; ++i){
+      variations = m_contact_phases.at(i-1).getContactsBroken(m_contact_phases.at(i)).size()
+          + m_contact_phases.at(i-1).getContactsCreated(m_contact_phases.at(i)).size();
+      if(variations > 1){
+        std::cout<<"Several contact changes between adjacents phases at id : "<<i<<std::endl;
+        return false;
+      }
+      if(m_contact_phases.at(i-1).getContactsRepositioned(m_contact_phases.at(i)).size() > 0){
+        std::cout<<"Contact repositionning without intermediate phase at id : "<<i<<std::endl;
+        return false;
+      }
+      if(m_contact_phases.at(i).numContacts() == 0){
+        // FIXME : may want to test this in a separate method in the future
+        std::cout<<"Phase without any contact at id : "<<i<<std::endl;
+        return false;
+      }
+      if(variations == 0){
+        std::cout<<"No contact change between adjacents phases at id : "<<i<<std::endl;
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * @brief haveCOMvalues Check that the initial and final CoM position values are defined for all phases
+   * Also check that the initial values of one phase correspond to the final values of the previous ones.
+   * @return
+   */
+  bool haveCOMvalues() const{
+    if(m_contact_phases.front().m_c_init.isZero()){
+      std::cout<<"Initial CoM position not defined."<<std::endl;
+      return false;
+    }
+    for(size_t i = 1 ; i < m_contact_phases.size() ; ++i){
+      if(m_contact_phases.at(i).m_c_init.isZero()){
+        std::cout<<"Intermediate CoM position not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(m_contact_phases.at(i).m_c_init != m_contact_phases.at(i-1).m_c_final){
+        std::cout<<"Init CoM position do not match final CoM of previous phase for id : "<<i<<std::endl;
+        return false;
+      }
+      if(!m_contact_phases.at(i).m_dc_init.isZero()){
+        if(m_contact_phases.at(i).m_dc_init != m_contact_phases.at(i-1).m_dc_final){
+          std::cout<<"Init CoM velocity do not match final velocity of previous phase for id : "<<i<<std::endl;
+          return false;
+        }
+      }
+      if(!m_contact_phases.at(i).m_ddc_init.isZero()){
+        if(m_contact_phases.at(i).m_ddc_init != m_contact_phases.at(i-1).m_ddc_final){
+          std::cout<<"Init CoM acceleration do not match final acceleration of previous phase for id : "<<i<<std::endl;
+          return false;
+        }
+      }
+    }
+    if(m_contact_phases.back().m_c_final.isZero()){
+      std::cout<<"Final CoM position not defined."<<std::endl;
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * @brief haveAMvalues Check that the initial and final AM values are defined for all phases
+   * Also check that the initial values of one phase correspond to the final values of the previous ones.
+   * @return
+   */
+  bool haveAMvalues() const{
+    if(m_contact_phases.front().m_L_init.isZero()){
+      std::cout<<"Initial AM value not defined."<<std::endl;
+      return false;
+    }
+    for(size_t i = 1 ; i < m_contact_phases.size() ; ++i){
+      if(m_contact_phases.at(i).m_L_init.isZero()){
+        std::cout<<"Intermediate AM value not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(m_contact_phases.at(i).m_L_init != m_contact_phases.at(i-1).m_L_final){
+        std::cout<<"Init AM value do not match final value of previous phase for id : "<<i<<std::endl;
+        return false;
+      }
+      if(!m_contact_phases.at(i).m_dL_init.isZero()){
+        if(m_contact_phases.at(i).m_dL_init != m_contact_phases.at(i-1).m_dL_final){
+          std::cout<<"Init AM derivative do not match final AM derivative of previous phase for id : "<<i<<std::endl;
+          return false;
+        }
+      }
+    }
+    if(m_contact_phases.back().m_L_final.isZero()){
+      std::cout<<"Final AM value not defined."<<std::endl;
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * @brief haveCentroidalValues Check that the initial and final CoM position and AM values are defined for all phases
+   * Also check that the initial values of one phase correspond to the final values of the previous ones.
+   * @return
+   */
+  bool haveCentroidalValues() const{
+    return haveAMvalues() && haveCOMvalues();
+  }
+
+  /**
+   * @brief haveConfigurationsValues Check that the initial and final configuration are defined for all phases
+   * Also check that the initial values of one phase correspond to the final values of the previous ones.
+   * @return
+   */
+  bool haveConfigurationsValues() const{
+    if(m_contact_phases.front().m_q_init.isZero()){
+      std::cout<<"Initial configuration not defined."<<std::endl;
+      return false;
+    }
+    for(size_t i = 1 ; i < m_contact_phases.size() ; ++i){
+      if(m_contact_phases.at(i).m_q_init.isZero()){
+        std::cout<<"Intermediate configuration not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(m_contact_phases.at(i).m_q_init != m_contact_phases.at(i-1).m_q_final){
+        std::cout<<"Init configuration do not match final configuration of previous phase for id : "<<i<<std::endl;
+        return false;
+      }
+    }
+    if(m_contact_phases.back().m_q_final.isZero()){
+      std::cout<<"Final configuration not defined."<<std::endl;
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * @brief haveCOMtrajectories check that a c, dc and ddc trajectories are defined for each phases
+   * Also check that the time interval of this trajectories matches the one of the phase
+   * and that the trajectories start and end and the correct values defined in each phase
+   * @return
+   */
+  bool haveCOMtrajectories() const{
+    if(!(haveTimings() && haveCOMvalues()))
+      return false;
+    size_t i = 0;
+    for(const ContactPhase& phase : m_contact_phases){
+      if(!phase.m_c){
+        std::cout<<"CoM position trajectory not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!phase.m_dc){
+        std::cout<<"CoM velocity trajectory not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!phase.m_ddc){
+        std::cout<<"CoM acceleration trajectory not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_c->min() != phase.timeInitial()){
+        std::cout<<"CoM trajectory do not start at t_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_dc->min() != phase.timeInitial()){
+        std::cout<<"CoM velocity trajectory do not start at t_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_ddc->min() != phase.timeInitial()){
+        std::cout<<"CoM acceleration trajectory do not start at t_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_c->max() != phase.timeFinal()){
+        std::cout<<"CoM trajectory do not end at t_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_dc->max() != phase.timeFinal()){
+        std::cout<<"CoM velocity trajectory do not end at t_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_ddc->max() != phase.timeFinal()){
+        std::cout<<"CoM acceleration trajectory do not end at t_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!(*phase.m_c)(phase.m_c->min()).isApprox(phase.m_c_init) ){
+        std::cout<<"CoM trajectory do not start at c_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!(*phase.m_dc)(phase.m_dc->min()).isApprox(phase.m_dc_init) ){
+        std::cout<<"CoM velocity trajectory do not start at dc_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!(*phase.m_ddc)(phase.m_ddc->min()).isApprox(phase.m_ddc_init) ){
+        std::cout<<"CoM velocity trajectory do not start at ddc_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!(*phase.m_c)(phase.m_c->max()).isApprox(phase.m_c_final) ){
+        std::cout<<"CoM trajectory do not end at c_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!(*phase.m_dc)(phase.m_dc->max()).isApprox(phase.m_dc_final) ){
+        std::cout<<"CoM velocity trajectory do not end at dc_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!(*phase.m_ddc)(phase.m_ddc->max()).isApprox(phase.m_ddc_final) ){
+        std::cout<<"CoM velocity trajectory do not end at ddc_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      ++i;
+    }
+    return true;
+  }
+
+  /**
+   * @brief haveAMtrajectories check that a L and dL trajectories are defined for each phases
+   * Also check that the time interval of this trajectories matches the one of the phase
+   * and that the trajectories start and end and the correct values defined in each phase
+   * @return
+   */
+  bool haveAMtrajectories() const{
+    if(!(haveTimings() && haveAMvalues()))
+      return false;
+    size_t i = 0;
+    for(const ContactPhase& phase : m_contact_phases){
+      if(!phase.m_L){
+        std::cout<<"AM position trajectory not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!phase.m_dL){
+        std::cout<<"AM velocity trajectory not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_L->min() != phase.timeInitial()){
+        std::cout<<"AM trajectory do not start at t_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_dL->min() != phase.timeInitial()){
+        std::cout<<"AM velocity trajectory do not start at t_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_L->max() != phase.timeFinal()){
+        std::cout<<"AM trajectory do not end at t_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_dL->max() != phase.timeFinal()){
+        std::cout<<"AM velocity trajectory do not end at t_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!(*phase.m_L)(phase.m_L->min()).isApprox(phase.m_L_init) ){
+        std::cout<<"AM trajectory do not start at L_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!(*phase.m_dL)(phase.m_dL->min()).isApprox(phase.m_dL_init) ){
+        std::cout<<"AM velocity trajectory do not start at dL_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!(*phase.m_L)(phase.m_L->max()).isApprox(phase.m_L_final) ){
+        std::cout<<"AM trajectory do not end at L_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!(*phase.m_dL)(phase.m_dL->max()).isApprox(phase.m_dL_final) ){
+        std::cout<<"AM velocity trajectory do not end at dL_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      ++i;
+    }
+    return true;
+  }
+
+  /**
+   * @brief haveCentroidalTrajectories check that all centroidal trajectories are defined for each phases
+   * Also check that the time interval of this trajectories matches the one of the phase
+   * and that the trajectories start and end and the correct values defined in each phase
+   * @return
+   */
+  bool haveCentroidalTrajectories() const{
+    return haveAMtrajectories() && haveCOMtrajectories();
+  }
+
+  /**
+   * @brief haveEffectorsTrajectories check that for each phase preceeding a contact creation,
+   *  an SE3 trajectory is defined for the effector that will be in contact.
+   * Also check that this trajectory is defined on the time-interval of the phase.
+   * Also check that the trajectory correctly end at the placement defined for the contact in the next phase.
+   * If this effector was in contact in the previous phase, it check that the trajectory start at the previous contact placement.
+   * @return
+   */
+  bool haveEffectorsTrajectories() const{
+    if(!haveTimings())
+      return false;
+    for(size_t i = 0 ; i < m_contact_phases.size() -1 ; ++i){
+      for(std::string eeName : m_contact_phases.at(i).getContactsCreated(m_contact_phases.at(i+1))){
+        if(! m_contact_phases.at(i).effectorHaveAtrajectory(eeName)){
+          std::cout<<"No end effector trajectory for "<<eeName<<" at phase "<<i<<" but it is in contact at phase "<<i+1<<std::endl;
+          return false;
+        }
+        const typename ContactPhase::curve_SE3_ptr traj = m_contact_phases.at(i).effectorTrajectories().at(eeName);
+        if(traj->min() != m_contact_phases.at(i).timeInitial()){
+          std::cout<<"Effector trajectory for "<<eeName<<" do not start at t_init in phase "<<i<<std::endl;
+          return false;
+        }
+        if(traj->max() != m_contact_phases.at(i).timeFinal()){
+          std::cout<<"Effector trajectory for "<<eeName<<" do not end at t_final in phase "<<i<<std::endl;
+          return false;
+        }
+        ContactPatch::SE3 pMax = ContactPatch::SE3((*traj)(traj->max()).matrix());
+        if(!pMax.isApprox(m_contact_phases.at(i+1).contactPatches().at(eeName).placement())){
+          std::cout<<"Effector trajectory for "<<eeName
+                  << " do not end at it's contact placement in the next phase, for phase "<<i<<std::endl;
+          return false;
+        }
+        if(i > 0 && m_contact_phases.at(i-1).isEffectorInContact(eeName)){
+          ContactPatch::SE3 pMin = ContactPatch::SE3((*traj)(traj->min()).matrix());
+          if(!pMin.isApprox(m_contact_phases.at(i-1).contactPatches().at(eeName).placement())){
+            std::cout<<"Effector trajectory for "<<eeName
+                    << " do not start at it's contact placement in the previous phase, for phase "<<i<<std::endl;
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * @brief haveJointsTrajectories Check that a q, dq and ddq trajectories are defined for each phases
+   * Also check that the time interval of this trajectories matches the one of the phase
+   * and that the trajectories start and end and the correct values defined in each phase
+   * @return
+   */
+  bool haveJointsTrajectories() const{
+    if(!(haveTimings() && haveConfigurationsValues()))
+      return false;
+    size_t i = 0;
+    for(const ContactPhase& phase : m_contact_phases){
+      if(!phase.m_q){
+        std::cout<<"joint position trajectory not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!phase.m_dq){
+        std::cout<<"joint velocity trajectory not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!phase.m_ddq){
+        std::cout<<"joint acceleration trajectory not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_q->min() != phase.timeInitial()){
+        std::cout<<"joint trajectory do not start at t_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_dq->min() != phase.timeInitial()){
+        std::cout<<"joint velocity trajectory do not start at t_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_ddq->min() != phase.timeInitial()){
+        std::cout<<"joint acceleration trajectory do not start at t_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_q->max() != phase.timeFinal()){
+        std::cout<<"joint trajectory do not end at t_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_dq->max() != phase.timeFinal()){
+        std::cout<<"joint velocity trajectory do not end at t_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_ddq->max() != phase.timeFinal()){
+        std::cout<<"joint acceleration trajectory do not end at t_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!(*phase.m_q)(phase.m_q->min()).isApprox(phase.m_q_init) ){
+        std::cout<<"joint trajectory do not start at q_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!(*phase.m_q)(phase.m_q->max()).isApprox(phase.m_q_final) ){
+        std::cout<<"joint trajectory do not end at q_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      ++i;
+    }
+    return true;
+  }
+
+  /**
+   * @brief haveJointsTrajectories Check that a joint torque trajectories are defined for each phases
+   * Also check that the time interval of this trajectories matches the one of the phase
+   * and that the trajectories start and end and the correct values defined in each phase
+   * @return
+   */
+  bool haveTorquesTrajectories() const{
+    if(!haveTimings())
+      return false;
+    size_t i =0;
+    for(const ContactPhase& phase : m_contact_phases){
+      if(!phase.m_tau){
+        std::cout<<"Torque trajectory not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+
+      if(phase.m_tau->min() != phase.timeInitial()){
+        std::cout<<"Torque trajectory do not start at t_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_tau->max() != phase.timeFinal()){
+        std::cout<<"Torque trajectory do not end at t_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      ++i;
+    }
+    return true;
+  }
+
+  /**
+   * @brief haveJointsTrajectories Check that a contact force trajectory exist for each active contact
+   * Also check that the time interval of this trajectories matches the one of the phase
+   * and that the trajectories start and end and the correct values defined in each phase
+   * @return
+   */
+  bool haveContactForcesTrajectories() const{
+    if(!haveTimings())
+      return false;
+    size_t i = 0;
+    for(const ContactPhase& phase : m_contact_phases){
+      for(std::string eeName : phase.effectorsInContact()){
+        if(phase.contactForces().count(eeName) == 0){
+          std::cout<<"No contact forces trajectory for effector "<<eeName<<" at phase "<<i<<std::endl;
+          return false;
+        }
+        if(phase.contactNormalForces().count(eeName) == 0){
+          std::cout<<"No contact normal force trajectory for effector "<<eeName<<" for phase "<<i<<std::endl;
+          return false;
+        }
+        if(phase.contactForces().at(eeName)->min() != phase.timeInitial()){
+          std::cout<<"No contact forces trajectory for effector "<<eeName<<" do not start at t_init for phase "<<i<<std::endl;
+          return false;
+        }
+        if(phase.contactForces().at(eeName)->max() != phase.timeInitial()){
+          std::cout<<"No contact forces trajectory for effector "<<eeName<<" do not end at t_final for phase "<<i<<std::endl;
+          return false;
+        }
+        if(phase.contactNormalForces().at(eeName)->min() != phase.timeInitial()){
+          std::cout<<"No contact normal force trajectory for effector "<<eeName<<" do not start at t_init for phase "<<i<<std::endl;
+          return false;
+        }
+        if(phase.contactNormalForces().at(eeName)->max() != phase.timeInitial()){
+          std::cout<<"No contact normal force trajectory for effector "<<eeName<<" do not end at t_final for phase "<<i<<std::endl;
+          return false;
+        }
+      }
+      ++i;
+    }
+    return true;
+  }
+
   /* End Helpers */
 
   /*Public Attributes*/
