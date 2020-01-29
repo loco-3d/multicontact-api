@@ -100,6 +100,52 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
              "(ie. the time always increase and the final time of one phase is equal to the initial one of the newt "
              "phase) \n"
              "Return true if the sequence is consistent, false otherwise")
+        .def("haveConsistentContacts", &CS::haveConsistentContacts,
+             "check that there is always one contact change between adjacent phases in the sequence.\n"
+             "and that there isn't any phase without any contact.")
+        .def("haveCOMvalues", &CS::haveCOMvalues,
+             "Check that the initial and final CoM position values are defined for all phases.\n"
+             "Also check that the initial values of one phase correspond to the final values of the previous ones.")
+        .def("haveAMvalues", &CS::haveAMvalues,
+             "Check that the initial and final AM values are defined for all phases.\n"
+             "Also check that the initial values of one phase correspond to the final values of the previous ones.")
+        .def("haveCentroidalValues", &CS::haveCentroidalValues,
+             "Check that the initial and final CoM position and AM values are defined for all phases.\n"
+             "Also check that the initial values of one phase correspond to the final values of the previous ones.")
+        .def("haveConfigurationsValues", &CS::haveConfigurationsValues,
+             "Check that the initial and final configuration are defined for all phases.\n"
+             "Also check that the initial values of one phase correspond to the final values of the previous ones.")
+        .def("haveCOMtrajectories", &CS::haveCOMtrajectories,
+             "check that a c, dc and ddc trajectories are defined for each phases.\n"
+             "Also check that the time interval of this trajectories matches the one of the phase.\n"
+             "and that the trajectories start and end and the correct values defined in each phase.")
+        .def("haveAMtrajectories", &CS::haveAMtrajectories,
+             "check that a L and dL trajectories are defined for each phases.\n"
+             "Also check that the time interval of this trajectories matches the one of the phase.\n"
+             "and that the trajectories start and end and the correct values defined in each phase.")
+        .def("haveCentroidalTrajectories", &CS::haveCentroidalTrajectories,
+             "check that all centroidal trajectories are defined for each phases.\n"
+             "Also check that the time interval of this trajectories matches the one of the phase.\n"
+             "and that the trajectories start and end and the correct values defined in each phase.")
+        .def("haveEffectorsTrajectories", &CS::haveEffectorsTrajectories,
+             "check that for each phase preceeding a contact creation,"
+             "an SE3 trajectory is defined for the effector that will be in contact.\n"
+             "Also check that this trajectory is defined on the time-interval of the phase.\n"
+             "Also check that the trajectory correctly end at the placement defined for the contact in the next phase.\n"
+             "If this effector was in contact in the previous phase,"
+             "it check that the trajectory start at the previous contact placement.")
+        .def("haveJointsTrajectories", &CS::haveJointsTrajectories,
+             "Check that a q, dq and ddq trajectories are defined for each phases.\n"
+             "Also check that the time interval of this trajectories matches the one of the phase.\n"
+             "and that the trajectories start and end and the correct values defined in each phase.")
+        .def("haveTorquesTrajectories", &CS::haveTorquesTrajectories,
+             "Check that a joint torque trajectories are defined for each phases.\n"
+             "Also check that the time interval of this trajectories matches the one of the phase.\n"
+             "and that the trajectories start and end and the correct values defined in each phase")
+        .def("haveContactForcesTrajectories", &CS::haveContactForcesTrajectories,
+             "Check that a contact force trajectory exist for each active contact.\n"
+             "Also check that the time interval of this trajectories matches the one of the phase.\n"
+             "and that the trajectories start and end and the correct values defined in each phase.")
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
         .def("copy", &copy, "Returns a copy of *this.");
