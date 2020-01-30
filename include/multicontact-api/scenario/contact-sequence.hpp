@@ -17,6 +17,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   typedef _ContactPhase ContactPhase;
   typedef typename ContactPhase::Scalar Scalar;
+  typedef typename ContactPhase::t_strings t_strings;
   typedef std::vector<ContactPhase> ContactPhaseVector;
 
   ContactSequenceTpl(const size_t size = 0) : m_contact_phases(size) {}
@@ -740,6 +741,21 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
       ++i;
     }
     return true;
+  }
+
+  /**
+   * @brief getAllEffectorsInContact return a vector of names of all the effectors used to create contacts during the sequence
+   * @return
+   */
+  t_strings getAllEffectorsInContact() const{
+    // use set to guarantee uniqueness, but return a vector for easier use and python bindings
+    std::set<std::string> res_set;
+    for(const ContactPhase& phase : m_contact_phases){
+      for(const std::string& eeName : phase.effectorsInContact()){
+        res_set.insert(eeName);
+      }
+    }
+    return t_strings(res_set.begin(), res_set.end());
   }
 
   /* End Helpers */
