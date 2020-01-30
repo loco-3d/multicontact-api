@@ -1567,7 +1567,7 @@ BOOST_AUTO_TEST_CASE(contact_sequence_helper) {
   BOOST_CHECK(cs1.size() == 10);
   BOOST_CHECK(!cs1.contactPhase(8).isEffectorInContact("left_foot"));
   BOOST_CHECK(cs1.contactPhase(9).isEffectorInContact("left_foot"));
-  target_placement = cs1.contactPhase(7).contactPatch("left_foot").placement().act(target_transform);
+  target_placement = target_transform.act(cs1.contactPhase(7).contactPatch("left_foot").placement());
   BOOST_CHECK(cs1.contactPhase(9).contactPatch("left_foot").placement() == target_placement);
   BOOST_CHECK(cs1.contactPhase(9).contactPatch("left_foot").friction() == 10.);
   // check that the other contactPatch have been copied :

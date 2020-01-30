@@ -216,7 +216,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     if (!m_contact_phases.back().isEffectorInContact(eeName))
       throw std::invalid_argument("In moveEffectorToPlacement : effector is not currently in contact : " + eeName);
     ContactPatch::SE3 previous(m_contact_phases.back().contactPatch(eeName).placement());
-    ContactPatch::SE3 target = previous.act(transform);
+    ContactPatch::SE3 target = transform.act(previous);
     return moveEffectorToPlacement(eeName, target, durationBreak, durationCreate);
   }
 

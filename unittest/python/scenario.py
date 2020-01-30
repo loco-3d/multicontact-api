@@ -1486,7 +1486,7 @@ class ContactSequenceTest(unittest.TestCase):
         self.assertTrue(cs1.size() == 10)
         self.assertFalse(cs1.contactPhases[8].isEffectorInContact("left-leg"))
         self.assertTrue(cs1.contactPhases[9].isEffectorInContact("left-leg"))
-        target_placement = cs1.contactPhases[7].contactPatch("left-leg").placement.act(target_transform)
+        target_placement = target_transform.act(cs1.contactPhases[7].contactPatch("left-leg").placement)
         self.assertTrue(cs1.contactPhases[9].contactPatch("left-leg").placement == target_placement)
         self.assertTrue(cs1.contactPhases[9].contactPatch("left-leg").friction == 10.)
         # check that the other contactPatch have been copied :
