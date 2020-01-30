@@ -326,29 +326,15 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * @return
    */
   bool haveAMvalues() const{
-    if(m_contact_phases.front().m_L_init.isZero()){
-      std::cout<<"Initial AM value not defined."<<std::endl;
-      return false;
-    }
     for(size_t i = 1 ; i < m_contact_phases.size() ; ++i){
-      if(m_contact_phases.at(i).m_L_init.isZero()){
-        std::cout<<"Intermediate AM value not defined for phase : "<<i<<std::endl;
-        return false;
-      }
       if(m_contact_phases.at(i).m_L_init != m_contact_phases.at(i-1).m_L_final){
         std::cout<<"Init AM value do not match final value of previous phase for id : "<<i<<std::endl;
         return false;
       }
-      if(!m_contact_phases.at(i).m_dL_init.isZero()){
-        if(m_contact_phases.at(i).m_dL_init != m_contact_phases.at(i-1).m_dL_final){
-          std::cout<<"Init AM derivative do not match final AM derivative of previous phase for id : "<<i<<std::endl;
-          return false;
-        }
+      if(m_contact_phases.at(i).m_dL_init != m_contact_phases.at(i-1).m_dL_final){
+        std::cout<<"Init AM derivative do not match final AM derivative of previous phase for id : "<<i<<std::endl;
+        return false;
       }
-    }
-    if(m_contact_phases.back().m_L_final.isZero()){
-      std::cout<<"Final AM value not defined."<<std::endl;
-      return false;
     }
     return true;
   }
