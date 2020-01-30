@@ -146,10 +146,11 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
              "Check that a contact force trajectory exist for each active contact.\n"
              "Also check that the time interval of this trajectories matches the one of the phase.\n"
              "and that the trajectories start and end and the correct values defined in each phase.")
+        .def("getAllEffectorsInContact",&getAllEffectorsInContactAsList,
+             "return a list of names of all the effectors used to create contacts during the sequence")
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
         .def("copy", &copy, "Returns a copy of *this.");
-    ;
   }
 
   static void expose(const std::string& class_name) {
@@ -163,6 +164,23 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
 
  protected:
   static CS copy(const CS& self) { return CS(self); }
+
+  // Converts a C++ vector to a python list
+  // Note : lot of overhead, should not be used for large vector and/or operations called frequently.
+  // prefer the direct bindings with std_vector_strings for this cases.
+  template <class T>
+  static bp::list toPythonList(std::vector<T> vector) {
+    typename std::vector<T>::const_iterator iter;
+    boost::python::list list;
+    for (iter = vector.begin(); iter != vector.end(); ++iter) {
+      list.append(*iter);
+    }
+    return list;
+  }
+
+  static bp::list getAllEffectorsInContactAsList(CS& self) {
+    return toPythonList<std::string>(self.getAllEffectorsInContact());
+  }
 };
 }  // namespace python
 }  // namespace multicontact_api
