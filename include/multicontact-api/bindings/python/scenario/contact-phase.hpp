@@ -11,7 +11,7 @@
 #include "multicontact-api/scenario/contact-phase.hpp"
 #include "multicontact-api/bindings/python/serialization/archive.hpp"
 #include "multicontact-api/bindings/python/utils/printable.hpp"
-
+#include <curves/python/python_definitions.h>
 #include <boost/python/suite/indexing/map_indexing_suite.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
@@ -31,6 +31,11 @@ struct ContactPhasePythonVisitor : public bp::def_visitor<ContactPhasePythonVisi
   typedef typename ContactPhase::point3_t point3_t;
   typedef typename ContactPhase::point6_t point6_t;
   typedef typename ContactPhase::pointX_t pointX_t;
+  typedef curves::t_pointX_t t_pointX_t;
+  typedef curves::t_time_t t_time_t;
+  typedef curves::pointX_list_t pointX_list_t;
+  typedef curves::time_waypoints_t time_waypoints_t;
+
 
   // call macro for all ContactPhase methods that can be overloaded
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(isConsistent_overloads, ContactPhase::isConsistent, 0, 1)
@@ -171,6 +176,22 @@ struct ContactPhasePythonVisitor : public bp::def_visitor<ContactPhasePythonVisi
              "return the list of effectors in contact both in 'to' and '*this' but not at the same placement")
         .def("getContactsVariations", &getContactsVariationsAsList, bp::arg("to"),
              "return the list of all the effectors whose contacts differ between *this and to")
+        .def("setCOMtrajectoryFromPoints", &setCOMtrajectoryFromPoints,
+             bp::args("COM_positions", "COM_velocities", "COM_accelerations", "times"),
+             "set the c,dc and ddc curves from a list of discrete"
+              "COM positions, velocity and accelerations.\n"
+              "The trajectories are build with first order polynomials connecting each discrete points given.\n"
+              "This method also set the initial/final values for c, dc and ddc from the first and last discrete point given.")
+        .def("setAMtrajectoryFromPoints", &setAMtrajectoryFromPoints,
+             bp::args("AM_values", "AM_derivatives", "times"),
+             "set the L and d_L curves from a list of discrete Angular velocity values and their derivatives.\n"
+             "The trajectories are build with first order polynomials connecting each discrete points given.\n"
+             "This method also set the initial/final values for L, and dL from the first and last discrete point given.")
+        .def("setJointsTrajectoryFromPoints", &setJointsTrajectoryFromPoints,
+             bp::args("Joints_poisitions", "Joints_velocities", "Joints_accelerations", "times"),
+             "set the q,dq and ddq curves from a list of discrete joints positions, velocity and accelerations."
+             "The trajectories are build with first order polynomials connecting each discrete points given.\n"
+             "This method also set initial/final values for q from the first and last discrete point given.\n")
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
         .def("copy", &copy, "Returns a copy of *this.");
@@ -266,6 +287,43 @@ struct ContactPhasePythonVisitor : public bp::def_visitor<ContactPhasePythonVisi
   static bp::dict effectorTrajectoriesAsDict(ContactPhase& self) {
     return toPythonDict<curve_SE3_ptr>(self.effectorTrajectories());
   }
+
+
+  static void setCOMtrajectoryFromPoints(ContactPhase& self, const pointX_list_t& points,
+                                         const pointX_list_t& points_derivative,
+                                         const pointX_list_t& points_second_derivative,
+                                         const time_waypoints_t& time_points) {
+    t_pointX_t points_list = curves::vectorFromEigenArray<pointX_list_t, t_pointX_t>(points);
+    t_pointX_t points_derivative_list = curves::vectorFromEigenArray<pointX_list_t, t_pointX_t>(points_derivative);
+    t_pointX_t points_second_derivative_list = curves::vectorFromEigenArray<pointX_list_t, t_pointX_t>(points_second_derivative);
+    t_time_t time_points_list = curves::vectorFromEigenVector<time_waypoints_t, t_time_t>(time_points);
+    self.setCOMtrajectoryFromPoints(points_list, points_derivative_list, points_second_derivative_list, time_points_list);
+    return ;
+  }
+
+  static void setJointsTrajectoryFromPoints(ContactPhase& self, const pointX_list_t& points,
+                                         const pointX_list_t& points_derivative,
+                                         const pointX_list_t& points_second_derivative,
+                                         const time_waypoints_t& time_points) {
+    t_pointX_t points_list = curves::vectorFromEigenArray<pointX_list_t, t_pointX_t>(points);
+    t_pointX_t points_derivative_list = curves::vectorFromEigenArray<pointX_list_t, t_pointX_t>(points_derivative);
+    t_pointX_t points_second_derivative_list = curves::vectorFromEigenArray<pointX_list_t, t_pointX_t>(points_second_derivative);
+    t_time_t time_points_list = curves::vectorFromEigenVector<time_waypoints_t, t_time_t>(time_points);
+    self.setJointsTrajectoryFromPoints(points_list, points_derivative_list, points_second_derivative_list, time_points_list);
+    return ;
+  }
+
+  static void setAMtrajectoryFromPoints(ContactPhase& self, const pointX_list_t& points,
+                                         const pointX_list_t& points_derivative,
+                                         const time_waypoints_t& time_points) {
+    t_pointX_t points_list = curves::vectorFromEigenArray<pointX_list_t, t_pointX_t>(points);
+    t_pointX_t points_derivative_list = curves::vectorFromEigenArray<pointX_list_t, t_pointX_t>(points_derivative);
+    t_time_t time_points_list = curves::vectorFromEigenVector<time_waypoints_t, t_time_t>(time_points);
+    self.setAMtrajectoryFromPoints(points_list, points_derivative_list, time_points_list);
+    return ;
+  }
+
+
   static ContactPhase copy(const ContactPhase& self) { return ContactPhase(self); }
 };
 }  // namespace python
