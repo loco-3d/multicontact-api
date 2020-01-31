@@ -440,7 +440,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
       }
       if(phase.m_ddc_init.isZero()){
         if(!(*phase.m_ddc)(phase.m_ddc->min()).isZero() ){
-          std::cout<<"CoM velocity trajectory do not start at ddc_init for phase : "<<i<<std::endl;
+          std::cout<<"CoM acceleration trajectory do not start at ddc_init for phase : "<<i<<std::endl;
           return false;
         }
       }
@@ -464,12 +464,12 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
       }
       if(phase.m_ddc_final.isZero()){
         if(!(*phase.m_ddc)(phase.m_ddc->max()).isZero() ){
-          std::cout<<"CoM velocity trajectory do not end at ddc_final for phase : "<<i<<std::endl;
+          std::cout<<"CoM acceleration trajectory do not end at ddc_final for phase : "<<i<<std::endl;
           return false;
         }
       }
       else if(!(*phase.m_ddc)(phase.m_ddc->max()).isApprox(phase.m_ddc_final) ){
-        std::cout<<"CoM velocity trajectory do not end at ddc_final for phase : "<<i<<std::endl;
+        std::cout<<"CoM acceleration trajectory do not end at ddc_final for phase : "<<i<<std::endl;
         return false;
       }
       ++i;
