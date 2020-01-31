@@ -744,6 +744,32 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
   }
 
   /**
+   * @brief haveRootTrajectories check that a root trajectory exist for each contact phases.
+   * Also check that it start and end at the correct time interval
+   * @return
+   */
+  bool haveRootTrajectories() const{
+    size_t i = 0;
+    for(const ContactPhase& phase : m_contact_phases){
+      if(!phase.m_root){
+        std::cout<<"Root trajectory not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_root->min() != phase.timeInitial()){
+        std::cout<<"Root trajectory do not start at t_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_root->max() != phase.timeFinal()){
+        std::cout<<"Root trajectory do not start at t_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      ++i;
+    }
+    return true;
+  }
+
+
+  /**
    * @brief getAllEffectorsInContact return a vector of names of all the effectors used to create contacts during the sequence
    * @return
    */

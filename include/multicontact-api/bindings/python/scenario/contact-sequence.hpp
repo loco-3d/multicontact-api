@@ -146,6 +146,9 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
              "Check that a contact force trajectory exist for each active contact.\n"
              "Also check that the time interval of this trajectories matches the one of the phase.\n"
              "and that the trajectories start and end and the correct values defined in each phase.")
+        .def("haveRootTrajectories", &CS::haveRootTrajectories,
+             "check that a root trajectory exist for each contact phases.\n"
+             "Also check that it start and end at the correct time interval.")
         .def("getAllEffectorsInContact",&getAllEffectorsInContactAsList,
              "return a list of names of all the effectors used to create contacts during the sequence")
         .def(bp::self == bp::self)
