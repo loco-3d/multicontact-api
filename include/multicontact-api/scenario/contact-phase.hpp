@@ -446,9 +446,7 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
    * @brief setCOMtrajectoryFromPoints set the c,dc and ddc curves from a list of discrete
    * COM positions, velocity and accelerations.
    * The trajectories are build with first order polynomials connecting each discrete points given.
-   * If the initial/final values for c, dc and ddc are not set,
-   * this method also set them from the first and last discrete point given.
-   * Otherwise it do not modify them.
+   * this method also set the initial/final values for c, dc and ddc from the first and last discrete point given.
    * @param points list of discrete CoM positions
    * @param points_derivative list of discrete CoM velocities
    * @param points_second_derivative list of discrete CoM accelerations
@@ -473,12 +471,12 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
     if(m_c->dim() != 3 || m_dc->dim() != 3 || m_ddc->dim() != 3)
       throw std::invalid_argument("Dimension of the points must be 3.");
 
-    if (m_c_init.isZero()) m_c_init = point3_t(points.front());
-    if (m_c_final.isZero()) m_c_final = point3_t(points.back());
-    if (m_dc_init.isZero()) m_dc_init = point3_t(points_derivative.front());
-    if (m_dc_final.isZero()) m_dc_final = point3_t(points_derivative.back());
-    if (m_ddc_init.isZero()) m_ddc_init = point3_t(points_second_derivative.front());
-    if (m_ddc_final.isZero()) m_ddc_final = point3_t(points_second_derivative.back());
+    m_c_init = point3_t(points.front());
+    m_c_final = point3_t(points.back());
+    m_dc_init = point3_t(points_derivative.front());
+    m_dc_final = point3_t(points_derivative.back());
+    m_ddc_init = point3_t(points_second_derivative.front());
+    m_ddc_final = point3_t(points_second_derivative.back());
     return;
   }
 
@@ -486,9 +484,7 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
    * @brief setAMtrajectoryFromPoints set the L and d_L curves from a list of discrete
    * Angular velocity values and their derivatives
    * The trajectories are build with first order polynomials connecting each discrete points given.
-   * If the initial/final values for L, and dL are not set,
-   * this method also set them from the first and last discrete point given.
-   * Otherwise it do not modify them.
+   * This method also set the initial/final values for L, and dL from the first and last discrete point given.
    * @param points list of discrete Angular Momentum values
    * @param points_derivative list of discrete Angular momentum derivative
    * @param time_points list of times corresponding to each discrete point given.
@@ -509,10 +505,10 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
     if(m_L->dim() != 3 || m_dL->dim() != 3 )
       throw std::invalid_argument("Dimension of the points must be 3.");
 
-    if (m_L_init.isZero()) m_L_init = point3_t(points.front());
-    if (m_L_final.isZero()) m_L_final = point3_t(points.back());
-    if (m_dL_init.isZero()) m_dL_init = point3_t(points_derivative.front());
-    if (m_dL_final.isZero()) m_dL_final = point3_t(points_derivative.back());
+    m_L_init = point3_t(points.front());
+    m_L_final = point3_t(points.back());
+    m_dL_init = point3_t(points_derivative.front());
+    m_dL_final = point3_t(points_derivative.back());
     return;
   }
 
@@ -520,9 +516,7 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
    * @brief setJointsTrajectoryFromPoints set the q,dq and ddq curves from a list of discrete
    * joints positions, velocity and accelerations.
    * The trajectories are build with first order polynomials connecting each discrete points given.
-   * If the initial/final values for q are not set,
-   * this method also set them from the first and last discrete point given.
-   * Otherwise it do not modify them.
+   * This method also set initial/final values for q from the first and last discrete point given.
    * @param points list of discrete joints positions
    * @param points_derivative list of discrete joints velocities
    * @param points_second_derivative list of discrete joints accelerations
@@ -543,8 +537,8 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
                                        points_derivative, time_points)));
     m_ddq = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
                                         points_second_derivative, time_points)));
-    if (m_q_init.isZero()) m_q_init = points.front();
-    if (m_q_final.isZero()) m_q_final = points.back();
+    m_q_init = points.front();
+    m_q_final = points.back();
     return;
   }
 
