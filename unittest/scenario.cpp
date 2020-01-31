@@ -1115,27 +1115,28 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
   BOOST_CHECK(cp.m_ddc_final.isApprox(dd3));
 
   // check that init/final are not modified if they ere already set :
-  ContactPhase cp2 = buildRandomContactPhase(0, 2);
-  point3_t c_init, c_final, dc_init, dc_final, ddc_init, ddc_final;
-  c_init = cp2.m_c_init;
-  dc_init = cp2.m_dc_init;
-  ddc_init = cp2.m_ddc_init;
-  c_final = cp2.m_c_final;
-  dc_final = cp2.m_dc_final;
-  ddc_final = cp2.m_ddc_final;
-  cp2.setCOMtrajectoryFromPoints(points, points_derivative, points_second_derivative, time_points);
-  BOOST_CHECK(cp2.m_c_init.isApprox(c_init));
-  BOOST_CHECK(cp2.m_c_final.isApprox(c_final));
-  BOOST_CHECK(cp2.m_dc_init.isApprox(dc_init));
-  BOOST_CHECK(cp2.m_dc_final.isApprox(dc_final));
-  BOOST_CHECK(cp2.m_ddc_init.isApprox(ddc_init));
-  BOOST_CHECK(cp2.m_ddc_final.isApprox(ddc_final));
-  BOOST_CHECK(!cp2.m_c_init.isApprox(p0));
-  BOOST_CHECK(!cp2.m_c_final.isApprox(p3));
-  BOOST_CHECK(!cp2.m_dc_init.isApprox(d0));
-  BOOST_CHECK(!cp2.m_dc_final.isApprox(d3));
-  BOOST_CHECK(!cp2.m_ddc_init.isApprox(dd0));
-  BOOST_CHECK(!cp2.m_ddc_final.isApprox(dd3));
+  // NOT THE CORRECT BEHAVIOR ANYMORE
+//  ContactPhase cp2 = buildRandomContactPhase(0, 2);
+//  point3_t c_init, c_final, dc_init, dc_final, ddc_init, ddc_final;
+//  c_init = cp2.m_c_init;
+//  dc_init = cp2.m_dc_init;
+//  ddc_init = cp2.m_ddc_init;
+//  c_final = cp2.m_c_final;
+//  dc_final = cp2.m_dc_final;
+//  ddc_final = cp2.m_ddc_final;
+//  cp2.setCOMtrajectoryFromPoints(points, points_derivative, points_second_derivative, time_points);
+//  BOOST_CHECK(cp2.m_c_init.isApprox(c_init));
+//  BOOST_CHECK(cp2.m_c_final.isApprox(c_final));
+//  BOOST_CHECK(cp2.m_dc_init.isApprox(dc_init));
+//  BOOST_CHECK(cp2.m_dc_final.isApprox(dc_final));
+//  BOOST_CHECK(cp2.m_ddc_init.isApprox(ddc_init));
+//  BOOST_CHECK(cp2.m_ddc_final.isApprox(ddc_final));
+//  BOOST_CHECK(!cp2.m_c_init.isApprox(p0));
+//  BOOST_CHECK(!cp2.m_c_final.isApprox(p3));
+//  BOOST_CHECK(!cp2.m_dc_init.isApprox(d0));
+//  BOOST_CHECK(!cp2.m_dc_final.isApprox(d3));
+//  BOOST_CHECK(!cp2.m_ddc_init.isApprox(dd0));
+//  BOOST_CHECK(!cp2.m_ddc_final.isApprox(dd3));
 
   // check AM trajectory
 
@@ -1161,20 +1162,21 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
   BOOST_CHECK(cp.m_dL_final.isApprox(d3));
 
   // check that init/final are not modified if they ere already set :
-  point3_t L_init, L_final, dL_init, dL_final;
-  L_init = cp2.m_L_init;
-  dL_init = cp2.m_dL_init;
-  L_final = cp2.m_L_final;
-  dL_final = cp2.m_dL_final;
-  cp2.setAMtrajectoryFromPoints(points, points_derivative, time_points);
-  BOOST_CHECK(cp2.m_L_init.isApprox(L_init));
-  BOOST_CHECK(cp2.m_L_final.isApprox(L_final));
-  BOOST_CHECK(cp2.m_dL_init.isApprox(dL_init));
-  BOOST_CHECK(cp2.m_dL_final.isApprox(dL_final));
-  BOOST_CHECK(!cp2.m_L_init.isApprox(p0));
-  BOOST_CHECK(!cp2.m_L_final.isApprox(p3));
-  BOOST_CHECK(!cp2.m_dL_init.isApprox(d0));
-  BOOST_CHECK(!cp2.m_dL_final.isApprox(d3));
+  //NOT THE CORRECT BEHAVIOR ANYMORE
+//  point3_t L_init, L_final, dL_init, dL_final;
+//  L_init = cp2.m_L_init;
+//  dL_init = cp2.m_dL_init;
+//  L_final = cp2.m_L_final;
+//  dL_final = cp2.m_dL_final;
+//  cp2.setAMtrajectoryFromPoints(points, points_derivative, time_points);
+//  BOOST_CHECK(cp2.m_L_init.isApprox(L_init));
+//  BOOST_CHECK(cp2.m_L_final.isApprox(L_final));
+//  BOOST_CHECK(cp2.m_dL_init.isApprox(dL_init));
+//  BOOST_CHECK(cp2.m_dL_final.isApprox(dL_final));
+//  BOOST_CHECK(!cp2.m_L_init.isApprox(p0));
+//  BOOST_CHECK(!cp2.m_L_final.isApprox(p3));
+//  BOOST_CHECK(!cp2.m_dL_init.isApprox(d0));
+//  BOOST_CHECK(!cp2.m_dL_final.isApprox(d3));
 
   // check q trajectory :
   pointX_t q0 = point12_t::Random();
@@ -1232,14 +1234,15 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
   BOOST_CHECK(cp.m_q_final.isApprox(q3));
 
   // check that init/final are not modified if they ere already set :
-  pointX_t q_init, q_final;
-  q_init = cp2.m_q_init;
-  q_final = cp2.m_q_final;
-  cp2.setJointsTrajectoryFromPoints(points_q, points_derivative_q, points_second_derivative_q, time_points);
-  BOOST_CHECK(cp2.m_q_init.isApprox(q_init));
-  BOOST_CHECK(cp2.m_q_final.isApprox(q_final));
-  BOOST_CHECK(!cp2.m_q_init.isApprox(q0));
-  BOOST_CHECK(!cp2.m_q_final.isApprox(q3));
+  // NOT THE CORRECT BEHAVIOR ANYMORE
+//  pointX_t q_init, q_final;
+//  q_init = cp2.m_q_init;
+//  q_final = cp2.m_q_final;
+//  cp2.setJointsTrajectoryFromPoints(points_q, points_derivative_q, points_second_derivative_q, time_points);
+//  BOOST_CHECK(cp2.m_q_init.isApprox(q_init));
+//  BOOST_CHECK(cp2.m_q_final.isApprox(q_final));
+//  BOOST_CHECK(!cp2.m_q_init.isApprox(q0));
+//  BOOST_CHECK(!cp2.m_q_final.isApprox(q3));
 
   // check that errors are correctly throw when required :
   // not the correct size
