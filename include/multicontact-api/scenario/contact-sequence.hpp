@@ -434,7 +434,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         }
       }
       // FIXME : isApprox do not work when values close to 0
-      else if(!(*phase.m_dc)(phase.m_dc->min()).isApprox(phase.m_dc_init) ){
+      else if(!(*phase.m_dc)(phase.m_dc->min()).isApprox(phase.m_dc_init, 1e-6) ){
         std::cout<<"CoM velocity trajectory do not start at dc_init for phase : "<<i<<std::endl;
         return false;
       }
@@ -444,7 +444,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
           return false;
         }
       }
-      else if(!(*phase.m_ddc)(phase.m_ddc->min()).isApprox(phase.m_ddc_init) ){
+      else if(!(*phase.m_ddc)(phase.m_ddc->min()).isApprox(phase.m_ddc_init, 1e-6) ){
         std::cout<<"CoM acceleration trajectory do not start at ddc_init for phase : "<<i<<std::endl;
         return false;
       }
@@ -458,7 +458,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
           return false;
         }
       }
-      else if(!(*phase.m_dc)(phase.m_dc->max()).isApprox(phase.m_dc_final) ){
+      else if(!(*phase.m_dc)(phase.m_dc->max()).isApprox(phase.m_dc_final, 1e-6) ){
         std::cout<<"CoM velocity trajectory do not end at dc_final for phase : "<<i<<std::endl;
         return false;
       }
@@ -468,7 +468,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
           return false;
         }
       }
-      else if(!(*phase.m_ddc)(phase.m_ddc->max()).isApprox(phase.m_ddc_final) ){
+      else if(!(*phase.m_ddc)(phase.m_ddc->max()).isApprox(phase.m_ddc_final, 1e-6) ){
         std::cout<<"CoM acceleration trajectory do not end at ddc_final for phase : "<<i<<std::endl;
         return false;
       }
@@ -528,7 +528,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
           return false;
         }
       }
-      else if(!(*phase.m_dL)(phase.m_dL->min()).isApprox(phase.m_dL_init) ){
+      else if(!(*phase.m_dL)(phase.m_dL->min()).isApprox(phase.m_dL_init, 1e-6) ){
         std::cout<<"AM derivative trajectory do not start at dL_init for phase : "<<i<<std::endl;
         return false;
       }
@@ -538,7 +538,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
           return false;
         }
       }
-      else if(!(*phase.m_L)(phase.m_L->max()).isApprox(phase.m_L_final) ){
+      else if(!(*phase.m_L)(phase.m_L->max()).isApprox(phase.m_L_final, 1e-6) ){
         std::cout<<"AM trajectory do not end at L_final for phase : "<<i<<std::endl;
         return false;
       }
