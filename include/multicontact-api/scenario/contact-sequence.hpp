@@ -655,7 +655,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         std::cout<<"joint velocity trajectory do not end at t_final for phase : "<<i<<std::endl;
         return false;
       }
-      if(phase.m_ddq->max() != phase.timeFinal()){
+      if((phase.m_ddq->max() != phase.timeFinal()) && i < size()-1 ){ // not required for the last phase
         std::cout<<"joint acceleration trajectory do not end at t_final for phase : "<<i<<std::endl;
         return false;
       }
@@ -692,7 +692,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         std::cout<<"Torque trajectory do not start at t_init for phase : "<<i<<std::endl;
         return false;
       }
-      if(phase.m_tau->max() != phase.timeFinal()){
+      if((phase.m_tau->max() != phase.timeFinal()) && i < size()-1 ){
         std::cout<<"Torque trajectory do not end at t_final for phase : "<<i<<std::endl;
         return false;
       }
