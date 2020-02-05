@@ -3,7 +3,11 @@
 
 #include "multicontact-api/scenario/fwd.hpp"
 #include "multicontact-api/scenario/contact-phase.hpp"
-
+#include <curves/fwd.h>
+#include <curves/curve_abc.h>
+#include <curves/piecewise_curve.h>
+#include <curves/polynomial.h>
+#include <curves/se3_curve.h>
 #include "multicontact-api/serialization/archive.hpp"
 
 #include <vector>
@@ -18,7 +22,19 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
   typedef _ContactPhase ContactPhase;
   typedef typename ContactPhase::Scalar Scalar;
   typedef typename ContactPhase::t_strings t_strings;
+  typedef typename ContactPhase::SE3 SE3;
   typedef std::vector<ContactPhase> ContactPhaseVector;
+
+  typedef curves::pointX_t pointX_t;
+  typedef curves::transform_t transform_t;
+  typedef curves::curve_abc_t curve_t;
+  typedef curves::curve_SE3_t curve_SE3_t;
+  typedef boost::shared_ptr<curve_t> curve_ptr;
+  typedef boost::shared_ptr<curve_SE3_t> curve_SE3_ptr;
+  typedef curves::piecewise_t piecewise_t;
+  typedef curves::piecewise_SE3_t piecewise_SE3_t;
+  typedef curves::SE3Curve_t SE3Curve_t;
+  typedef curves::polynomial_t polynomial_t;
 
   ContactSequenceTpl(const size_t size = 0) : m_contact_phases(size) {}
 
@@ -783,6 +799,254 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     }
     return t_strings(res_set.begin(), res_set.end());
   }
+
+  /**
+   * @brief concatenateCtrajectories Return a piecewise curve which is the concatenation
+   *  of the m_c curves for each contact phases in the sequence.
+   * @return
+   */
+  piecewise_t concatenateCtrajectories() const {
+    piecewise_t res = piecewise_t();
+    for(const ContactPhase& phase : m_contact_phases){
+      res.add_curve_ptr(phase.m_c);
+    }
+    return res;
+  }
+
+  /**
+   * @brief concatenateDCtrajectories Return a piecewise curve which is the concatenation
+   *  of the m_dc curves for each contact phases in the sequence.
+   * @return
+   */
+  piecewise_t concatenateDCtrajectories() const {
+    piecewise_t res = piecewise_t();
+    for(const ContactPhase& phase : m_contact_phases){
+      res.add_curve_ptr(phase.m_dc);
+    }
+    return res;
+  }
+
+  /**
+   * @brief concatenateDDCtrajectories Return a piecewise curve which is the concatenation
+   *  of the m_ddc curves for each contact phases in the sequence.
+   * @return
+   */
+  piecewise_t concatenateDDCtrajectories() const {
+    piecewise_t res = piecewise_t();
+    for(const ContactPhase& phase : m_contact_phases){
+      res.add_curve_ptr(phase.m_ddc);
+    }
+    return res;
+  }
+
+  /**
+   * @brief concatenateLtrajectories Return a piecewise curve which is the concatenation
+   *  of the m_L curves for each contact phases in the sequence.
+   * @return
+   */
+  piecewise_t concatenateLtrajectories() const {
+    piecewise_t res = piecewise_t();
+    for(const ContactPhase& phase : m_contact_phases){
+      res.add_curve_ptr(phase.m_L);
+    }
+    return res;
+  }
+
+  /**
+   * @brief concatenateDLtrajectories Return a piecewise curve which is the concatenation
+   *  of the m_dL curves for each contact phases in the sequence.
+   * @return
+   */
+  piecewise_t concatenateDLtrajectories() const {
+    piecewise_t res = piecewise_t();
+    for(const ContactPhase& phase : m_contact_phases){
+      res.add_curve_ptr(phase.m_dL);
+    }
+    return res;
+  }
+
+  /**
+   * @brief concatenateZMPtrajectories Return a piecewise curve which is the concatenation
+   *  of the m_zmp curves for each contact phases in the sequence.
+   * @return
+   */
+  piecewise_t concatenateZMPtrajectories() const {
+    piecewise_t res = piecewise_t();
+    for(const ContactPhase& phase : m_contact_phases){
+      res.add_curve_ptr(phase.m_zmp);
+    }
+    return res;
+  }
+
+  /**
+   * @brief concatenateQtrajectories Return a piecewise curve which is the concatenation
+   *  of the m_q curves for each contact phases in the sequence.
+   * @return
+   */
+  piecewise_t concatenateQtrajectories() const {
+    piecewise_t res = piecewise_t();
+    for(const ContactPhase& phase : m_contact_phases){
+      res.add_curve_ptr(phase.m_q);
+    }
+    return res;
+  }
+
+  /**
+   * @brief concatenateDQtrajectories Return a piecewise curve which is the concatenation
+   *  of the m_dq curves for each contact phases in the sequence.
+   * @return
+   */
+  piecewise_t concatenateDQtrajectories() const {
+    piecewise_t res = piecewise_t();
+    for(const ContactPhase& phase : m_contact_phases){
+      res.add_curve_ptr(phase.m_dq);
+    }
+    return res;
+  }
+
+  /**
+   * @brief concatenateDDQtrajectories Return a piecewise curve which is the concatenation
+   *  of the m_ddq curves for each contact phases in the sequence.
+   * @return
+   */
+  piecewise_t concatenateDDQtrajectories() const {
+    piecewise_t res = piecewise_t();
+    for(const ContactPhase& phase : m_contact_phases){
+      res.add_curve_ptr(phase.m_ddq);
+    }
+    return res;
+  }
+
+  /**
+   * @brief concatenateTauTrajectories Return a piecewise curve which is the concatenation
+   *  of the m_tau curves for each contact phases in the sequence.
+   * @return
+   */
+  piecewise_t concatenateTauTrajectories() const {
+    piecewise_t res = piecewise_t();
+    for(const ContactPhase& phase : m_contact_phases){
+      res.add_curve_ptr(phase.m_tau);
+    }
+    return res;
+  }
+
+  /**
+   * @brief concatenateRootTrajectories Return a piecewise curve which is the concatenation
+   *  of the m_root curves for each contact phases in the sequence.
+   * @return
+   */
+  piecewise_SE3_t concatenateRootTrajectories() const {
+    piecewise_SE3_t res = piecewise_SE3_t();
+    for(const ContactPhase& phase : m_contact_phases){
+      res.add_curve_ptr(phase.m_root);
+    }
+    return res;
+  }
+
+  /**
+   * @brief concatenateEffectorTrajectories Return a piecewise curve which is the concatenation
+   *  of the effectors trajectories curves for the given effector
+   *  for each contact phases in the sequence.
+   *  During the phases where no effector trajectories are defined, the trajectory is constant
+   *  with the value of the last phase where it was defined.
+   * @param eeName the effector name
+   * @return
+   */
+  piecewise_SE3_t concatenateEffectorTrajectories(const std::string& eeName) const {
+    piecewise_SE3_t res = piecewise_SE3_t();
+    transform_t last_placement;
+    // first find the first and last phase with a trajectory for this effector
+    size_t first_phase = m_contact_phases.size();
+    size_t last_phase = 0;
+    for(size_t i = 0 ; i < m_contact_phases.size() ; ++i){
+      if(m_contact_phases.at(i).effectorHaveAtrajectory(eeName)){
+        last_phase = i;
+        if(first_phase > i ){
+          first_phase = i;
+        }
+      }
+    }
+    // loop over this phases to concatenate the trajectories
+    for(size_t i = first_phase ; i <= last_phase ; ++i){
+      if(m_contact_phases.at(i).effectorHaveAtrajectory(eeName)){
+        res.add_curve_ptr(m_contact_phases.at(i).effectorTrajectories().at(eeName));
+        last_placement = res(res.max());
+      }
+      else
+      {
+        // when the trajectory do not exist, add a constant one with the previous value
+        curve_SE3_ptr ptr(new SE3Curve_t(last_placement, last_placement,
+                                                           m_contact_phases.at(i).timeInitial(),
+                                                           m_contact_phases.at(i).timeFinal()));
+        res.add_curve_ptr(ptr);
+      }
+    }
+    return res;
+  }
+
+  /**
+   * @brief concatenateContactForceTrajectories Return a piecewise curve which
+   *  is the concatenation of the contact forces for the given effector
+   *  for each contact phases in the sequence.
+   *  During the phases where no contact forces are defined, the trajectory is constant
+   *  with the value of 0.
+   * @param eeName the effector name
+   * @return
+   */
+  piecewise_t concatenateContactForceTrajectories(const std::string& eeName) const {
+    piecewise_t res = piecewise_t();
+    // first find the dimension used, in order to fill with 0 when required:
+    size_t dim = 0;
+    for(const ContactPhase& phase : m_contact_phases){
+      if(phase.contactForces().count(eeName) > 0){
+        dim = phase.contactForces().at(eeName)->dim();
+      }
+    }
+    if(dim == 0){
+      // no forces trajectory for this effector
+      return res;
+    }
+    Eigen::MatrixXd zeros = Eigen::MatrixXd::Zero(dim,1);
+    // loop over all phases and either add trajectory if it exist or add zeros
+    for(const ContactPhase& phase : m_contact_phases){
+      if(phase.contactForces().count(eeName) > 0){
+        res.add_curve_ptr(phase.contactForces().at(eeName));
+      }else{
+        curve_ptr ptr(
+              new polynomial_t(zeros, phase.timeInitial(), phase.timeFinal()));
+        res.add_curve_ptr(ptr);
+      }
+    }
+    return res;
+  }
+
+  /**
+   * @brief concatenateNormalForceTrajectories Return a piecewise curve which
+   *  is the concatenation of the contact normal forces for the given effector
+   *  for each contact phases in the sequence.
+   *  During the phases where no contact normal forces are defined, the trajectory is constant
+   *  with the value of 0.
+   * @param eeName the effector name
+   * @return
+   */
+  piecewise_t concatenateNormalForceTrajectories(const std::string& eeName) const {
+    piecewise_t res = piecewise_t();
+    Eigen::MatrixXd zeros = Eigen::MatrixXd::Zero(1,1);
+    // loop over all phases and either add trajectory if it exist or add zeros
+    for(const ContactPhase& phase : m_contact_phases){
+      if(phase.contactNormalForces().count(eeName) > 0){
+        res.add_curve_ptr(phase.contactNormalForces().at(eeName));
+      }else{
+        curve_ptr ptr(
+          new polynomial_t(zeros,phase.timeInitial(), phase.timeFinal()));
+        res.add_curve_ptr(ptr);
+      }
+    }
+    return res;
+  }
+
+
+
 
   /* End Helpers */
 
