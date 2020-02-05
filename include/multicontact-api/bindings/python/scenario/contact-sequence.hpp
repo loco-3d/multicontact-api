@@ -151,6 +151,61 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
              "Also check that it start and end at the correct time interval.")
         .def("getAllEffectorsInContact",&getAllEffectorsInContactAsList,
              "return a list of names of all the effectors used to create contacts during the sequence")
+        .def("concatenateCtrajectories", &CS::concatenateCtrajectories,
+             "Return a piecewise curve wchich is the concatenation of the m_c curves"
+             " for each contact phases in the sequence.")
+        .def("concatenateDCtrajectories", &CS::concatenateDCtrajectories,
+             "Return a piecewise curve wchich is the concatenation of the m_dc curves"
+             " for each contact phases in the sequence.")
+        .def("concatenateDDCtrajectories", &CS::concatenateDDCtrajectories,
+             "Return a piecewise curve wchich is the concatenation of the m_ddc curves"
+             " for each contact phases in the sequence.")
+        .def("concatenateLtrajectories", &CS::concatenateLtrajectories,
+             "Return a piecewise curve wchich is the concatenation of the m_L curves"
+             " for each contact phases in the sequence.")
+        .def("concatenateDLtrajectories", &CS::concatenateDLtrajectories,
+             "Return a piecewise curve wchich is the concatenation of the m_dL curves"
+             " for each contact phases in the sequence.")
+        .def("concatenateZMPtrajectories", &CS::concatenateZMPtrajectories,
+             "Return a piecewise curve wchich is the concatenation of the m_zmp curves"
+             " for each contact phases in the sequence.")
+        .def("concatenateQtrajectories", &CS::concatenateQtrajectories,
+             "Return a piecewise curve wchich is the concatenation of the m_q curves"
+             " for each contact phases in the sequence.")
+        .def("concatenateDQtrajectories", &CS::concatenateDQtrajectories,
+             "Return a piecewise curve wchich is the concatenation of the m_dq curves"
+             " for each contact phases in the sequence.")
+        .def("concatenateDDQtrajectories", &CS::concatenateDDQtrajectories,
+             "Return a piecewise curve wchich is the concatenation of the m_ddq curves"
+             " for each contact phases in the sequence.")
+        .def("concatenateTauTrajectories", &CS::concatenateTauTrajectories,
+             "Return a piecewise curve wchich is the concatenation of the m_tau curves"
+             " for each contact phases in the sequence.")
+        .def("concatenateRootTrajectories", &CS::concatenateRootTrajectories,
+             "Return a piecewise curve wchich is the concatenation of the m_root curves"
+             " for each contact phases in the sequence.")
+        .def("concatenateEffectorTrajectories", &CS::concatenateEffectorTrajectories,
+             bp::arg("eeName"),
+             "Return a piecewise curve which is the concatenation"
+             "of the effectors trajectories curves for the given effector"
+             "for each contact phases in the sequence.\n"
+             "During the phases where no effector trajectories are defined,"
+             "the trajectory is constant  with the value of"
+             "the last phase where it was defined.")
+        .def("concatenateContactForceTrajectories", &CS::concatenateContactForceTrajectories,
+             bp::arg("eeName"),
+             "Return a piecewise curve which"
+             "is the concatenation of the contact forces for the given effector"
+             "for each contact phases in the sequence.\n"
+             "During the phases where no contact forces are defined,"
+             "the trajectory is constant with the value of 0.")
+        .def("concatenateNormalForceTrajectories", &CS::concatenateNormalForceTrajectories,
+             bp::arg("eeName"),
+             "Return a piecewise curve which"
+             "is the concatenation of the contact normal forces for the given effector"
+             "for each contact phases in the sequence.\n"
+             "During the phases where no contact normal forces are defined,"
+             "the trajectory is constant with the value of 0.")
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
         .def("copy", &copy, "Returns a copy of *this.");
