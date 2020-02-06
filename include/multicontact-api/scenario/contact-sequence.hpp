@@ -628,8 +628,9 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     return true;
   }
 
+
   /**
-   * @brief haveJointsTrajectories Check that a q, dq and ddq trajectories are defined for each phases
+   * @brief haveJointsTrajectories Check that a q trajectory is defined for each phases
    * Also check that the time interval of this trajectories matches the one of the phase
    * and that the trajectories start and end and the correct values defined in each phase
    * @return
@@ -643,36 +644,12 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         std::cout<<"joint position trajectory not defined for phase : "<<i<<std::endl;
         return false;
       }
-      if(!phase.m_dq){
-        std::cout<<"joint velocity trajectory not defined for phase : "<<i<<std::endl;
-        return false;
-      }
-      if(!phase.m_ddq){
-        std::cout<<"joint acceleration trajectory not defined for phase : "<<i<<std::endl;
-        return false;
-      }
       if(phase.m_q->min() != phase.timeInitial()){
         std::cout<<"joint trajectory do not start at t_init for phase : "<<i<<std::endl;
         return false;
       }
-      if(phase.m_dq->min() != phase.timeInitial()){
-        std::cout<<"joint velocity trajectory do not start at t_init for phase : "<<i<<std::endl;
-        return false;
-      }
-      if(phase.m_ddq->min() != phase.timeInitial()){
-        std::cout<<"joint acceleration trajectory do not start at t_init for phase : "<<i<<std::endl;
-        return false;
-      }
       if(phase.m_q->max() != phase.timeFinal()){
         std::cout<<"joint trajectory do not end at t_final for phase : "<<i<<std::endl;
-        return false;
-      }
-      if(phase.m_dq->max() != phase.timeFinal()){
-        std::cout<<"joint velocity trajectory do not end at t_final for phase : "<<i<<std::endl;
-        return false;
-      }
-      if((phase.m_ddq->max() != phase.timeFinal()) && i < size()-1 ){ // not required for the last phase
-        std::cout<<"joint acceleration trajectory do not end at t_final for phase : "<<i<<std::endl;
         return false;
       }
       if(!(*phase.m_q)(phase.m_q->min()).isApprox(phase.m_q_init) ){
@@ -687,6 +664,48 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     }
     return true;
   }
+
+  /**
+   * @brief haveJointsDerivativesTrajectories Check that a dq and ddq trajectories are defined for each phases
+   * Also check that the time interval of this trajectories matches the one of the phase
+   * and that the trajectories start and end and the correct values defined in each phase
+   * @return
+   */
+  bool haveJointsDerivativesTrajectories() const{
+    if(!(haveTimings()))
+      return false;
+    size_t i = 0;
+    for(const ContactPhase& phase : m_contact_phases){
+      if(!phase.m_dq){
+        std::cout<<"joint velocity trajectory not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(!phase.m_ddq){
+        std::cout<<"joint acceleration trajectory not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_dq->min() != phase.timeInitial()){
+        std::cout<<"joint velocity trajectory do not start at t_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_ddq->min() != phase.timeInitial()){
+        std::cout<<"joint acceleration trajectory do not start at t_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_dq->max() != phase.timeFinal()){
+        std::cout<<"joint velocity trajectory do not end at t_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      if((phase.m_ddq->max() != phase.timeFinal()) && i < size()-1 ){ // not required for the last phase
+        std::cout<<"joint acceleration trajectory do not end at t_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      ++i;
+    }
+    return true;
+  }
+
+
 
   /**
    * @brief haveJointsTrajectories Check that a joint torque trajectories are defined for each phases

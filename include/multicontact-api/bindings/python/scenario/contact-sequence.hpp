@@ -135,7 +135,11 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
              "If this effector was in contact in the previous phase,"
              "it check that the trajectory start at the previous contact placement.")
         .def("haveJointsTrajectories", &CS::haveJointsTrajectories,
-             "Check that a q, dq and ddq trajectories are defined for each phases.\n"
+             "Check that a q trajectory is defined for each phases.\n"
+             "Also check that the time interval of this trajectories matches the one of the phase.\n"
+             "and that the trajectories start and end and the correct values defined in each phase.")
+        .def("haveJointsDerivativesTrajectories", &CS::haveJointsDerivativesTrajectories,
+             "Check that a  dq and ddq trajectories are defined for each phases.\n"
              "Also check that the time interval of this trajectories matches the one of the phase.\n"
              "and that the trajectories start and end and the correct values defined in each phase.")
         .def("haveTorquesTrajectories", &CS::haveTorquesTrajectories,
