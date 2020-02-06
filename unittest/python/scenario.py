@@ -1157,6 +1157,7 @@ class ContactPhaseTest(unittest.TestCase):
         cp_xml = ContactPhase()
         cp_xml.loadFromXML("cp_test.xml", 'ContactPhase')
         self.assertEqual(cp1, cp_xml)
+        # TODO : check serialization from another file
 
     def test_contact_phase_contacts_variation(self):
         # # contacts repositioned :
@@ -1559,6 +1560,122 @@ class ContactSequenceTest(unittest.TestCase):
         cs4.append(cp7)
         consistent = cs4.haveTimings()
         self.assertFalse(consistent)
+
+    def test_contact_sequence_concatenate_config_traj(self):
+        cs1 = ContactSequence(0)
+        cp0 = buildRandomContactPhase(0, 2)
+        cp1 = buildRandomContactPhase(2, 4.)
+        p0 = np.random.rand(35)
+        p1 = np.random.rand(35)
+        p2 = np.random.rand(35)
+        t0 = 0.
+        t1 = 2.
+        t2 = 4.
+        c1 = polynomial(p0, p1, t0, t1)
+        c2 = polynomial(p1, p2, t1, t2)
+        cp0.q_t = c1
+        cp1.q_t = c2
+        self.assertTrue(cp0.q_t.min() == 0.)
+        self.assertTrue(cp0.q_t.max() == 2.)
+        self.assertTrue(cp1.q_t.min() == 2.)
+        self.assertTrue(cp1.q_t.max() == 4.)
+        cs1.append(cp0)
+        cs1.append(cp1)
+        q_t = cs1.concatenateQtrajectories()
+        self.assertTrue(q_t.min() == 0.)
+        self.assertTrue(q_t.max() == 4.)
+        self.assertTrue(array_equal(q_t(0), cp0.q_t(0)))
+        self.assertTrue(array_equal(q_t(0.5), cp0.q_t(0.5)))
+        self.assertTrue(array_equal(q_t(2.), cp0.q_t(2.)))
+        self.assertTrue(array_equal(q_t(3), cp1.q_t(3)))
+        self.assertTrue(array_equal(q_t(4.), cp1.q_t(4.)))
+
+    def test_contact_sequence_concatenate_effector_traj(self):
+        cs1 = ContactSequence(0)
+        cp0 = ContactPhase(0, 2)
+        cp1 = ContactPhase(2, 4.)
+        cp2 = ContactPhase(4, 8.)
+        p0 = SE3()
+        p0.setRandom()
+        p1 = SE3()
+        p1.setRandom()
+        p2 = SE3()
+        p2.setRandom()
+
+        traj_0 = SE3Curve(p0, p1, 0., 2.)
+        traj_2 = SE3Curve(p1, p2, 4., 8.)
+        cp0.addEffectorTrajectory("right_leg", traj_0)
+        cp2.addEffectorTrajectory("right_leg", traj_2)
+        cs1.append(cp0)
+        cs1.append(cp1)
+        cs1.append(cp2)
+
+        traj = cs1.concatenateEffectorTrajectories("right_leg")
+        self.assertTrue(traj.min() == 0.)
+        self.assertTrue(traj.max() == 8.)
+        self.assertTrue(np.isclose(traj(0.), traj_0(0.)).all())
+        self.assertTrue(np.isclose(traj(1.5), traj_0(1.5)).all())
+        self.assertTrue(np.isclose(traj(2.), traj_0(2.)).all())
+        self.assertTrue(np.isclose(traj(4.), traj_2(4.)).all())
+        self.assertTrue(np.isclose(traj(6.), traj_2(6.)).all())
+        self.assertTrue(np.isclose(traj(8.), traj_2(8.)).all())
+        self.assertTrue(np.isclose(traj(2.5), traj_0(2.)).all())
+        self.assertTrue(np.isclose(traj(3.8), traj_0(2.)).all())
+
+    def test_contact_sequence_concatenate_force_traj(self):
+        cs1 = ContactSequence(0)
+        cp0 = ContactPhase(0, 2)
+        cp1 = ContactPhase(2, 4.)
+        cp2 = ContactPhase(4, 8.)
+
+        cp0.addContact("right_leg", ContactPatch())
+        cp2.addContact("right_leg", ContactPatch())
+        f_0 = createRandomPiecewisePolynomial(12, 0, 2)
+        f_2 = createRandomPiecewisePolynomial(12, 4, 8)
+        cp0.addContactForceTrajectory("right_leg", f_0)
+        cp2.addContactForceTrajectory("right_leg", f_2)
+
+        cs1.append(cp0)
+        cs1.append(cp1)
+        cs1.append(cp2)
+
+        forces = cs1.concatenateContactForceTrajectories("right_leg")
+        self.assertTrue(forces.min() == 0.)
+        self.assertTrue(forces.max() == 8.)
+        self.assertTrue(array_equal(forces(0.), f_0(0.)))
+        self.assertTrue(array_equal(forces(1.5), f_0(1.5)))
+        self.assertTrue(array_equal(forces(1.999), f_0(1.999)))
+        self.assertTrue(array_equal(forces(4.), f_2(4.)))
+        self.assertTrue(array_equal(forces(6.), f_2(6.)))
+        self.assertTrue(array_equal(forces(8.), f_2(8.)))
+        self.assertTrue(array_equal(forces(2.), np.zeros(12)))
+        self.assertTrue(array_equal(forces(2.5), np.zeros(12)))
+        self.assertTrue(array_equal(forces(3.8), np.zeros(12)))
+
+    def test_contact_sequence_concatenate_normal_force_traj(self):
+        cs1 = ContactSequence(0)
+        cp0 = ContactPhase(0, 2)
+        cp1 = ContactPhase(2, 4.)
+        cp2 = ContactPhase(4, 8.)
+
+        cp1.addContact("right_leg", ContactPatch())
+        f_1 = createRandomPiecewisePolynomial(1, 2., 4.)
+        cp1.addContactNormalForceTrajectory("right_leg", f_1)
+
+        cs1.append(cp0)
+        cs1.append(cp1)
+        cs1.append(cp2)
+
+        forces = cs1.concatenateNormalForceTrajectories("right_leg")
+        self.assertTrue(forces.min() == 0.)
+        self.assertTrue(forces.max() == 8.)
+        self.assertTrue(array_equal(forces(2.), f_1(2.)))
+        self.assertTrue(array_equal(forces(2.5), f_1(2.5)))
+        self.assertTrue(array_equal(forces(3.999), f_1(3.999)))
+        self.assertTrue(array_equal(forces(0.), np.zeros(1)))
+        self.assertTrue(array_equal(forces(1.5), np.zeros(1)))
+        self.assertTrue(array_equal(forces(4.), np.zeros(1)))
+        self.assertTrue(array_equal(forces(7.5), np.zeros(1)))
 
 
 if __name__ == '__main__':
