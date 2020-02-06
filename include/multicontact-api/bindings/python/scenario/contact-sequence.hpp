@@ -206,6 +206,16 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
              "for each contact phases in the sequence.\n"
              "During the phases where no contact normal forces are defined,"
              "the trajectory is constant with the value of 0.")
+        .def("phaseIdAtTime", &CS::phaseIdAtTime,
+             bp::arg("time"),
+             "return the index of a phase in the sequence such that "
+             "phase.timeInitial <= t < phase.timeFinal \n"
+             "if t equal to the last phase timeFinal, this index is returned.")
+        .def("phaseAtTime", &CS::phaseAtTime,
+             bp::arg("time"), bp::return_internal_reference<>(),
+             "return a phase of the sequence such that "
+             "phase.timeInitial <= t < phase.timeFinal \n"
+             "if t equal to the last phase timeFinal, this index is returned.")
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
         .def("copy", &copy, "Returns a copy of *this.");
