@@ -1800,4 +1800,41 @@ BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_normal_force_traj) {
 }
 
 
+BOOST_AUTO_TEST_CASE(contact_sequence_phase_at_time) {
+  ContactSequence cs1 = ContactSequence(0);
+  ContactPhase cp0 = ContactPhase(0, 2);
+  ContactPhase cp1 = ContactPhase(2, 4.);
+  ContactPhase cp2 = ContactPhase(4, 8.);
+
+  cs1.append(cp0);
+  cs1.append(cp1);
+  cs1.append(cp2);
+
+  BOOST_CHECK_EQUAL(cs1.phaseIdAtTime(0.), 0);
+  BOOST_CHECK_EQUAL(cs1.phaseIdAtTime(1.), 0);
+  BOOST_CHECK_EQUAL(cs1.phaseIdAtTime(1.9), 0);
+  BOOST_CHECK_EQUAL(cs1.phaseIdAtTime(2.), 1);
+  BOOST_CHECK_EQUAL(cs1.phaseIdAtTime(3.5), 1);
+  BOOST_CHECK_EQUAL(cs1.phaseIdAtTime(4.), 2);
+  BOOST_CHECK_EQUAL(cs1.phaseIdAtTime(5.), 2);
+  BOOST_CHECK_EQUAL(cs1.phaseIdAtTime(8.), 2);
+  BOOST_CHECK_EQUAL(cs1.phaseIdAtTime(-0.5), -1);
+  BOOST_CHECK_EQUAL(cs1.phaseIdAtTime(10.), -1);
+
+
+  BOOST_CHECK_EQUAL(cs1.phaseAtTime(0.), cp0);
+  BOOST_CHECK_EQUAL(cs1.phaseAtTime(1.), cp0);
+  BOOST_CHECK_EQUAL(cs1.phaseAtTime(1.9), cp0);
+  BOOST_CHECK_EQUAL(cs1.phaseAtTime(2.), cp1);
+  BOOST_CHECK_EQUAL(cs1.phaseAtTime(3.5), cp1);
+  BOOST_CHECK_EQUAL(cs1.phaseAtTime(4.), cp2);
+  BOOST_CHECK_EQUAL(cs1.phaseAtTime(5.), cp2);
+  BOOST_CHECK_EQUAL(cs1.phaseAtTime(8.), cp2);
+  BOOST_CHECK_THROW(cs1.phaseAtTime(-0.5), std::invalid_argument);
+  BOOST_CHECK_THROW(cs1.phaseAtTime(10.), std::invalid_argument);
+
+}
+
+
+
 BOOST_AUTO_TEST_SUITE_END()
