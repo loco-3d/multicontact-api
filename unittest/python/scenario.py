@@ -1145,17 +1145,17 @@ class ContactPhaseTest(unittest.TestCase):
 
     def test_contact_phase_serialization_full(self):
         cp1 = buildRandomContactPhase(0., 2.)
-        cp1.saveAsText("cp_test.txt")
+        cp1.saveAsText("cp_test_full.txt")
         cp_txt = ContactPhase()
-        cp_txt.loadFromText("cp_test.txt")
+        cp_txt.loadFromText("cp_test_full.txt")
         self.assertEqual(cp1, cp_txt)
-        cp1.saveAsBinary("cp_test")
+        cp1.saveAsBinary("cp_test_full")
         cp_bin = ContactPhase()
-        cp_bin.loadFromBinary("cp_test")
+        cp_bin.loadFromBinary("cp_test_full")
         self.assertEqual(cp1, cp_bin)
-        cp1.saveAsXML("cp_test.xml", 'ContactPhase')
+        cp1.saveAsXML("cp_test_full.xml", 'ContactPhase')
         cp_xml = ContactPhase()
-        cp_xml.loadFromXML("cp_test.xml", 'ContactPhase')
+        cp_xml.loadFromXML("cp_test_full.xml", 'ContactPhase')
         self.assertEqual(cp1, cp_xml)
         # TODO : check serialization from another file
 
@@ -1357,17 +1357,17 @@ class ContactSequenceTest(unittest.TestCase):
             cp = buildRandomContactPhase(0., 2.)
             cs.append(cp)
 
-        cs.saveAsText("cs_test.txt")
+        cs.saveAsText("cs_test_full.txt")
         cs_txt = ContactSequence()
-        cs_txt.loadFromText("cs_test.txt")
+        cs_txt.loadFromText("cs_test_full.txt")
         self.assertEqual(cs, cs_txt)
-        cs.saveAsBinary("cs_test")
+        cs.saveAsBinary("cs_test_full")
         cs_bin = ContactSequence()
-        cs_bin.loadFromBinary("cs_test")
+        cs_bin.loadFromBinary("cs_test_full")
         self.assertEqual(cs, cs_bin)
-        cs.saveAsXML("cs_test.xml", 'ContactSequence')
+        cs.saveAsXML("cs_test_full.xml", 'ContactSequence')
         cs_xml = ContactSequence()
-        cs_xml.loadFromXML("cs_test.xml", 'ContactPatch')
+        cs_xml.loadFromXML("cs_test_full.xml", 'ContactPatch')
         self.assertEqual(cs, cs_xml)
 
     def test_contact_sequence_helpers(self):
