@@ -1677,6 +1677,40 @@ class ContactSequenceTest(unittest.TestCase):
         self.assertTrue(array_equal(forces(4.), np.zeros(1)))
         self.assertTrue(array_equal(forces(7.5), np.zeros(1)))
 
+    def test_contact_sequence_phase_at_time(self):
+        cs1 = ContactSequence(0)
+        cp0 = ContactPhase(0, 2)
+        cp1 = ContactPhase(2, 4.)
+        cp2 = ContactPhase(4, 8.)
+
+        cs1.append(cp0)
+        cs1.append(cp1)
+        cs1.append(cp2)
+
+        self.assertEqual(cs1.phaseIdAtTime(0.), 0)
+        self.assertEqual(cs1.phaseIdAtTime(1.), 0)
+        self.assertEqual(cs1.phaseIdAtTime(1.9), 0)
+        self.assertEqual(cs1.phaseIdAtTime(2.), 1)
+        self.assertEqual(cs1.phaseIdAtTime(3.5), 1)
+        self.assertEqual(cs1.phaseIdAtTime(4.), 2)
+        self.assertEqual(cs1.phaseIdAtTime(5.), 2)
+        self.assertEqual(cs1.phaseIdAtTime(8.), 2)
+        self.assertEqual(cs1.phaseIdAtTime(-0.5), -1)
+        self.assertEqual(cs1.phaseIdAtTime(10.), -1)
+
+        self.assertEqual(cs1.phaseAtTime(0.), cp0)
+        self.assertEqual(cs1.phaseAtTime(1.), cp0)
+        self.assertEqual(cs1.phaseAtTime(1.9), cp0)
+        self.assertEqual(cs1.phaseAtTime(2.), cp1)
+        self.assertEqual(cs1.phaseAtTime(3.5), cp1)
+        self.assertEqual(cs1.phaseAtTime(4.), cp2)
+        self.assertEqual(cs1.phaseAtTime(5.), cp2)
+        self.assertEqual(cs1.phaseAtTime(8.), cp2)
+        with self.assertRaises(ValueError):
+            cs1.phaseAtTime(-0.5)
+        with self.assertRaises(ValueError):
+            cs1.phaseAtTime(10.)
+
 
 if __name__ == '__main__':
     unittest.main()
