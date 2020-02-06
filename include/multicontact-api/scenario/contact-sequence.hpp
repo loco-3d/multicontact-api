@@ -1045,8 +1045,40 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     return res;
   }
 
+  /**
+   * @brief phaseAtTime return a phase of the sequence such that :
+   *  phase.timeInitial <= t < phase.timeFinal
+   *  if t equal to the last phase timeFinal, this index is returned
+   * @param time
+   * @return the phase whose time interval contains 'time'
+   * @throw invalid_argument error if no phase are found for this time
+   */
+  ContactPhase& phaseAtTime(const double time){
+    const int id = phaseIdAtTime(time);
+    if(id >= 0 )
+      return m_contact_phases.at(id);
+    else
+      throw std::invalid_argument("No phase found for the given time.");
+  }
 
-
+  /**
+   * @brief phaseIdAtTime return the index of a phase in the sequence such that :
+   *  phase.timeInitial <= t < phase.timeFinal
+   *  if t equal to the last phase timeFinal, this index is returned
+   * @param time
+   * @return the index of the phase whose time interval contain 'time', -1 if no phase are found
+   */
+  int phaseIdAtTime(const double time) const {
+    for(int i = 0 ; i < static_cast<int>(m_contact_phases.size()) ; ++i){
+      const ContactPhase& phase = m_contact_phases[i];
+      if(time >= phase.timeInitial() && time < phase.timeFinal()){
+        return i;
+      }
+    }
+    if(time == m_contact_phases.back().timeFinal())
+      return static_cast<int>(m_contact_phases.size() - 1);
+    return -1;
+  }
 
   /* End Helpers */
 
