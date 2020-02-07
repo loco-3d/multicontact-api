@@ -757,19 +757,19 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
           return false;
         }
         if(phase.contactForces().at(eeName)->min() != phase.timeInitial()){
-          std::cout<<"No contact forces trajectory for effector "<<eeName<<" do not start at t_init for phase "<<i<<std::endl;
+          std::cout<<"Contact forces trajectory for effector "<<eeName<<" do not start at t_init for phase "<<i<<std::endl;
           return false;
         }
-        if(phase.contactForces().at(eeName)->max() != phase.timeInitial()){
-          std::cout<<"No contact forces trajectory for effector "<<eeName<<" do not end at t_final for phase "<<i<<std::endl;
+        if(phase.contactForces().at(eeName)->max() != phase.timeFinal()){
+          std::cout<<"Contact forces trajectory for effector "<<eeName<<" do not end at t_final for phase "<<i<<std::endl;
           return false;
         }
         if(phase.contactNormalForces().at(eeName)->min() != phase.timeInitial()){
-          std::cout<<"No contact normal force trajectory for effector "<<eeName<<" do not start at t_init for phase "<<i<<std::endl;
+          std::cout<<"Contact normal force trajectory for effector "<<eeName<<" do not start at t_init for phase "<<i<<std::endl;
           return false;
         }
-        if(phase.contactNormalForces().at(eeName)->max() != phase.timeInitial()){
-          std::cout<<"No contact normal force trajectory for effector "<<eeName<<" do not end at t_final for phase "<<i<<std::endl;
+        if(phase.contactNormalForces().at(eeName)->max() != phase.timeFinal()){
+          std::cout<<"Contact normal force trajectory for effector "<<eeName<<" do not end at t_final for phase "<<i<<std::endl;
           return false;
         }
       }
