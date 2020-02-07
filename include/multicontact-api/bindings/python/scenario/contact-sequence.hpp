@@ -156,6 +156,9 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
         .def("haveRootTrajectories", &CS::haveRootTrajectories,
              "check that a root trajectory exist for each contact phases.\n"
              "Also check that it start and end at the correct time interval.")
+        .def("haveFriction", &CS::haveFriction,
+             "check that all the contact patch used in the sequence have"
+             "a friction coefficient initialized.")
         .def("getAllEffectorsInContact",&getAllEffectorsInContactAsList,
              "return a list of names of all the effectors used to create contacts during the sequence")
         .def("concatenateCtrajectories", &CS::concatenateCtrajectories,

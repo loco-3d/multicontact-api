@@ -805,6 +805,25 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
 
 
   /**
+   * @brief haveFriction check that all the contact patch used in the sequence have
+   * a friction coefficient initialized
+   * @return
+   */
+  bool haveFriction() const{
+    size_t i = 0;
+    for(const ContactPhase& phase : m_contact_phases){
+      for(const std::string& eeName : phase.effectorsInContact()){
+        if(phase.contactPatches().at(eeName).friction() <= 0.){
+          std::cout<<"Friction not defined for phase "<<i<<" and effector "<<eeName<<std::endl;
+          return false;
+        }
+      }
+      ++i;
+    }
+    return true;
+  }
+
+  /**
    * @brief getAllEffectorsInContact return a vector of names of all the effectors used to create contacts during the sequence
    * @return
    */
