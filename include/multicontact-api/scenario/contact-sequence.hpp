@@ -824,6 +824,31 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
   }
 
   /**
+   * @brief haveZMPtrajectories check that all the contact phases have a zmp trajectory
+   * @return
+   */
+  bool haveZMPtrajectories(){
+    size_t i = 0;
+    for(const ContactPhase& phase : m_contact_phases){
+      if(!phase.m_zmp){
+        std::cout<<"ZMP trajectory not defined for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_zmp->min() != phase.timeInitial()){
+        std::cout<<"ZMP trajectory do not start at t_init for phase : "<<i<<std::endl;
+        return false;
+      }
+      if(phase.m_zmp->max() != phase.timeFinal()){
+        std::cout<<"ZMP trajectory do not end at t_final for phase : "<<i<<std::endl;
+        return false;
+      }
+      ++i;
+    }
+    return true;
+  }
+
+
+  /**
    * @brief getAllEffectorsInContact return a vector of names of all the effectors used to create contacts during the sequence
    * @return
    */

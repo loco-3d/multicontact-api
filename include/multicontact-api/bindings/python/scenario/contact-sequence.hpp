@@ -159,6 +159,8 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
         .def("haveFriction", &CS::haveFriction,
              "check that all the contact patch used in the sequence have"
              "a friction coefficient initialized.")
+        .def("haveZMPtrajectories", &CS::haveZMPtrajectories,
+             "check that all the contact phases have a ZMP trajectory.")
         .def("getAllEffectorsInContact",&getAllEffectorsInContactAsList,
              "return a list of names of all the effectors used to create contacts during the sequence")
         .def("concatenateCtrajectories", &CS::concatenateCtrajectories,
