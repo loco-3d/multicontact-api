@@ -591,7 +591,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * If this effector was in contact in the previous phase, it check that the trajectory start at the previous contact placement.
    * @return
    */
-  bool haveEffectorsTrajectories() const{
+  bool haveEffectorsTrajectories( const Scalar prec = Eigen::NumTraits<Scalar>::dummy_precision()) const{
     if(!haveTimings())
       return false;
     for(size_t i = 0 ; i < m_contact_phases.size() -1 ; ++i){
@@ -610,14 +610,14 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
           return false;
         }
         ContactPatch::SE3 pMax = ContactPatch::SE3((*traj)(traj->max()).matrix());
-        if(!pMax.isApprox(m_contact_phases.at(i+1).contactPatches().at(eeName).placement())){
+        if(!pMax.isApprox(m_contact_phases.at(i+1).contactPatches().at(eeName).placement(), prec)){
           std::cout<<"Effector trajectory for "<<eeName
                   << " do not end at it's contact placement in the next phase, for phase "<<i<<std::endl;
           return false;
         }
         if(i > 0 && m_contact_phases.at(i-1).isEffectorInContact(eeName)){
           ContactPatch::SE3 pMin = ContactPatch::SE3((*traj)(traj->min()).matrix());
-          if(!pMin.isApprox(m_contact_phases.at(i-1).contactPatches().at(eeName).placement())){
+          if(!pMin.isApprox(m_contact_phases.at(i-1).contactPatches().at(eeName).placement(), prec)){
             std::cout<<"Effector trajectory for "<<eeName
                     << " do not start at it's contact placement in the previous phase, for phase "<<i<<std::endl;
             return false;
