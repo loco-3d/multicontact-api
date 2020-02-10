@@ -14,7 +14,8 @@ ContactSequence cs;
 cs.loadFromBinary(filename);
 ```
 
-### Python
+### Python
+
 
 ```python
 from multicontact_api import ContactSequence
