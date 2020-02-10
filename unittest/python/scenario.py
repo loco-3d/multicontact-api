@@ -3,7 +3,7 @@
 import unittest
 
 import numpy as np
-from numpy import array, array_equal
+from numpy import array, array_equal, random
 from random import uniform
 from math import sqrt, sin, cos
 
@@ -1204,6 +1204,34 @@ class ContactPhaseTest(unittest.TestCase):
         vars = cp4.getContactsVariations(cp3)
         self.assertTrue(len(vars) == 1)
         self.assertTrue(vars[0] == "left-leg")
+
+    def test_com_trajectory_helper(self):
+        N = 7
+        points = array(random.rand(3, N))
+        points_derivative = array(random.rand(3, N))
+        points_second_derivative = array(random.rand(3, N))
+        time_points = array(random.rand(1, N)).T
+        time_points.sort(0)
+        cp = ContactPhase()
+        cp.setCOMtrajectoryFromPoints(points,points_derivative,points_second_derivative,time_points)
+        self.assertEqual(cp.c_t.min(), time_points[0])
+        self.assertEqual(cp.c_t.max(), time_points[-1])
+        self.assertEqual(cp.dc_t.dim(), 3)
+        for i in range(N):
+            self.assertTrue(array_equal(cp.c_t(time_points[i, 0]), points[:,i]))
+            self.assertTrue(array_equal(cp.dc_t(time_points[i, 0]), points_derivative[:,i]))
+            self.assertTrue(array_equal(cp.ddc_t(time_points[i, 0]), points_second_derivative[:,i]))
+
+        cp.setAMtrajectoryFromPoints(points,points_derivative,time_points)
+        for i in range(N):
+            self.assertTrue(array_equal(cp.L_t(time_points[i, 0]), points[:,i]))
+            self.assertTrue(array_equal(cp.dL_t(time_points[i, 0]), points_derivative[:,i]))
+
+        cp.setJointsTrajectoryFromPoints(points,points_derivative,points_second_derivative,time_points)
+        for i in range(N):
+            self.assertTrue(array_equal(cp.q_t(time_points[i, 0]), points[:,i]))
+            self.assertTrue(array_equal(cp.dq_t(time_points[i, 0]), points_derivative[:,i]))
+            self.assertTrue(array_equal(cp.ddq_t(time_points[i, 0]), points_second_derivative[:,i]))
 
 
 class ContactSequenceTest(unittest.TestCase):
