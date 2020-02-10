@@ -215,7 +215,7 @@ ContactPhase cp0;
 cs.append(cp0);
 ``` 
 
-**Helper methods**
+**Helper methods to create contact sequence**
 
 Several helper methods have been added to the ContactSequence class to ease the contact creation process:
 
@@ -228,6 +228,34 @@ Several helper methods have been added to the ContactSequence class to ease the 
 - it create the contact with eeName at the given placement.
 
 * `moveEffectorOf(eeName, transform, durationBreak, durationCreate)` Similar to moveEffectorToPlacement but use a transform from the previous contact placement instead of a new placement. 
+
+
+
+**Helper methods to check a contact sequence**
+
+The ContactSequence class contains several methods to check if the sequence contains some of the optional data, and if they are consistents across all the contact phases. 
+This methods should be used in order to check if a ContactSequence object given as input to your algorithm have been correctly initialized with all the data that you are going to use in your algorithm. 
+It may also be used to check if your algorithm output consistent data. 
+
+Examples of such methods are `haveConsistentContacts` or `haveCentroidalTrajectories` which check that the (c, dc, ddc, L, dL) have been initialized, have the correct duration, 
+and that each trajectories of one phase correctly end at the same value as it begin in the next phase. 
+
+
+**Helper methods to access Data**
+
+The ContactSequence class also contains methods for easier access to the data contained in the ContactPhase vector. For example, `phaseAtTime` or `phaseIdAtTime` can be used to access a specific ContactPhase at a given time.
+`getAllEffectorsInContact` output all the effector used to create contact during the sequence. 
+
+Finally, methods exists to return the complete trajectory along the contact sequence, concatenating the trajectories of each phases (eg. `concatenateCtrajectories` return the complete c(t) trajectory for all the contact sequence).
+
+
+## Examples
+
+[Examples](examples/README.md) provide several serialized ContactSequence files with descriptions. 
+
+
+
+
 
 
 
