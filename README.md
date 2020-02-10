@@ -217,4 +217,20 @@ cs.append(cp0);
 
 **Helper methods**
 
-_TODO_ Several helper methods will be added to easy the contact sequence creation process.
+Several helper methods have been added to the ContactSequence class to ease the contact creation process:
+
+* `breakContact(eeName, phaseDuration)` Add a new contactPhase at the end of the current ContactSequence, the new ContactPhase have the same ContactPatchs as the last phase of the sequence, with the exeption of the given contact removed.
+
+* `createContact(eeName, contactPatch, phaseDuration)` Add a new contactPhase at the end of the current ContactSequence, the new ContactPhase have the same ContactPatchs as the last phase of the sequence, with the exeption of the given contact added.
+
+* `moveEffectorToPlacement(eeName, placement, durationBreak, durationCreate)`  Add two new phases at the end of the current ContactSequence:
+- it break the contact with eeName
+- it create the contact with eeName at the given placement.
+
+* `moveEffectorOf(eeName, transform, durationBreak, durationCreate)` Similar to moveEffectorToPlacement but use a transform from the previous contact placement instead of a new placement. 
+
+
+
+
+
+
