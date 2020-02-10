@@ -942,6 +942,19 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
   }
 
   /**
+   * @brief concatenateWrenchTrajectories Return a piecewise curve which is the concatenation
+   *  of the m_wrench curves for each contact phases in the sequence.
+   * @return
+   */
+  piecewise_t concatenateWrenchTrajectories() const {
+    piecewise_t res = piecewise_t();
+    for(const ContactPhase& phase : m_contact_phases){
+      res.add_curve_ptr(phase.m_wrench);
+    }
+    return res;
+  }
+
+  /**
    * @brief concatenateQtrajectories Return a piecewise curve which is the concatenation
    *  of the m_q curves for each contact phases in the sequence.
    * @return

@@ -181,6 +181,9 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
         .def("concatenateZMPtrajectories", &CS::concatenateZMPtrajectories,
              "Return a piecewise curve wchich is the concatenation of the m_zmp curves"
              " for each contact phases in the sequence.")
+        .def("concatenateWrenchTrajectories", &CS::concatenateWrenchTrajectories,
+             "Return a piecewise curve wchich is the concatenation of the m_wrench curves"
+             " for each contact phases in the sequence.")
         .def("concatenateQtrajectories", &CS::concatenateQtrajectories,
              "Return a piecewise curve wchich is the concatenation of the m_q curves"
              " for each contact phases in the sequence.")
