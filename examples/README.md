@@ -42,22 +42,32 @@ Contact sequence with only one Contact Phase:
 
 Starting from the reference configuration with both feet in contacts, the CoM is moved above the right feet (in 2 seconds) then above the left feet (in 3 seconds), then go back to the reference position (in 2 seconds).
 
+![com_motion_above_feet motion.](videos/com_motion_above_feet.gif "com_motion_above_feet motion.")
+
+
 ### step_in_place_quasistatic
 
 Starting from the reference configuration with both feet in contact with the ground, the Robot do 2 steps in place with each feet (starting with the right one). 
 The Centroidal motion is quasi-static : the CoM only move during the double support phase (duration 2s) and is fixed during the single support phase (duration 1.5s).
 
+![step_in_place_quasistatic motion.](videos/step_in_place_quasistatic.gif "step_in_place_quasistatic motion.")
+
 ### step_in_place
 
 Similar to above exept that the motion is not quasi-static and the double support duration is 0.2 seconds and the single support last 1 seconds.
 
+![step_in_place motion.](videos/step_in_place.gif "step_in_place motion.")
 
 ### walk_20cm
 
 Walk 1 meter forward with 20cm steps, starting with the right foot. The first and last steps are only 10cm long. Double support duration 0.2seconds, single support duration 1.2seconds.
 
+![walk_20cm motion.](videos/walk_20cm.gif "walk_20cm motion.")
 
 ### walk_20cm_quasistatic
 
 Similar to above exept that the motion is quasistatic and the CoM only move during the double support phases. Double support duration 2 seconds, single support duration 2 seconds.
+
+
+![walk_20cm_quasistatic motion.](videos/walk_20cm_quasistatic.gif "walk_20cm_quasistatic motion.")
 
