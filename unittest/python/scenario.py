@@ -3,7 +3,7 @@
 import unittest
 
 import numpy as np
-from numpy import array, array_equal, random
+from numpy import array, array_equal, random, isclose
 from random import uniform
 from math import sqrt, sin, cos
 
@@ -1218,20 +1218,20 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertEqual(cp.c_t.max(), time_points[-1])
         self.assertEqual(cp.dc_t.dim(), 3)
         for i in range(N):
-            self.assertTrue(array_equal(cp.c_t(time_points[i, 0]), points[:,i]))
-            self.assertTrue(array_equal(cp.dc_t(time_points[i, 0]), points_derivative[:,i]))
-            self.assertTrue(array_equal(cp.ddc_t(time_points[i, 0]), points_second_derivative[:,i]))
+            self.assertTrue(isclose(cp.c_t(time_points[i, 0]), points[:,i]).all())
+            self.assertTrue(isclose(cp.dc_t(time_points[i, 0]), points_derivative[:,i]).all())
+            self.assertTrue(isclose(cp.ddc_t(time_points[i, 0]), points_second_derivative[:,i]).all())
 
         cp.setAMtrajectoryFromPoints(points,points_derivative,time_points)
         for i in range(N):
-            self.assertTrue(array_equal(cp.L_t(time_points[i, 0]), points[:,i]))
-            self.assertTrue(array_equal(cp.dL_t(time_points[i, 0]), points_derivative[:,i]))
+            self.assertTrue(isclose(cp.L_t(time_points[i, 0]), points[:,i]).all())
+            self.assertTrue(isclose(cp.dL_t(time_points[i, 0]), points_derivative[:,i]).all())
 
         cp.setJointsTrajectoryFromPoints(points,points_derivative,points_second_derivative,time_points)
         for i in range(N):
-            self.assertTrue(array_equal(cp.q_t(time_points[i, 0]), points[:,i]))
-            self.assertTrue(array_equal(cp.dq_t(time_points[i, 0]), points_derivative[:,i]))
-            self.assertTrue(array_equal(cp.ddq_t(time_points[i, 0]), points_second_derivative[:,i]))
+            self.assertTrue(isclose(cp.q_t(time_points[i, 0]), points[:,i]).all())
+            self.assertTrue(isclose(cp.dq_t(time_points[i, 0]), points_derivative[:,i]).all())
+            self.assertTrue(isclose(cp.ddq_t(time_points[i, 0]), points_second_derivative[:,i]).all())
 
 
 class ContactSequenceTest(unittest.TestCase):
