@@ -27,7 +27,7 @@
 
 using namespace multicontact_api::scenario;
 
-const std::string path = "../examples/";
+const std::string path = TEST_DATA_PATH;
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
 BOOST_AUTO_TEST_CASE(com_motion_above_feet_COM) {
