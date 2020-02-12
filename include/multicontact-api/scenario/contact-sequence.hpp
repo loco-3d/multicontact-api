@@ -613,6 +613,8 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         if(!pMax.isApprox(m_contact_phases.at(i+1).contactPatches().at(eeName).placement(), prec)){
           std::cout<<"Effector trajectory for "<<eeName
                   << " do not end at it's contact placement in the next phase, for phase "<<i<<std::endl;
+          std::cout<<"Last point : "<<std::endl<<pMax<<std::endl<<"Next contact : "
+                  <<std::endl<<m_contact_phases.at(i+1).contactPatches().at(eeName).placement()<<std::endl;
           return false;
         }
         if(i > 0 && m_contact_phases.at(i-1).isEffectorInContact(eeName)){
@@ -620,6 +622,8 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
           if(!pMin.isApprox(m_contact_phases.at(i-1).contactPatches().at(eeName).placement(), prec)){
             std::cout<<"Effector trajectory for "<<eeName
                     << " do not start at it's contact placement in the previous phase, for phase "<<i<<std::endl;
+            std::cout<<"First point : "<<std::endl<<pMin<<std::endl<<"Previous contact : "
+                    <<std::endl<<m_contact_phases.at(i-1).contactPatches().at(eeName).placement()<<std::endl;
             return false;
           }
         }
