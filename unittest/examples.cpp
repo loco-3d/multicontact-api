@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(step_in_place_WB) {
   BOOST_CHECK(cs.haveTimings());
   BOOST_CHECK(cs.haveCentroidalValues());
   BOOST_CHECK(cs.haveCentroidalTrajectories());
-  BOOST_CHECK(cs.haveEffectorsTrajectories(1e-2));
+  BOOST_CHECK(cs.haveEffectorsTrajectories(1e-1));
   BOOST_CHECK(cs.haveJointsTrajectories());
   BOOST_CHECK(cs.haveJointsDerivativesTrajectories());
   BOOST_CHECK(cs.haveContactForcesTrajectories());
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(step_in_place_quasistatic_WB) {
   BOOST_CHECK(cs.haveTimings());
   BOOST_CHECK(cs.haveCentroidalValues());
   BOOST_CHECK(cs.haveCentroidalTrajectories());
-  BOOST_CHECK(cs.haveEffectorsTrajectories(1e-2));
+  BOOST_CHECK(cs.haveEffectorsTrajectories(1e-1));
   BOOST_CHECK(cs.haveJointsTrajectories());
   BOOST_CHECK(cs.haveJointsDerivativesTrajectories());
   BOOST_CHECK(cs.haveContactForcesTrajectories());
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE(walk_20cm_WB) {
   BOOST_CHECK(cs.haveTimings());
   BOOST_CHECK(cs.haveCentroidalValues());
   BOOST_CHECK(cs.haveCentroidalTrajectories());
-  BOOST_CHECK(cs.haveEffectorsTrajectories(1e-2));
+  BOOST_CHECK(cs.haveEffectorsTrajectories(1e-1));
   BOOST_CHECK(cs.haveJointsTrajectories());
   BOOST_CHECK(cs.haveJointsDerivativesTrajectories());
   BOOST_CHECK(cs.haveContactForcesTrajectories());
@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE(walk_20cm_quasistatic_WB) {
   BOOST_CHECK(cs.haveTimings());
   BOOST_CHECK(cs.haveCentroidalValues());
   BOOST_CHECK(cs.haveCentroidalTrajectories());
-  BOOST_CHECK(cs.haveEffectorsTrajectories(1e-2));
+  BOOST_CHECK(cs.haveEffectorsTrajectories(1e-1));
   BOOST_CHECK(cs.haveJointsTrajectories());
   BOOST_CHECK(cs.haveJointsDerivativesTrajectories());
   BOOST_CHECK(cs.haveContactForcesTrajectories());
