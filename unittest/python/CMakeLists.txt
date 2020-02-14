@@ -2,7 +2,7 @@ SET(${PROJECT_NAME}_PYTHON_TESTS
   trivial
   geometry
   scenario
-  scenario_serialization
+  serialization_examples
   )
 
 FOREACH(TEST ${${PROJECT_NAME}_PYTHON_TESTS})
