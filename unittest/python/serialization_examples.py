@@ -13,7 +13,7 @@ from multicontact_api import ContactSequence
 
 pin.switchToNumpyArray()
 
-PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())+"/examples/"
+PATH = (pathlib.Path(__file__).parent.parent.parent / 'examples').absolute()
 print("PATH : ", PATH)
 
 
@@ -106,7 +106,7 @@ class ExamplesSerialization(unittest.TestCase):
 
     def test_com_motion_above_feet_COM(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"com_motion_above_feet_COM.cs")
+        cs.loadFromBinary(str(PATH / "com_motion_above_feet_COM.cs"))
         self.assertEqual(cs.size(), 1)
         self.assertTrue(cs.haveConsistentContacts())
         self.assertTrue(cs.haveTimings())
@@ -118,7 +118,7 @@ class ExamplesSerialization(unittest.TestCase):
 
     def test_com_motion_above_feet_WB(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"com_motion_above_feet_WB.cs")
+        cs.loadFromBinary(str(PATH /  "com_motion_above_feet_WB.cs"))
         self.assertEqual(cs.size(), 1)
         self.assertTrue(cs.haveConsistentContacts())
         self.assertTrue(cs.haveTimings())
@@ -134,14 +134,14 @@ class ExamplesSerialization(unittest.TestCase):
 
     def test_step_in_place(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"step_in_place.cs")
+        cs.loadFromBinary(str(PATH /  "step_in_place.cs"))
         self.assertEqual(cs.size(), 9)
         self.assertTrue(cs.haveConsistentContacts())
 
 
     def test_step_in_place_COM(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"step_in_place_COM.cs")
+        cs.loadFromBinary(str(PATH /  "step_in_place_COM.cs"))
         self.assertEqual(cs.size(), 9)
         self.assertTrue(cs.haveConsistentContacts())
         self.assertTrue(cs.haveTimings())
@@ -152,7 +152,7 @@ class ExamplesSerialization(unittest.TestCase):
 
     def test_step_in_place_REF(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"step_in_place_REF.cs")
+        cs.loadFromBinary(str(PATH /  "step_in_place_REF.cs"))
         self.assertEqual(cs.size(), 9)
         self.assertTrue(cs.haveConsistentContacts())
         self.assertTrue(cs.haveTimings())
@@ -165,7 +165,7 @@ class ExamplesSerialization(unittest.TestCase):
 
     def test_step_in_place_WB(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"step_in_place_WB.cs")
+        cs.loadFromBinary(str(PATH /  "step_in_place_WB.cs"))
         self.assertEqual(cs.size(), 9)
         self.assertTrue(cs.haveConsistentContacts())
         self.assertTrue(cs.haveTimings())
@@ -180,14 +180,14 @@ class ExamplesSerialization(unittest.TestCase):
 
     def test_step_in_place_quasistatic(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"step_in_place_quasistatic.cs")
+        cs.loadFromBinary(str(PATH /  "step_in_place_quasistatic.cs"))
         self.assertEqual(cs.size(), 9)
         self.assertTrue(cs.haveConsistentContacts())
 
 
     def test_step_in_place_quasistatic_COM(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"step_in_place_quasistatic_COM.cs")
+        cs.loadFromBinary(str(PATH /  "step_in_place_quasistatic_COM.cs"))
         self.assertEqual(cs.size(), 9)
         self.assertTrue(cs.haveConsistentContacts())
         self.assertTrue(cs.haveTimings())
@@ -197,7 +197,7 @@ class ExamplesSerialization(unittest.TestCase):
 
     def test_step_in_place_quasistatic_REF(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"step_in_place_quasistatic_REF.cs")
+        cs.loadFromBinary(str(PATH /  "step_in_place_quasistatic_REF.cs"))
         self.assertEqual(cs.size(), 9)
         self.assertTrue(cs.haveConsistentContacts())
         self.assertTrue(cs.haveTimings())
@@ -208,7 +208,7 @@ class ExamplesSerialization(unittest.TestCase):
 
     def test_step_in_place_quasistatic_WB(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"step_in_place_quasistatic_WB.cs")
+        cs.loadFromBinary(str(PATH /  "step_in_place_quasistatic_WB.cs"))
         self.assertEqual(cs.size(), 9)
         self.assertTrue(cs.haveConsistentContacts())
         self.assertTrue(cs.haveTimings())
@@ -223,14 +223,14 @@ class ExamplesSerialization(unittest.TestCase):
 
     def test_walk_20cm(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"walk_20cm.cs")
+        cs.loadFromBinary(str(PATH /  "walk_20cm.cs"))
         self.assertEqual(cs.size(), 23)
         self.assertTrue(cs.haveConsistentContacts())
 
 
     def test_walk_20cm_COM(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"walk_20cm_COM.cs")
+        cs.loadFromBinary(str(PATH /  "walk_20cm_COM.cs"))
         self.assertEqual(cs.size(), 23)
         self.assertTrue(cs.haveConsistentContacts())
         self.assertTrue(cs.haveTimings())
@@ -240,7 +240,7 @@ class ExamplesSerialization(unittest.TestCase):
 
     def test_walk_20cm_REF(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"walk_20cm_REF.cs")
+        cs.loadFromBinary(str(PATH /  "walk_20cm_REF.cs"))
         self.assertEqual(cs.size(), 23)
         self.assertTrue(cs.haveConsistentContacts())
         self.assertTrue(cs.haveTimings())
@@ -251,7 +251,7 @@ class ExamplesSerialization(unittest.TestCase):
 
     def test_walk_20cm_WB(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"walk_20cm_WB.cs")
+        cs.loadFromBinary(str(PATH /  "walk_20cm_WB.cs"))
         self.assertEqual(cs.size(), 23)
         self.assertTrue(cs.haveConsistentContacts())
         self.assertTrue(cs.haveTimings())
@@ -266,14 +266,14 @@ class ExamplesSerialization(unittest.TestCase):
 
     def test_walk_20cm_quasistatic(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"walk_20cm_quasistatic.cs")
+        cs.loadFromBinary(str(PATH /  "walk_20cm_quasistatic.cs"))
         self.assertEqual(cs.size(), 23)
         self.assertTrue(cs.haveConsistentContacts())
 
 
     def test_walk_20cm_quasistatic_COM(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"walk_20cm_quasistatic_COM.cs")
+        cs.loadFromBinary(str(PATH /  "walk_20cm_quasistatic_COM.cs"))
         self.assertEqual(cs.size(), 23)
         self.assertTrue(cs.haveConsistentContacts())
         self.assertTrue(cs.haveTimings())
@@ -283,7 +283,7 @@ class ExamplesSerialization(unittest.TestCase):
 
     def test_walk_20cm_quasistatic_REF(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"walk_20cm_quasistatic_REF.cs")
+        cs.loadFromBinary(str(PATH /  "walk_20cm_quasistatic_REF.cs"))
         self.assertEqual(cs.size(), 23)
         self.assertTrue(cs.haveConsistentContacts())
         self.assertTrue(cs.haveTimings())
@@ -294,7 +294,7 @@ class ExamplesSerialization(unittest.TestCase):
 
     def test_walk_20cm_quasistatic_WB(self):
         cs = ContactSequence()
-        cs.loadFromBinary(PATH+"walk_20cm_quasistatic_WB.cs")
+        cs.loadFromBinary(str(PATH /  "walk_20cm_quasistatic_WB.cs"))
         self.assertEqual(cs.size(), 23)
         self.assertTrue(cs.haveConsistentContacts())
         self.assertTrue(cs.haveTimings())
