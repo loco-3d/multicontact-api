@@ -17,10 +17,10 @@ BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 BOOST_AUTO_TEST_CASE(WrenchConeTest) {
   using std::fabs;
   typedef ForceCone::Matrix3x Matrix3x;
-  typedef WrenchCone::Matrix6x Matrix6x;
+  // typedef WrenchCone::Matrix6x Matrix6x;
   typedef ForceCone::Index Index;
   typedef ForceCone::SE3 SE3;
-  typedef ForceCone::Scalar Scalar;
+  // typedef ForceCone::Scalar Scalar;
 
   const Index size = 10;
   const Matrix3x rays(Matrix3x::Random(3, size));

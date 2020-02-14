@@ -57,8 +57,8 @@ struct LCPythonVisitor : public boost::python::def_visitor<LCPythonVisitor<LC> >
     cl_.def(LCPythonVisitor<LC>()).def(SerializableVisitor<LC>());
 
     // Expose related matrix types
-    eigenpy::enableEigenPySpecific<MatrixDx, MatrixDx>();
-    eigenpy::enableEigenPySpecific<VectorD, VectorD>();
+    ENABLE_SPECIFIC_MATRIX_TYPE(MatrixDx);
+    ENABLE_SPECIFIC_MATRIX_TYPE(VectorD);
 
     return cl_;
   }

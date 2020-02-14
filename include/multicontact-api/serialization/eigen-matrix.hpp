@@ -25,20 +25,21 @@
  THE SOFTWARE.
  */
 
-#ifndef __multicontact_api_serialization_eigen_matrix_hpp__
-#define __multicontact_api_serialization_eigen_matrix_hpp__
+#ifndef EIGEN_BOOST_SERIALIZATION
+#define EIGEN_BOOST_SERIALIZATION
 
 #include <Eigen/Dense>
 #include <boost/serialization/split_free.hpp>
 #include <boost/serialization/vector.hpp>
 
 namespace boost {
-
 namespace serialization {
-
 template <class Archive, typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
 void save(Archive& ar, const Eigen::Matrix<_Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols>& m,
-          const unsigned int /*version*/) {
+          const unsigned int version) {
+  if (version) {
+    // Do something
+  }
   Eigen::DenseIndex rows(m.rows()), cols(m.cols());
   ar& BOOST_SERIALIZATION_NVP(rows);
   ar& BOOST_SERIALIZATION_NVP(cols);
@@ -47,12 +48,15 @@ void save(Archive& ar, const Eigen::Matrix<_Scalar, _Rows, _Cols, _Options, _Max
 
 template <class Archive, typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
 void load(Archive& ar, Eigen::Matrix<_Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols>& m,
-          const unsigned int /*version*/) {
+          const unsigned int version) {
+  if (version) {
+    // Do something
+  }
   Eigen::DenseIndex rows, cols;
   ar >> BOOST_SERIALIZATION_NVP(rows);
   ar >> BOOST_SERIALIZATION_NVP(cols);
   m.resize(rows, cols);
-  //      if(m.size() > 0)
+  // if(m.size() > 0)
   ar >> make_nvp("data", make_array(m.data(), (size_t)m.size()));
 }
 

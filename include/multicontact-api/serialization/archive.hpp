@@ -4,8 +4,6 @@
 #ifndef __multicontact_api_serialization_archive_hpp__
 #define __multicontact_api_serialization_archive_hpp__
 
-#include "multicontact-api/serialization/fwd.hpp"
-
 #include <fstream>
 #include <string>
 #include <stdexcept>

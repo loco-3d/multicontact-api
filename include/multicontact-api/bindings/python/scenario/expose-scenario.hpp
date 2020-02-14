@@ -14,11 +14,11 @@ void exposeScenarioEnums();
 void exposeContactModels();
 
 inline void exposeScenario() {
+  exposeScenarioEnums();
+  exposeContactModels();
   exposeContactPatch();
   exposeContactPhase();
   exposeContactSequence();
-  exposeScenarioEnums();
-  exposeContactModels();
 }
 
 }  // namespace python
