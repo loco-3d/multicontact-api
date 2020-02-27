@@ -1,6 +1,8 @@
 import pathlib
 import unittest
 
+import curves  # noqa: requiered to get C++ type exposition
+
 import pinocchio as pin
 from multicontact_api import ContactSequence
 
