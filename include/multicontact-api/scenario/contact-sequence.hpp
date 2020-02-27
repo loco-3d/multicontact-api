@@ -263,35 +263,35 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
   }
 
   /**
-   * @brief haveConsistentContacts check that there is always one contact change between adjacent phases in the sequence
-   * and that there isn't any phase without any contact.
+   * @brief haveConsistentContacts check that there is always one contact change between adjacent phases in the
+   * sequence and that there isn't any phase without any contact.
    * @return
    */
-  bool haveConsistentContacts() const{
+  bool haveConsistentContacts() const {
     size_t variations;
-    if(m_contact_phases.front().numContacts() == 0){
+    if (m_contact_phases.front().numContacts() == 0) {
       // FIXME : may want to test this in a separate method in the future
-      std::cout<<"Phase without any contact at id : 0"<<std::endl;
+      std::cout << "Phase without any contact at id : 0" << std::endl;
       return false;
     }
-    for(size_t i = 1 ; i < m_contact_phases.size() ; ++i){
-      variations = m_contact_phases.at(i-1).getContactsBroken(m_contact_phases.at(i)).size()
-          + m_contact_phases.at(i-1).getContactsCreated(m_contact_phases.at(i)).size();
-      if(variations > 1){
-        std::cout<<"Several contact changes between adjacents phases at id : "<<i<<std::endl;
+    for (size_t i = 1; i < m_contact_phases.size(); ++i) {
+      variations = m_contact_phases.at(i - 1).getContactsBroken(m_contact_phases.at(i)).size() +
+                   m_contact_phases.at(i - 1).getContactsCreated(m_contact_phases.at(i)).size();
+      if (variations > 1) {
+        std::cout << "Several contact changes between adjacents phases at id : " << i << std::endl;
         return false;
       }
-      if(m_contact_phases.at(i-1).getContactsRepositioned(m_contact_phases.at(i)).size() > 0){
-        std::cout<<"Contact repositionning without intermediate phase at id : "<<i<<std::endl;
+      if (m_contact_phases.at(i - 1).getContactsRepositioned(m_contact_phases.at(i)).size() > 0) {
+        std::cout << "Contact repositionning without intermediate phase at id : " << i << std::endl;
         return false;
       }
-      if(m_contact_phases.at(i).numContacts() == 0){
+      if (m_contact_phases.at(i).numContacts() == 0) {
         // FIXME : may want to test this in a separate method in the future
-        std::cout<<"Phase without any contact at id : "<<i<<std::endl;
+        std::cout << "Phase without any contact at id : " << i << std::endl;
         return false;
       }
-      if(variations == 0){
-        std::cout<<"No contact change between adjacents phases at id : "<<i<<std::endl;
+      if (variations == 0) {
+        std::cout << "No contact change between adjacents phases at id : " << i << std::endl;
         return false;
       }
     }
@@ -303,35 +303,36 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * Also check that the initial values of one phase correspond to the final values of the previous ones.
    * @return
    */
-  bool haveCOMvalues() const{
-    if(m_contact_phases.front().m_c_init.isZero()){
-      std::cout<<"Initial CoM position not defined."<<std::endl;
+  bool haveCOMvalues() const {
+    if (m_contact_phases.front().m_c_init.isZero()) {
+      std::cout << "Initial CoM position not defined." << std::endl;
       return false;
     }
-    for(size_t i = 1 ; i < m_contact_phases.size() ; ++i){
-      if(m_contact_phases.at(i).m_c_init.isZero()){
-        std::cout<<"Intermediate CoM position not defined for phase : "<<i<<std::endl;
+    for (size_t i = 1; i < m_contact_phases.size(); ++i) {
+      if (m_contact_phases.at(i).m_c_init.isZero()) {
+        std::cout << "Intermediate CoM position not defined for phase : " << i << std::endl;
         return false;
       }
-      if(m_contact_phases.at(i).m_c_init != m_contact_phases.at(i-1).m_c_final){
-        std::cout<<"Init CoM position do not match final CoM of previous phase for id : "<<i<<std::endl;
+      if (m_contact_phases.at(i).m_c_init != m_contact_phases.at(i - 1).m_c_final) {
+        std::cout << "Init CoM position do not match final CoM of previous phase for id : " << i << std::endl;
         return false;
       }
-      if(!m_contact_phases.at(i).m_dc_init.isZero()){
-        if(m_contact_phases.at(i).m_dc_init != m_contact_phases.at(i-1).m_dc_final){
-          std::cout<<"Init CoM velocity do not match final velocity of previous phase for id : "<<i<<std::endl;
+      if (!m_contact_phases.at(i).m_dc_init.isZero()) {
+        if (m_contact_phases.at(i).m_dc_init != m_contact_phases.at(i - 1).m_dc_final) {
+          std::cout << "Init CoM velocity do not match final velocity of previous phase for id : " << i << std::endl;
           return false;
         }
       }
-      if(!m_contact_phases.at(i).m_ddc_init.isZero()){
-        if(m_contact_phases.at(i).m_ddc_init != m_contact_phases.at(i-1).m_ddc_final){
-          std::cout<<"Init CoM acceleration do not match final acceleration of previous phase for id : "<<i<<std::endl;
+      if (!m_contact_phases.at(i).m_ddc_init.isZero()) {
+        if (m_contact_phases.at(i).m_ddc_init != m_contact_phases.at(i - 1).m_ddc_final) {
+          std::cout << "Init CoM acceleration do not match final acceleration of previous phase for id : " << i
+                    << std::endl;
           return false;
         }
       }
     }
-    if(m_contact_phases.back().m_c_final.isZero()){
-      std::cout<<"Final CoM position not defined."<<std::endl;
+    if (m_contact_phases.back().m_c_final.isZero()) {
+      std::cout << "Final CoM position not defined." << std::endl;
       return false;
     }
     return true;
@@ -342,14 +343,15 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * Also check that the initial values of one phase correspond to the final values of the previous ones.
    * @return
    */
-  bool haveAMvalues() const{
-    for(size_t i = 1 ; i < m_contact_phases.size() ; ++i){
-      if(m_contact_phases.at(i).m_L_init != m_contact_phases.at(i-1).m_L_final){
-        std::cout<<"Init AM value do not match final value of previous phase for id : "<<i<<std::endl;
+  bool haveAMvalues() const {
+    for (size_t i = 1; i < m_contact_phases.size(); ++i) {
+      if (m_contact_phases.at(i).m_L_init != m_contact_phases.at(i - 1).m_L_final) {
+        std::cout << "Init AM value do not match final value of previous phase for id : " << i << std::endl;
         return false;
       }
-      if(m_contact_phases.at(i).m_dL_init != m_contact_phases.at(i-1).m_dL_final){
-        std::cout<<"Init AM derivative do not match final AM derivative of previous phase for id : "<<i<<std::endl;
+      if (m_contact_phases.at(i).m_dL_init != m_contact_phases.at(i - 1).m_dL_final) {
+        std::cout << "Init AM derivative do not match final AM derivative of previous phase for id : " << i
+                  << std::endl;
         return false;
       }
     }
@@ -361,32 +363,31 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * Also check that the initial values of one phase correspond to the final values of the previous ones.
    * @return
    */
-  bool haveCentroidalValues() const{
-    return haveAMvalues() && haveCOMvalues();
-  }
+  bool haveCentroidalValues() const { return haveAMvalues() && haveCOMvalues(); }
 
   /**
    * @brief haveConfigurationsValues Check that the initial and final configuration are defined for all phases
    * Also check that the initial values of one phase correspond to the final values of the previous ones.
    * @return
    */
-  bool haveConfigurationsValues() const{
-    if(m_contact_phases.front().m_q_init.isZero()){
-      std::cout<<"Initial configuration not defined."<<std::endl;
+  bool haveConfigurationsValues() const {
+    if (m_contact_phases.front().m_q_init.isZero()) {
+      std::cout << "Initial configuration not defined." << std::endl;
       return false;
     }
-    for(size_t i = 1 ; i < m_contact_phases.size() ; ++i){
-      if(m_contact_phases.at(i).m_q_init.isZero()){
-        std::cout<<"Intermediate configuration not defined for phase : "<<i<<std::endl;
+    for (size_t i = 1; i < m_contact_phases.size(); ++i) {
+      if (m_contact_phases.at(i).m_q_init.isZero()) {
+        std::cout << "Intermediate configuration not defined for phase : " << i << std::endl;
         return false;
       }
-      if(m_contact_phases.at(i).m_q_init != m_contact_phases.at(i-1).m_q_final){
-        std::cout<<"Init configuration do not match final configuration of previous phase for id : "<<i<<std::endl;
+      if (m_contact_phases.at(i).m_q_init != m_contact_phases.at(i - 1).m_q_final) {
+        std::cout << "Init configuration do not match final configuration of previous phase for id : " << i
+                  << std::endl;
         return false;
       }
     }
-    if(m_contact_phases.back().m_q_final.isZero()){
-      std::cout<<"Final configuration not defined."<<std::endl;
+    if (m_contact_phases.back().m_q_final.isZero()) {
+      std::cout << "Final configuration not defined." << std::endl;
       return false;
     }
     return true;
@@ -398,94 +399,90 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * and that the trajectories start and end and the correct values defined in each phase
    * @return
    */
-  bool haveCOMtrajectories() const{
-    if(!(haveTimings() && haveCOMvalues()))
-      return false;
+  bool haveCOMtrajectories() const {
+    if (!(haveTimings() && haveCOMvalues())) return false;
     size_t i = 0;
-    for(const ContactPhase& phase : m_contact_phases){
-      if(!phase.m_c){
-        std::cout<<"CoM position trajectory not defined for phase : "<<i<<std::endl;
+    for (const ContactPhase& phase : m_contact_phases) {
+      if (!phase.m_c) {
+        std::cout << "CoM position trajectory not defined for phase : " << i << std::endl;
         return false;
       }
-      if(!phase.m_dc){
-        std::cout<<"CoM velocity trajectory not defined for phase : "<<i<<std::endl;
+      if (!phase.m_dc) {
+        std::cout << "CoM velocity trajectory not defined for phase : " << i << std::endl;
         return false;
       }
-      if(!phase.m_ddc){
-        std::cout<<"CoM acceleration trajectory not defined for phase : "<<i<<std::endl;
+      if (!phase.m_ddc) {
+        std::cout << "CoM acceleration trajectory not defined for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_c->min() != phase.timeInitial()){
-        std::cout<<"CoM trajectory do not start at t_init for phase : "<<i<<std::endl;
+      if (phase.m_c->min() != phase.timeInitial()) {
+        std::cout << "CoM trajectory do not start at t_init for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_dc->min() != phase.timeInitial()){
-        std::cout<<"CoM velocity trajectory do not start at t_init for phase : "<<i<<std::endl;
+      if (phase.m_dc->min() != phase.timeInitial()) {
+        std::cout << "CoM velocity trajectory do not start at t_init for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_ddc->min() != phase.timeInitial()){
-        std::cout<<"CoM acceleration trajectory do not start at t_init for phase : "<<i<<std::endl;
+      if (phase.m_ddc->min() != phase.timeInitial()) {
+        std::cout << "CoM acceleration trajectory do not start at t_init for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_c->max() != phase.timeFinal()){
-        std::cout<<"CoM trajectory do not end at t_final for phase : "<<i<<std::endl;
+      if (phase.m_c->max() != phase.timeFinal()) {
+        std::cout << "CoM trajectory do not end at t_final for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_dc->max() != phase.timeFinal()){
-        std::cout<<"CoM velocity trajectory do not end at t_final for phase : "<<i<<std::endl;
+      if (phase.m_dc->max() != phase.timeFinal()) {
+        std::cout << "CoM velocity trajectory do not end at t_final for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_ddc->max() != phase.timeFinal()){
-        std::cout<<"CoM acceleration trajectory do not end at t_final for phase : "<<i<<std::endl;
+      if (phase.m_ddc->max() != phase.timeFinal()) {
+        std::cout << "CoM acceleration trajectory do not end at t_final for phase : " << i << std::endl;
         return false;
       }
-      if(!(*phase.m_c)(phase.m_c->min()).isApprox(phase.m_c_init) ){
-        std::cout<<"CoM trajectory do not start at c_init for phase : "<<i<<std::endl;
+      if (!(*phase.m_c)(phase.m_c->min()).isApprox(phase.m_c_init)) {
+        std::cout << "CoM trajectory do not start at c_init for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_dc_init.isZero()){
-        if(!(*phase.m_dc)(phase.m_dc->min()).isZero()){
-          std::cout<<"CoM velocity trajectory do not start at dc_init for phase : "<<i<<std::endl;
+      if (phase.m_dc_init.isZero()) {
+        if (!(*phase.m_dc)(phase.m_dc->min()).isZero()) {
+          std::cout << "CoM velocity trajectory do not start at dc_init for phase : " << i << std::endl;
           return false;
         }
       }
       // FIXME : isApprox do not work when values close to 0
-      else if(!(*phase.m_dc)(phase.m_dc->min()).isApprox(phase.m_dc_init, 1e-6) ){
-        std::cout<<"CoM velocity trajectory do not start at dc_init for phase : "<<i<<std::endl;
+      else if (!(*phase.m_dc)(phase.m_dc->min()).isApprox(phase.m_dc_init, 1e-6)) {
+        std::cout << "CoM velocity trajectory do not start at dc_init for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_ddc_init.isZero()){
-        if(!(*phase.m_ddc)(phase.m_ddc->min()).isZero() ){
-          std::cout<<"CoM acceleration trajectory do not start at ddc_init for phase : "<<i<<std::endl;
+      if (phase.m_ddc_init.isZero()) {
+        if (!(*phase.m_ddc)(phase.m_ddc->min()).isZero()) {
+          std::cout << "CoM acceleration trajectory do not start at ddc_init for phase : " << i << std::endl;
           return false;
         }
-      }
-      else if(!(*phase.m_ddc)(phase.m_ddc->min()).isApprox(phase.m_ddc_init, 1e-6) ){
-        std::cout<<"CoM acceleration trajectory do not start at ddc_init for phase : "<<i<<std::endl;
+      } else if (!(*phase.m_ddc)(phase.m_ddc->min()).isApprox(phase.m_ddc_init, 1e-6)) {
+        std::cout << "CoM acceleration trajectory do not start at ddc_init for phase : " << i << std::endl;
         return false;
       }
-      if(!(*phase.m_c)(phase.m_c->max()).isApprox(phase.m_c_final) ){
-        std::cout<<"CoM trajectory do not end at c_final for phase : "<<i<<std::endl;
+      if (!(*phase.m_c)(phase.m_c->max()).isApprox(phase.m_c_final)) {
+        std::cout << "CoM trajectory do not end at c_final for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_dc_final.isZero()){
-        if(!(*phase.m_dc)(phase.m_dc->max()).isZero() ){
-          std::cout<<"CoM velocity trajectory do not end at dc_final for phase : "<<i<<std::endl;
+      if (phase.m_dc_final.isZero()) {
+        if (!(*phase.m_dc)(phase.m_dc->max()).isZero()) {
+          std::cout << "CoM velocity trajectory do not end at dc_final for phase : " << i << std::endl;
           return false;
         }
-      }
-      else if(!(*phase.m_dc)(phase.m_dc->max()).isApprox(phase.m_dc_final, 1e-6) ){
-        std::cout<<"CoM velocity trajectory do not end at dc_final for phase : "<<i<<std::endl;
+      } else if (!(*phase.m_dc)(phase.m_dc->max()).isApprox(phase.m_dc_final, 1e-6)) {
+        std::cout << "CoM velocity trajectory do not end at dc_final for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_ddc_final.isZero()){
-        if(!(*phase.m_ddc)(phase.m_ddc->max()).isZero() ){
-          std::cout<<"CoM acceleration trajectory do not end at ddc_final for phase : "<<i<<std::endl;
+      if (phase.m_ddc_final.isZero()) {
+        if (!(*phase.m_ddc)(phase.m_ddc->max()).isZero()) {
+          std::cout << "CoM acceleration trajectory do not end at ddc_final for phase : " << i << std::endl;
           return false;
         }
-      }
-      else if(!(*phase.m_ddc)(phase.m_ddc->max()).isApprox(phase.m_ddc_final, 1e-6) ){
-        std::cout<<"CoM acceleration trajectory do not end at ddc_final for phase : "<<i<<std::endl;
+      } else if (!(*phase.m_ddc)(phase.m_ddc->max()).isApprox(phase.m_ddc_final, 1e-6)) {
+        std::cout << "CoM acceleration trajectory do not end at ddc_final for phase : " << i << std::endl;
         return false;
       }
       ++i;
@@ -499,73 +496,68 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * and that the trajectories start and end and the correct values defined in each phase
    * @return
    */
-  bool haveAMtrajectories() const{
-    if(!(haveTimings() && haveAMvalues()))
-      return false;
+  bool haveAMtrajectories() const {
+    if (!(haveTimings() && haveAMvalues())) return false;
     size_t i = 0;
-    for(const ContactPhase& phase : m_contact_phases){
-      if(!phase.m_L){
-        std::cout<<"AM position trajectory not defined for phase : "<<i<<std::endl;
+    for (const ContactPhase& phase : m_contact_phases) {
+      if (!phase.m_L) {
+        std::cout << "AM position trajectory not defined for phase : " << i << std::endl;
         return false;
       }
-      if(!phase.m_dL){
-        std::cout<<"AM velocity trajectory not defined for phase : "<<i<<std::endl;
+      if (!phase.m_dL) {
+        std::cout << "AM velocity trajectory not defined for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_L->min() != phase.timeInitial()){
-        std::cout<<"AM trajectory do not start at t_init for phase : "<<i<<std::endl;
+      if (phase.m_L->min() != phase.timeInitial()) {
+        std::cout << "AM trajectory do not start at t_init for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_dL->min() != phase.timeInitial()){
-        std::cout<<"AM derivative trajectory do not start at t_init for phase : "<<i<<std::endl;
+      if (phase.m_dL->min() != phase.timeInitial()) {
+        std::cout << "AM derivative trajectory do not start at t_init for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_L->max() != phase.timeFinal()){
-        std::cout<<"AM trajectory do not end at t_final for phase : "<<i<<std::endl;
+      if (phase.m_L->max() != phase.timeFinal()) {
+        std::cout << "AM trajectory do not end at t_final for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_dL->max() != phase.timeFinal()){
-        std::cout<<"AM derivative trajectory do not end at t_final for phase : "<<i<<std::endl;
+      if (phase.m_dL->max() != phase.timeFinal()) {
+        std::cout << "AM derivative trajectory do not end at t_final for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_L_init.isZero()){
-        if(!(*phase.m_L)(phase.m_L->min()).isZero()){
-          std::cout<<"AM trajectory do not start at L_init for phase : "<<i<<std::endl;
+      if (phase.m_L_init.isZero()) {
+        if (!(*phase.m_L)(phase.m_L->min()).isZero()) {
+          std::cout << "AM trajectory do not start at L_init for phase : " << i << std::endl;
           return false;
         }
-      }
-      else if(!(*phase.m_L)(phase.m_L->min()).isApprox(phase.m_L_init) ){
-        std::cout<<"AM trajectory do not start at L_init for phase : "<<i<<std::endl;
+      } else if (!(*phase.m_L)(phase.m_L->min()).isApprox(phase.m_L_init)) {
+        std::cout << "AM trajectory do not start at L_init for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_dL_init.isZero()){
-        if(!(*phase.m_dL)(phase.m_dL->min()).isZero()){
-          std::cout<<"AM derivative trajectory do not start at dL_init for phase : "<<i<<std::endl;
+      if (phase.m_dL_init.isZero()) {
+        if (!(*phase.m_dL)(phase.m_dL->min()).isZero()) {
+          std::cout << "AM derivative trajectory do not start at dL_init for phase : " << i << std::endl;
           return false;
         }
-      }
-      else if(!(*phase.m_dL)(phase.m_dL->min()).isApprox(phase.m_dL_init, 1e-6) ){
-        std::cout<<"AM derivative trajectory do not start at dL_init for phase : "<<i<<std::endl;
+      } else if (!(*phase.m_dL)(phase.m_dL->min()).isApprox(phase.m_dL_init, 1e-6)) {
+        std::cout << "AM derivative trajectory do not start at dL_init for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_L_final.isZero()){
-        if(!(*phase.m_L)(phase.m_L->max()).isZero()){
-          std::cout<<"AM trajectory do not end at L_final for phase : "<<i<<std::endl;
+      if (phase.m_L_final.isZero()) {
+        if (!(*phase.m_L)(phase.m_L->max()).isZero()) {
+          std::cout << "AM trajectory do not end at L_final for phase : " << i << std::endl;
           return false;
         }
-      }
-      else if(!(*phase.m_L)(phase.m_L->max()).isApprox(phase.m_L_final, 1e-6) ){
-        std::cout<<"AM trajectory do not end at L_final for phase : "<<i<<std::endl;
+      } else if (!(*phase.m_L)(phase.m_L->max()).isApprox(phase.m_L_final, 1e-6)) {
+        std::cout << "AM trajectory do not end at L_final for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_dL_final.isZero()){
-        if(!(*phase.m_dL)(phase.m_dL->max()).isZero()){
-          std::cout<<"AM derivative trajectory do not end at dL_final for phase : "<<i<<std::endl;
+      if (phase.m_dL_final.isZero()) {
+        if (!(*phase.m_dL)(phase.m_dL->max()).isZero()) {
+          std::cout << "AM derivative trajectory do not end at dL_final for phase : " << i << std::endl;
           return false;
         }
-      }
-      else if(!(*phase.m_dL)(phase.m_dL->max()).isApprox(phase.m_dL_final) ){
-        std::cout<<"AM derivative trajectory do not end at dL_final for phase : "<<i<<std::endl;
+      } else if (!(*phase.m_dL)(phase.m_dL->max()).isApprox(phase.m_dL_final)) {
+        std::cout << "AM derivative trajectory do not end at dL_final for phase : " << i << std::endl;
         return false;
       }
       ++i;
@@ -579,51 +571,54 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * and that the trajectories start and end and the correct values defined in each phase
    * @return
    */
-  bool haveCentroidalTrajectories() const{
-    return haveAMtrajectories() && haveCOMtrajectories();
-  }
+  bool haveCentroidalTrajectories() const { return haveAMtrajectories() && haveCOMtrajectories(); }
 
   /**
    * @brief haveEffectorsTrajectories check that for each phase preceeding a contact creation,
    *  an SE3 trajectory is defined for the effector that will be in contact.
    * Also check that this trajectory is defined on the time-interval of the phase.
    * Also check that the trajectory correctly end at the placement defined for the contact in the next phase.
-   * If this effector was in contact in the previous phase, it check that the trajectory start at the previous contact placement.
+   * If this effector was in contact in the previous phase, it check that the trajectory start at the previous contact
+   * placement.
    * @return
    */
-  bool haveEffectorsTrajectories( const Scalar prec = Eigen::NumTraits<Scalar>::dummy_precision()) const{
-    if(!haveTimings())
-      return false;
-    for(size_t i = 0 ; i < m_contact_phases.size() -1 ; ++i){
-      for(std::string eeName : m_contact_phases.at(i).getContactsCreated(m_contact_phases.at(i+1))){
-        if(! m_contact_phases.at(i).effectorHaveAtrajectory(eeName)){
-          std::cout<<"No end effector trajectory for "<<eeName<<" at phase "<<i<<" but it is in contact at phase "<<i+1<<std::endl;
+  bool haveEffectorsTrajectories(const Scalar prec = Eigen::NumTraits<Scalar>::dummy_precision()) const {
+    if (!haveTimings()) return false;
+    for (size_t i = 0; i < m_contact_phases.size() - 1; ++i) {
+      for (std::string eeName : m_contact_phases.at(i).getContactsCreated(m_contact_phases.at(i + 1))) {
+        if (!m_contact_phases.at(i).effectorHaveAtrajectory(eeName)) {
+          std::cout << "No end effector trajectory for " << eeName << " at phase " << i
+                    << " but it is in contact at phase " << i + 1 << std::endl;
           return false;
         }
         const typename ContactPhase::curve_SE3_ptr traj = m_contact_phases.at(i).effectorTrajectories().at(eeName);
-        if(traj->min() != m_contact_phases.at(i).timeInitial()){
-          std::cout<<"Effector trajectory for "<<eeName<<" do not start at t_init in phase "<<i<<std::endl;
+        if (traj->min() != m_contact_phases.at(i).timeInitial()) {
+          std::cout << "Effector trajectory for " << eeName << " do not start at t_init in phase " << i << std::endl;
           return false;
         }
-        if(traj->max() != m_contact_phases.at(i).timeFinal()){
-          std::cout<<"Effector trajectory for "<<eeName<<" do not end at t_final in phase "<<i<<std::endl;
+        if (traj->max() != m_contact_phases.at(i).timeFinal()) {
+          std::cout << "Effector trajectory for " << eeName << " do not end at t_final in phase " << i << std::endl;
           return false;
         }
         ContactPatch::SE3 pMax = ContactPatch::SE3((*traj)(traj->max()).matrix());
-        if(!pMax.isApprox(m_contact_phases.at(i+1).contactPatches().at(eeName).placement(), prec)){
-          std::cout<<"Effector trajectory for "<<eeName
-                  << " do not end at it's contact placement in the next phase, for phase "<<i<<std::endl;
-          std::cout<<"Last point : "<<std::endl<<pMax<<std::endl<<"Next contact : "
-                  <<std::endl<<m_contact_phases.at(i+1).contactPatches().at(eeName).placement()<<std::endl;
+        if (!pMax.isApprox(m_contact_phases.at(i + 1).contactPatches().at(eeName).placement(), prec)) {
+          std::cout << "Effector trajectory for " << eeName
+                    << " do not end at it's contact placement in the next phase, for phase " << i << std::endl;
+          std::cout << "Last point : " << std::endl
+                    << pMax << std::endl
+                    << "Next contact : " << std::endl
+                    << m_contact_phases.at(i + 1).contactPatches().at(eeName).placement() << std::endl;
           return false;
         }
-        if(i > 0 && m_contact_phases.at(i-1).isEffectorInContact(eeName)){
+        if (i > 0 && m_contact_phases.at(i - 1).isEffectorInContact(eeName)) {
           ContactPatch::SE3 pMin = ContactPatch::SE3((*traj)(traj->min()).matrix());
-          if(!pMin.isApprox(m_contact_phases.at(i-1).contactPatches().at(eeName).placement(), prec)){
-            std::cout<<"Effector trajectory for "<<eeName
-                    << " do not start at it's contact placement in the previous phase, for phase "<<i<<std::endl;
-            std::cout<<"First point : "<<std::endl<<pMin<<std::endl<<"Previous contact : "
-                    <<std::endl<<m_contact_phases.at(i-1).contactPatches().at(eeName).placement()<<std::endl;
+          if (!pMin.isApprox(m_contact_phases.at(i - 1).contactPatches().at(eeName).placement(), prec)) {
+            std::cout << "Effector trajectory for " << eeName
+                      << " do not start at it's contact placement in the previous phase, for phase " << i << std::endl;
+            std::cout << "First point : " << std::endl
+                      << pMin << std::endl
+                      << "Previous contact : " << std::endl
+                      << m_contact_phases.at(i - 1).contactPatches().at(eeName).placement() << std::endl;
             return false;
           }
         }
@@ -632,36 +627,34 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     return true;
   }
 
-
   /**
    * @brief haveJointsTrajectories Check that a q trajectory is defined for each phases
    * Also check that the time interval of this trajectories matches the one of the phase
    * and that the trajectories start and end and the correct values defined in each phase
    * @return
    */
-  bool haveJointsTrajectories() const{
-    if(!(haveTimings() && haveConfigurationsValues()))
-      return false;
+  bool haveJointsTrajectories() const {
+    if (!(haveTimings() && haveConfigurationsValues())) return false;
     size_t i = 0;
-    for(const ContactPhase& phase : m_contact_phases){
-      if(!phase.m_q){
-        std::cout<<"joint position trajectory not defined for phase : "<<i<<std::endl;
+    for (const ContactPhase& phase : m_contact_phases) {
+      if (!phase.m_q) {
+        std::cout << "joint position trajectory not defined for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_q->min() != phase.timeInitial()){
-        std::cout<<"joint trajectory do not start at t_init for phase : "<<i<<std::endl;
+      if (phase.m_q->min() != phase.timeInitial()) {
+        std::cout << "joint trajectory do not start at t_init for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_q->max() != phase.timeFinal()){
-        std::cout<<"joint trajectory do not end at t_final for phase : "<<i<<std::endl;
+      if (phase.m_q->max() != phase.timeFinal()) {
+        std::cout << "joint trajectory do not end at t_final for phase : " << i << std::endl;
         return false;
       }
-      if(!(*phase.m_q)(phase.m_q->min()).isApprox(phase.m_q_init) ){
-        std::cout<<"joint trajectory do not start at q_init for phase : "<<i<<std::endl;
+      if (!(*phase.m_q)(phase.m_q->min()).isApprox(phase.m_q_init)) {
+        std::cout << "joint trajectory do not start at q_init for phase : " << i << std::endl;
         return false;
       }
-      if(!(*phase.m_q)(phase.m_q->max()).isApprox(phase.m_q_final) ){
-        std::cout<<"joint trajectory do not end at q_final for phase : "<<i<<std::endl;
+      if (!(*phase.m_q)(phase.m_q->max()).isApprox(phase.m_q_final)) {
+        std::cout << "joint trajectory do not end at q_final for phase : " << i << std::endl;
         return false;
       }
       ++i;
@@ -675,33 +668,32 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * and that the trajectories start and end and the correct values defined in each phase
    * @return
    */
-  bool haveJointsDerivativesTrajectories() const{
-    if(!(haveTimings()))
-      return false;
+  bool haveJointsDerivativesTrajectories() const {
+    if (!(haveTimings())) return false;
     size_t i = 0;
-    for(const ContactPhase& phase : m_contact_phases){
-      if(!phase.m_dq){
-        std::cout<<"joint velocity trajectory not defined for phase : "<<i<<std::endl;
+    for (const ContactPhase& phase : m_contact_phases) {
+      if (!phase.m_dq) {
+        std::cout << "joint velocity trajectory not defined for phase : " << i << std::endl;
         return false;
       }
-      if(!phase.m_ddq){
-        std::cout<<"joint acceleration trajectory not defined for phase : "<<i<<std::endl;
+      if (!phase.m_ddq) {
+        std::cout << "joint acceleration trajectory not defined for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_dq->min() != phase.timeInitial()){
-        std::cout<<"joint velocity trajectory do not start at t_init for phase : "<<i<<std::endl;
+      if (phase.m_dq->min() != phase.timeInitial()) {
+        std::cout << "joint velocity trajectory do not start at t_init for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_ddq->min() != phase.timeInitial()){
-        std::cout<<"joint acceleration trajectory do not start at t_init for phase : "<<i<<std::endl;
+      if (phase.m_ddq->min() != phase.timeInitial()) {
+        std::cout << "joint acceleration trajectory do not start at t_init for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_dq->max() != phase.timeFinal()){
-        std::cout<<"joint velocity trajectory do not end at t_final for phase : "<<i<<std::endl;
+      if (phase.m_dq->max() != phase.timeFinal()) {
+        std::cout << "joint velocity trajectory do not end at t_final for phase : " << i << std::endl;
         return false;
       }
-      if((phase.m_ddq->max() != phase.timeFinal()) && i < size()-1 ){ // not required for the last phase
-        std::cout<<"joint acceleration trajectory do not end at t_final for phase : "<<i<<std::endl;
+      if ((phase.m_ddq->max() != phase.timeFinal()) && i < size() - 1) {  // not required for the last phase
+        std::cout << "joint acceleration trajectory do not end at t_final for phase : " << i << std::endl;
         return false;
       }
       ++i;
@@ -709,30 +701,27 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     return true;
   }
 
-
-
   /**
    * @brief haveJointsTrajectories Check that a joint torque trajectories are defined for each phases
    * Also check that the time interval of this trajectories matches the one of the phase
    * and that the trajectories start and end and the correct values defined in each phase
    * @return
    */
-  bool haveTorquesTrajectories() const{
-    if(!haveTimings())
-      return false;
-    size_t i =0;
-    for(const ContactPhase& phase : m_contact_phases){
-      if(!phase.m_tau){
-        std::cout<<"Torque trajectory not defined for phase : "<<i<<std::endl;
+  bool haveTorquesTrajectories() const {
+    if (!haveTimings()) return false;
+    size_t i = 0;
+    for (const ContactPhase& phase : m_contact_phases) {
+      if (!phase.m_tau) {
+        std::cout << "Torque trajectory not defined for phase : " << i << std::endl;
         return false;
       }
 
-      if(phase.m_tau->min() != phase.timeInitial()){
-        std::cout<<"Torque trajectory do not start at t_init for phase : "<<i<<std::endl;
+      if (phase.m_tau->min() != phase.timeInitial()) {
+        std::cout << "Torque trajectory do not start at t_init for phase : " << i << std::endl;
         return false;
       }
-      if((phase.m_tau->max() != phase.timeFinal()) && i < size()-1 ){
-        std::cout<<"Torque trajectory do not end at t_final for phase : "<<i<<std::endl;
+      if ((phase.m_tau->max() != phase.timeFinal()) && i < size() - 1) {
+        std::cout << "Torque trajectory do not end at t_final for phase : " << i << std::endl;
         return false;
       }
       ++i;
@@ -746,34 +735,37 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * and that the trajectories start and end and the correct values defined in each phase
    * @return
    */
-  bool haveContactForcesTrajectories() const{
-    if(!haveTimings())
-      return false;
+  bool haveContactForcesTrajectories() const {
+    if (!haveTimings()) return false;
     size_t i = 0;
-    for(const ContactPhase& phase : m_contact_phases){
-      for(std::string eeName : phase.effectorsInContact()){
-        if(phase.contactForces().count(eeName) == 0){
-          std::cout<<"No contact forces trajectory for effector "<<eeName<<" at phase "<<i<<std::endl;
+    for (const ContactPhase& phase : m_contact_phases) {
+      for (std::string eeName : phase.effectorsInContact()) {
+        if (phase.contactForces().count(eeName) == 0) {
+          std::cout << "No contact forces trajectory for effector " << eeName << " at phase " << i << std::endl;
           return false;
         }
-        if(phase.contactNormalForces().count(eeName) == 0){
-          std::cout<<"No contact normal force trajectory for effector "<<eeName<<" for phase "<<i<<std::endl;
+        if (phase.contactNormalForces().count(eeName) == 0) {
+          std::cout << "No contact normal force trajectory for effector " << eeName << " for phase " << i << std::endl;
           return false;
         }
-        if(phase.contactForces().at(eeName)->min() != phase.timeInitial()){
-          std::cout<<"Contact forces trajectory for effector "<<eeName<<" do not start at t_init for phase "<<i<<std::endl;
+        if (phase.contactForces().at(eeName)->min() != phase.timeInitial()) {
+          std::cout << "Contact forces trajectory for effector " << eeName << " do not start at t_init for phase " << i
+                    << std::endl;
           return false;
         }
-        if(phase.contactForces().at(eeName)->max() != phase.timeFinal()){
-          std::cout<<"Contact forces trajectory for effector "<<eeName<<" do not end at t_final for phase "<<i<<std::endl;
+        if (phase.contactForces().at(eeName)->max() != phase.timeFinal()) {
+          std::cout << "Contact forces trajectory for effector " << eeName << " do not end at t_final for phase " << i
+                    << std::endl;
           return false;
         }
-        if(phase.contactNormalForces().at(eeName)->min() != phase.timeInitial()){
-          std::cout<<"Contact normal force trajectory for effector "<<eeName<<" do not start at t_init for phase "<<i<<std::endl;
+        if (phase.contactNormalForces().at(eeName)->min() != phase.timeInitial()) {
+          std::cout << "Contact normal force trajectory for effector " << eeName
+                    << " do not start at t_init for phase " << i << std::endl;
           return false;
         }
-        if(phase.contactNormalForces().at(eeName)->max() != phase.timeFinal()){
-          std::cout<<"Contact normal force trajectory for effector "<<eeName<<" do not end at t_final for phase "<<i<<std::endl;
+        if (phase.contactNormalForces().at(eeName)->max() != phase.timeFinal()) {
+          std::cout << "Contact normal force trajectory for effector " << eeName << " do not end at t_final for phase "
+                    << i << std::endl;
           return false;
         }
       }
@@ -787,19 +779,19 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * Also check that it start and end at the correct time interval
    * @return
    */
-  bool haveRootTrajectories() const{
+  bool haveRootTrajectories() const {
     size_t i = 0;
-    for(const ContactPhase& phase : m_contact_phases){
-      if(!phase.m_root){
-        std::cout<<"Root trajectory not defined for phase : "<<i<<std::endl;
+    for (const ContactPhase& phase : m_contact_phases) {
+      if (!phase.m_root) {
+        std::cout << "Root trajectory not defined for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_root->min() != phase.timeInitial()){
-        std::cout<<"Root trajectory do not start at t_init for phase : "<<i<<std::endl;
+      if (phase.m_root->min() != phase.timeInitial()) {
+        std::cout << "Root trajectory do not start at t_init for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_root->max() != phase.timeFinal()){
-        std::cout<<"Root trajectory do not start at t_final for phase : "<<i<<std::endl;
+      if (phase.m_root->max() != phase.timeFinal()) {
+        std::cout << "Root trajectory do not start at t_final for phase : " << i << std::endl;
         return false;
       }
       ++i;
@@ -807,18 +799,17 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     return true;
   }
 
-
   /**
    * @brief haveFriction check that all the contact patch used in the sequence have
    * a friction coefficient initialized
    * @return
    */
-  bool haveFriction() const{
+  bool haveFriction() const {
     size_t i = 0;
-    for(const ContactPhase& phase : m_contact_phases){
-      for(const std::string& eeName : phase.effectorsInContact()){
-        if(phase.contactPatches().at(eeName).friction() <= 0.){
-          std::cout<<"Friction not defined for phase "<<i<<" and effector "<<eeName<<std::endl;
+    for (const ContactPhase& phase : m_contact_phases) {
+      for (const std::string& eeName : phase.effectorsInContact()) {
+        if (phase.contactPatches().at(eeName).friction() <= 0.) {
+          std::cout << "Friction not defined for phase " << i << " and effector " << eeName << std::endl;
           return false;
         }
       }
@@ -831,19 +822,19 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * @brief haveZMPtrajectories check that all the contact phases have a zmp trajectory
    * @return
    */
-  bool haveZMPtrajectories(){
+  bool haveZMPtrajectories() {
     size_t i = 0;
-    for(const ContactPhase& phase : m_contact_phases){
-      if(!phase.m_zmp){
-        std::cout<<"ZMP trajectory not defined for phase : "<<i<<std::endl;
+    for (const ContactPhase& phase : m_contact_phases) {
+      if (!phase.m_zmp) {
+        std::cout << "ZMP trajectory not defined for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_zmp->min() != phase.timeInitial()){
-        std::cout<<"ZMP trajectory do not start at t_init for phase : "<<i<<std::endl;
+      if (phase.m_zmp->min() != phase.timeInitial()) {
+        std::cout << "ZMP trajectory do not start at t_init for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_zmp->max() != phase.timeFinal()){
-        std::cout<<"ZMP trajectory do not end at t_final for phase : "<<i<<std::endl;
+      if (phase.m_zmp->max() != phase.timeFinal()) {
+        std::cout << "ZMP trajectory do not end at t_final for phase : " << i << std::endl;
         return false;
       }
       ++i;
@@ -851,16 +842,16 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     return true;
   }
 
-
   /**
-   * @brief getAllEffectorsInContact return a vector of names of all the effectors used to create contacts during the sequence
+   * @brief getAllEffectorsInContact return a vector of names of all the effectors used to create contacts during the
+   * sequence
    * @return
    */
-  t_strings getAllEffectorsInContact() const{
+  t_strings getAllEffectorsInContact() const {
     // use set to guarantee uniqueness, but return a vector for easier use and python bindings
     std::set<std::string> res_set;
-    for(const ContactPhase& phase : m_contact_phases){
-      for(const std::string& eeName : phase.effectorsInContact()){
+    for (const ContactPhase& phase : m_contact_phases) {
+      for (const std::string& eeName : phase.effectorsInContact()) {
         res_set.insert(eeName);
       }
     }
@@ -874,7 +865,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_t concatenateCtrajectories() const {
     piecewise_t res = piecewise_t();
-    for(const ContactPhase& phase : m_contact_phases){
+    for (const ContactPhase& phase : m_contact_phases) {
       res.add_curve_ptr(phase.m_c);
     }
     return res;
@@ -887,7 +878,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_t concatenateDCtrajectories() const {
     piecewise_t res = piecewise_t();
-    for(const ContactPhase& phase : m_contact_phases){
+    for (const ContactPhase& phase : m_contact_phases) {
       res.add_curve_ptr(phase.m_dc);
     }
     return res;
@@ -900,7 +891,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_t concatenateDDCtrajectories() const {
     piecewise_t res = piecewise_t();
-    for(const ContactPhase& phase : m_contact_phases){
+    for (const ContactPhase& phase : m_contact_phases) {
       res.add_curve_ptr(phase.m_ddc);
     }
     return res;
@@ -913,7 +904,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_t concatenateLtrajectories() const {
     piecewise_t res = piecewise_t();
-    for(const ContactPhase& phase : m_contact_phases){
+    for (const ContactPhase& phase : m_contact_phases) {
       res.add_curve_ptr(phase.m_L);
     }
     return res;
@@ -926,7 +917,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_t concatenateDLtrajectories() const {
     piecewise_t res = piecewise_t();
-    for(const ContactPhase& phase : m_contact_phases){
+    for (const ContactPhase& phase : m_contact_phases) {
       res.add_curve_ptr(phase.m_dL);
     }
     return res;
@@ -939,7 +930,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_t concatenateZMPtrajectories() const {
     piecewise_t res = piecewise_t();
-    for(const ContactPhase& phase : m_contact_phases){
+    for (const ContactPhase& phase : m_contact_phases) {
       res.add_curve_ptr(phase.m_zmp);
     }
     return res;
@@ -952,7 +943,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_t concatenateWrenchTrajectories() const {
     piecewise_t res = piecewise_t();
-    for(const ContactPhase& phase : m_contact_phases){
+    for (const ContactPhase& phase : m_contact_phases) {
       res.add_curve_ptr(phase.m_wrench);
     }
     return res;
@@ -965,7 +956,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_t concatenateQtrajectories() const {
     piecewise_t res = piecewise_t();
-    for(const ContactPhase& phase : m_contact_phases){
+    for (const ContactPhase& phase : m_contact_phases) {
       res.add_curve_ptr(phase.m_q);
     }
     return res;
@@ -978,7 +969,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_t concatenateDQtrajectories() const {
     piecewise_t res = piecewise_t();
-    for(const ContactPhase& phase : m_contact_phases){
+    for (const ContactPhase& phase : m_contact_phases) {
       res.add_curve_ptr(phase.m_dq);
     }
     return res;
@@ -991,7 +982,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_t concatenateDDQtrajectories() const {
     piecewise_t res = piecewise_t();
-    for(const ContactPhase& phase : m_contact_phases){
+    for (const ContactPhase& phase : m_contact_phases) {
       res.add_curve_ptr(phase.m_ddq);
     }
     return res;
@@ -1004,7 +995,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_t concatenateTauTrajectories() const {
     piecewise_t res = piecewise_t();
-    for(const ContactPhase& phase : m_contact_phases){
+    for (const ContactPhase& phase : m_contact_phases) {
       res.add_curve_ptr(phase.m_tau);
     }
     return res;
@@ -1017,7 +1008,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_SE3_t concatenateRootTrajectories() const {
     piecewise_SE3_t res = piecewise_SE3_t();
-    for(const ContactPhase& phase : m_contact_phases){
+    for (const ContactPhase& phase : m_contact_phases) {
       res.add_curve_ptr(phase.m_root);
     }
     return res;
@@ -1038,26 +1029,23 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     // first find the first and last phase with a trajectory for this effector
     size_t first_phase = m_contact_phases.size();
     size_t last_phase = 0;
-    for(size_t i = 0 ; i < m_contact_phases.size() ; ++i){
-      if(m_contact_phases.at(i).effectorHaveAtrajectory(eeName)){
+    for (size_t i = 0; i < m_contact_phases.size(); ++i) {
+      if (m_contact_phases.at(i).effectorHaveAtrajectory(eeName)) {
         last_phase = i;
-        if(first_phase > i ){
+        if (first_phase > i) {
           first_phase = i;
         }
       }
     }
     // loop over this phases to concatenate the trajectories
-    for(size_t i = first_phase ; i <= last_phase ; ++i){
-      if(m_contact_phases.at(i).effectorHaveAtrajectory(eeName)){
+    for (size_t i = first_phase; i <= last_phase; ++i) {
+      if (m_contact_phases.at(i).effectorHaveAtrajectory(eeName)) {
         res.add_curve_ptr(m_contact_phases.at(i).effectorTrajectories().at(eeName));
         last_placement = res(res.max());
-      }
-      else
-      {
+      } else {
         // when the trajectory do not exist, add a constant one with the previous value
-        curve_SE3_ptr ptr(new SE3Curve_t(last_placement, last_placement,
-                                                           m_contact_phases.at(i).timeInitial(),
-                                                           m_contact_phases.at(i).timeFinal()));
+        curve_SE3_ptr ptr(new SE3Curve_t(last_placement, last_placement, m_contact_phases.at(i).timeInitial(),
+                                         m_contact_phases.at(i).timeFinal()));
         res.add_curve_ptr(ptr);
       }
     }
@@ -1077,23 +1065,22 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     piecewise_t res = piecewise_t();
     // first find the dimension used, in order to fill with 0 when required:
     size_t dim = 0;
-    for(const ContactPhase& phase : m_contact_phases){
-      if(phase.contactForces().count(eeName) > 0){
+    for (const ContactPhase& phase : m_contact_phases) {
+      if (phase.contactForces().count(eeName) > 0) {
         dim = phase.contactForces().at(eeName)->dim();
       }
     }
-    if(dim == 0){
+    if (dim == 0) {
       // no forces trajectory for this effector
       return res;
     }
-    Eigen::MatrixXd zeros = Eigen::MatrixXd::Zero(dim,1);
+    Eigen::MatrixXd zeros = Eigen::MatrixXd::Zero(dim, 1);
     // loop over all phases and either add trajectory if it exist or add zeros
-    for(const ContactPhase& phase : m_contact_phases){
-      if(phase.contactForces().count(eeName) > 0){
+    for (const ContactPhase& phase : m_contact_phases) {
+      if (phase.contactForces().count(eeName) > 0) {
         res.add_curve_ptr(phase.contactForces().at(eeName));
-      }else{
-        curve_ptr ptr(
-              new polynomial_t(zeros, phase.timeInitial(), phase.timeFinal()));
+      } else {
+        curve_ptr ptr(new polynomial_t(zeros, phase.timeInitial(), phase.timeFinal()));
         res.add_curve_ptr(ptr);
       }
     }
@@ -1111,14 +1098,13 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_t concatenateNormalForceTrajectories(const std::string& eeName) const {
     piecewise_t res = piecewise_t();
-    Eigen::MatrixXd zeros = Eigen::MatrixXd::Zero(1,1);
+    Eigen::MatrixXd zeros = Eigen::MatrixXd::Zero(1, 1);
     // loop over all phases and either add trajectory if it exist or add zeros
-    for(const ContactPhase& phase : m_contact_phases){
-      if(phase.contactNormalForces().count(eeName) > 0){
+    for (const ContactPhase& phase : m_contact_phases) {
+      if (phase.contactNormalForces().count(eeName) > 0) {
         res.add_curve_ptr(phase.contactNormalForces().at(eeName));
-      }else{
-        curve_ptr ptr(
-          new polynomial_t(zeros,phase.timeInitial(), phase.timeFinal()));
+      } else {
+        curve_ptr ptr(new polynomial_t(zeros, phase.timeInitial(), phase.timeFinal()));
         res.add_curve_ptr(ptr);
       }
     }
@@ -1133,9 +1119,9 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * @return the phase whose time interval contains 'time'
    * @throw invalid_argument error if no phase are found for this time
    */
-  ContactPhase& phaseAtTime(const double time){
+  ContactPhase& phaseAtTime(const double time) {
     const int id = phaseIdAtTime(time);
-    if(id >= 0 )
+    if (id >= 0)
       return m_contact_phases.at(id);
     else
       throw std::invalid_argument("No phase found for the given time.");
@@ -1149,14 +1135,13 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * @return the index of the phase whose time interval contain 'time', -1 if no phase are found
    */
   int phaseIdAtTime(const double time) const {
-    for(int i = 0 ; i < static_cast<int>(m_contact_phases.size()) ; ++i){
+    for (int i = 0; i < static_cast<int>(m_contact_phases.size()); ++i) {
       const ContactPhase& phase = m_contact_phases[i];
-      if(time >= phase.timeInitial() && time < phase.timeFinal()){
+      if (time >= phase.timeInitial() && time < phase.timeFinal()) {
         return i;
       }
     }
-    if(time == m_contact_phases.back().timeFinal())
-      return static_cast<int>(m_contact_phases.size() - 1);
+    if (time == m_contact_phases.back().timeFinal()) return static_cast<int>(m_contact_phases.size() - 1);
     return -1;
   }
 

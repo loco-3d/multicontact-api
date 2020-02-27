@@ -130,13 +130,14 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
              "and that the trajectories start and end and the correct values defined in each phase.")
         .def("haveEffectorsTrajectories", &CS::haveEffectorsTrajectories,
              cs_haveEffectorTrajectories_overloads(
-               (bp::args("precision_treshold") = Eigen::NumTraits<typename CS::Scalar>::dummy_precision()),
-             "check that for each phase preceeding a contact creation,"
-             "an SE3 trajectory is defined for the effector that will be in contact.\n"
-             "Also check that this trajectory is defined on the time-interval of the phase.\n"
-             "Also check that the trajectory correctly end at the placement defined for the contact in the next phase.\n"
-             "If this effector was in contact in the previous phase,"
-             "it check that the trajectory start at the previous contact placement."))
+                 (bp::args("precision_treshold") = Eigen::NumTraits<typename CS::Scalar>::dummy_precision()),
+                 "check that for each phase preceeding a contact creation,"
+                 "an SE3 trajectory is defined for the effector that will be in contact.\n"
+                 "Also check that this trajectory is defined on the time-interval of the phase.\n"
+                 "Also check that the trajectory correctly end at the placement defined for the contact in the next "
+                 "phase.\n"
+                 "If this effector was in contact in the previous phase,"
+                 "it check that the trajectory start at the previous contact placement."))
         .def("haveJointsTrajectories", &CS::haveJointsTrajectories,
              "Check that a q trajectory is defined for each phases.\n"
              "Also check that the time interval of this trajectories matches the one of the phase.\n"
@@ -161,7 +162,7 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
              "a friction coefficient initialized.")
         .def("haveZMPtrajectories", &CS::haveZMPtrajectories,
              "check that all the contact phases have a ZMP trajectory.")
-        .def("getAllEffectorsInContact",&getAllEffectorsInContactAsList,
+        .def("getAllEffectorsInContact", &getAllEffectorsInContactAsList,
              "return a list of names of all the effectors used to create contacts during the sequence")
         .def("concatenateCtrajectories", &CS::concatenateCtrajectories,
              "Return a piecewise curve wchich is the concatenation of the m_c curves"
@@ -199,35 +200,30 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
         .def("concatenateRootTrajectories", &CS::concatenateRootTrajectories,
              "Return a piecewise curve wchich is the concatenation of the m_root curves"
              " for each contact phases in the sequence.")
-        .def("concatenateEffectorTrajectories", &CS::concatenateEffectorTrajectories,
-             bp::arg("eeName"),
+        .def("concatenateEffectorTrajectories", &CS::concatenateEffectorTrajectories, bp::arg("eeName"),
              "Return a piecewise curve which is the concatenation"
              "of the effectors trajectories curves for the given effector"
              "for each contact phases in the sequence.\n"
              "During the phases where no effector trajectories are defined,"
              "the trajectory is constant  with the value of"
              "the last phase where it was defined.")
-        .def("concatenateContactForceTrajectories", &CS::concatenateContactForceTrajectories,
-             bp::arg("eeName"),
+        .def("concatenateContactForceTrajectories", &CS::concatenateContactForceTrajectories, bp::arg("eeName"),
              "Return a piecewise curve which"
              "is the concatenation of the contact forces for the given effector"
              "for each contact phases in the sequence.\n"
              "During the phases where no contact forces are defined,"
              "the trajectory is constant with the value of 0.")
-        .def("concatenateNormalForceTrajectories", &CS::concatenateNormalForceTrajectories,
-             bp::arg("eeName"),
+        .def("concatenateNormalForceTrajectories", &CS::concatenateNormalForceTrajectories, bp::arg("eeName"),
              "Return a piecewise curve which"
              "is the concatenation of the contact normal forces for the given effector"
              "for each contact phases in the sequence.\n"
              "During the phases where no contact normal forces are defined,"
              "the trajectory is constant with the value of 0.")
-        .def("phaseIdAtTime", &CS::phaseIdAtTime,
-             bp::arg("time"),
+        .def("phaseIdAtTime", &CS::phaseIdAtTime, bp::arg("time"),
              "return the index of a phase in the sequence such that "
              "phase.timeInitial <= t < phase.timeFinal \n"
              "if t equal to the last phase timeFinal, this index is returned.")
-        .def("phaseAtTime", &CS::phaseAtTime,
-             bp::arg("time"), bp::return_internal_reference<>(),
+        .def("phaseAtTime", &CS::phaseAtTime, bp::arg("time"), bp::return_internal_reference<>(),
              "return a phase of the sequence such that "
              "phase.timeInitial <= t < phase.timeFinal \n"
              "if t equal to the last phase timeFinal, this index is returned.")

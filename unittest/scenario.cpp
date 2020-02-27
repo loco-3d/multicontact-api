@@ -27,9 +27,9 @@ using curves::point6_t;
 typedef Eigen::Matrix<double, 12, 1> point12_t;
 using curves::curve_ptr_t;
 using curves::curve_SE3_ptr_t;
-using curves::piecewise_t;
-using curves::piecewise_SE3_t;
 using curves::matrix3_t;
+using curves::piecewise_SE3_t;
+using curves::piecewise_t;
 using curves::pointX_t;
 using curves::quaternion_t;
 using curves::t_point3_t;
@@ -103,7 +103,7 @@ curve_ptr_t buildRandomPolynomial(double min = -1, double max = -1) {
   pointX_t b = Point::Random();
   pointX_t c = Point::Random();
   pointX_t d = Point::Random();
-  if(min < 0 && max < 0){
+  if (min < 0 && max < 0) {
     const double t1 = Eigen::internal::random<double>(0., 10.);
     const double t2 = Eigen::internal::random<double>(0., 10.);
     min = std::min(t1, t2);
@@ -118,14 +118,17 @@ curve_ptr_t buildRandomPolynomial(double min = -1, double max = -1) {
   return res;
 }
 
-curve_ptr_t buildRandomPolynomial3D(double min = -1, double max = -1)
-{ return buildRandomPolynomial<point3_t>(min,max); }
+curve_ptr_t buildRandomPolynomial3D(double min = -1, double max = -1) {
+  return buildRandomPolynomial<point3_t>(min, max);
+}
 
-curve_ptr_t buildRandomPolynomial12D(double min = -1, double max = -1)
-{ return buildRandomPolynomial<point12_t>(min, max); }
+curve_ptr_t buildRandomPolynomial12D(double min = -1, double max = -1) {
+  return buildRandomPolynomial<point12_t>(min, max);
+}
 
-curve_ptr_t buildRandomPolynomial1D(double min = -1, double max = -1)
-{ return buildRandomPolynomial<point1_t>(min, max); }
+curve_ptr_t buildRandomPolynomial1D(double min = -1, double max = -1) {
+  return buildRandomPolynomial<point1_t>(min, max);
+}
 
 curve_SE3_ptr_t buildPiecewiseSE3() {
   const double min = 0.5;
@@ -1123,27 +1126,27 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
 
   // check that init/final are not modified if they ere already set :
   // NOT THE CORRECT BEHAVIOR ANYMORE
-//  ContactPhase cp2 = buildRandomContactPhase(0, 2);
-//  point3_t c_init, c_final, dc_init, dc_final, ddc_init, ddc_final;
-//  c_init = cp2.m_c_init;
-//  dc_init = cp2.m_dc_init;
-//  ddc_init = cp2.m_ddc_init;
-//  c_final = cp2.m_c_final;
-//  dc_final = cp2.m_dc_final;
-//  ddc_final = cp2.m_ddc_final;
-//  cp2.setCOMtrajectoryFromPoints(points, points_derivative, points_second_derivative, time_points);
-//  BOOST_CHECK(cp2.m_c_init.isApprox(c_init));
-//  BOOST_CHECK(cp2.m_c_final.isApprox(c_final));
-//  BOOST_CHECK(cp2.m_dc_init.isApprox(dc_init));
-//  BOOST_CHECK(cp2.m_dc_final.isApprox(dc_final));
-//  BOOST_CHECK(cp2.m_ddc_init.isApprox(ddc_init));
-//  BOOST_CHECK(cp2.m_ddc_final.isApprox(ddc_final));
-//  BOOST_CHECK(!cp2.m_c_init.isApprox(p0));
-//  BOOST_CHECK(!cp2.m_c_final.isApprox(p3));
-//  BOOST_CHECK(!cp2.m_dc_init.isApprox(d0));
-//  BOOST_CHECK(!cp2.m_dc_final.isApprox(d3));
-//  BOOST_CHECK(!cp2.m_ddc_init.isApprox(dd0));
-//  BOOST_CHECK(!cp2.m_ddc_final.isApprox(dd3));
+  //  ContactPhase cp2 = buildRandomContactPhase(0, 2);
+  //  point3_t c_init, c_final, dc_init, dc_final, ddc_init, ddc_final;
+  //  c_init = cp2.m_c_init;
+  //  dc_init = cp2.m_dc_init;
+  //  ddc_init = cp2.m_ddc_init;
+  //  c_final = cp2.m_c_final;
+  //  dc_final = cp2.m_dc_final;
+  //  ddc_final = cp2.m_ddc_final;
+  //  cp2.setCOMtrajectoryFromPoints(points, points_derivative, points_second_derivative, time_points);
+  //  BOOST_CHECK(cp2.m_c_init.isApprox(c_init));
+  //  BOOST_CHECK(cp2.m_c_final.isApprox(c_final));
+  //  BOOST_CHECK(cp2.m_dc_init.isApprox(dc_init));
+  //  BOOST_CHECK(cp2.m_dc_final.isApprox(dc_final));
+  //  BOOST_CHECK(cp2.m_ddc_init.isApprox(ddc_init));
+  //  BOOST_CHECK(cp2.m_ddc_final.isApprox(ddc_final));
+  //  BOOST_CHECK(!cp2.m_c_init.isApprox(p0));
+  //  BOOST_CHECK(!cp2.m_c_final.isApprox(p3));
+  //  BOOST_CHECK(!cp2.m_dc_init.isApprox(d0));
+  //  BOOST_CHECK(!cp2.m_dc_final.isApprox(d3));
+  //  BOOST_CHECK(!cp2.m_ddc_init.isApprox(dd0));
+  //  BOOST_CHECK(!cp2.m_ddc_final.isApprox(dd3));
 
   // check AM trajectory
 
@@ -1169,21 +1172,21 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
   BOOST_CHECK(cp.m_dL_final.isApprox(d3));
 
   // check that init/final are not modified if they ere already set :
-  //NOT THE CORRECT BEHAVIOR ANYMORE
-//  point3_t L_init, L_final, dL_init, dL_final;
-//  L_init = cp2.m_L_init;
-//  dL_init = cp2.m_dL_init;
-//  L_final = cp2.m_L_final;
-//  dL_final = cp2.m_dL_final;
-//  cp2.setAMtrajectoryFromPoints(points, points_derivative, time_points);
-//  BOOST_CHECK(cp2.m_L_init.isApprox(L_init));
-//  BOOST_CHECK(cp2.m_L_final.isApprox(L_final));
-//  BOOST_CHECK(cp2.m_dL_init.isApprox(dL_init));
-//  BOOST_CHECK(cp2.m_dL_final.isApprox(dL_final));
-//  BOOST_CHECK(!cp2.m_L_init.isApprox(p0));
-//  BOOST_CHECK(!cp2.m_L_final.isApprox(p3));
-//  BOOST_CHECK(!cp2.m_dL_init.isApprox(d0));
-//  BOOST_CHECK(!cp2.m_dL_final.isApprox(d3));
+  // NOT THE CORRECT BEHAVIOR ANYMORE
+  //  point3_t L_init, L_final, dL_init, dL_final;
+  //  L_init = cp2.m_L_init;
+  //  dL_init = cp2.m_dL_init;
+  //  L_final = cp2.m_L_final;
+  //  dL_final = cp2.m_dL_final;
+  //  cp2.setAMtrajectoryFromPoints(points, points_derivative, time_points);
+  //  BOOST_CHECK(cp2.m_L_init.isApprox(L_init));
+  //  BOOST_CHECK(cp2.m_L_final.isApprox(L_final));
+  //  BOOST_CHECK(cp2.m_dL_init.isApprox(dL_init));
+  //  BOOST_CHECK(cp2.m_dL_final.isApprox(dL_final));
+  //  BOOST_CHECK(!cp2.m_L_init.isApprox(p0));
+  //  BOOST_CHECK(!cp2.m_L_final.isApprox(p3));
+  //  BOOST_CHECK(!cp2.m_dL_init.isApprox(d0));
+  //  BOOST_CHECK(!cp2.m_dL_final.isApprox(d3));
 
   // check q trajectory :
   pointX_t q0 = point12_t::Random();
@@ -1242,14 +1245,14 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
 
   // check that init/final are not modified if they ere already set :
   // NOT THE CORRECT BEHAVIOR ANYMORE
-//  pointX_t q_init, q_final;
-//  q_init = cp2.m_q_init;
-//  q_final = cp2.m_q_final;
-//  cp2.setJointsTrajectoryFromPoints(points_q, points_derivative_q, points_second_derivative_q, time_points);
-//  BOOST_CHECK(cp2.m_q_init.isApprox(q_init));
-//  BOOST_CHECK(cp2.m_q_final.isApprox(q_final));
-//  BOOST_CHECK(!cp2.m_q_init.isApprox(q0));
-//  BOOST_CHECK(!cp2.m_q_final.isApprox(q3));
+  //  pointX_t q_init, q_final;
+  //  q_init = cp2.m_q_init;
+  //  q_final = cp2.m_q_final;
+  //  cp2.setJointsTrajectoryFromPoints(points_q, points_derivative_q, points_second_derivative_q, time_points);
+  //  BOOST_CHECK(cp2.m_q_init.isApprox(q_init));
+  //  BOOST_CHECK(cp2.m_q_final.isApprox(q_final));
+  //  BOOST_CHECK(!cp2.m_q_init.isApprox(q0));
+  //  BOOST_CHECK(!cp2.m_q_final.isApprox(q3));
 
   // check that errors are correctly throw when required :
   // not the correct size
@@ -1305,7 +1308,7 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
       std::invalid_argument);
 }
 
-BOOST_AUTO_TEST_CASE(contact_phase_helper_contact_variation){
+BOOST_AUTO_TEST_CASE(contact_phase_helper_contact_variation) {
   typedef ContactPhase::t_strings t_strings;
   // # contacts repositioned :
   ContactPhase cp1 = buildRandomContactPhase();
@@ -1677,11 +1680,11 @@ BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_com_traj) {
   time_points2.push_back(t3);
   time_points2.push_back(t4);
 
-  curves::piecewise_t c1 = curves::piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
-      points1, time_points1);
+  curves::piecewise_t c1 =
+      curves::piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points1, time_points1);
   curve_ptr_t c1_ptr(new curves::piecewise_t(c1));
-  curves::piecewise_t c2 = curves::piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
-      points2, time_points2);
+  curves::piecewise_t c2 =
+      curves::piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points2, time_points2);
   curve_ptr_t c2_ptr(new curves::piecewise_t(c2));
   cp0.m_c = c1_ptr;
   cp1.m_c = c2_ptr;
@@ -1694,11 +1697,11 @@ BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_com_traj) {
   piecewise_t c_t = cs1.concatenateCtrajectories();
   BOOST_CHECK(c_t.min() == 0.);
   BOOST_CHECK(c_t.max() == 4.);
-  BOOST_CHECK(c_t(0) == cp0.m_c->operator ()(0));
-  BOOST_CHECK(c_t(0.5) == cp0.m_c->operator ()(0.5));
-  BOOST_CHECK(c_t(2.) == cp0.m_c->operator ()(2.));
-  BOOST_CHECK(c_t(3) == cp1.m_c->operator ()(3));
-  BOOST_CHECK(c_t(4.) == cp1.m_c->operator ()(4.));
+  BOOST_CHECK(c_t(0) == cp0.m_c->operator()(0));
+  BOOST_CHECK(c_t(0.5) == cp0.m_c->operator()(0.5));
+  BOOST_CHECK(c_t(2.) == cp0.m_c->operator()(2.));
+  BOOST_CHECK(c_t(3) == cp1.m_c->operator()(3));
+  BOOST_CHECK(c_t(4.) == cp1.m_c->operator()(4.));
 }
 
 BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_effector_traj) {
@@ -1744,13 +1747,12 @@ BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_force_traj) {
   ContactPhase cp1 = ContactPhase(2, 4.);
   ContactPhase cp2 = ContactPhase(4, 8.);
 
-
   cp0.addContact("right_leg", ContactPatch());
   cp2.addContact("right_leg", ContactPatch());
-  curve_ptr_t f_0 = buildRandomPolynomial12D(0,2);
-  curve_ptr_t f_2 = buildRandomPolynomial12D(4,8);
-  cp0.addContactForceTrajectory("right_leg",f_0 );
-  cp2.addContactForceTrajectory("right_leg",f_2 );
+  curve_ptr_t f_0 = buildRandomPolynomial12D(0, 2);
+  curve_ptr_t f_2 = buildRandomPolynomial12D(4, 8);
+  cp0.addContactForceTrajectory("right_leg", f_0);
+  cp2.addContactForceTrajectory("right_leg", f_2);
 
   cs1.append(cp0);
   cs1.append(cp1);
@@ -1770,17 +1772,15 @@ BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_force_traj) {
   BOOST_CHECK(forces(3.8).isApprox(point12_t::Zero()));
 }
 
-
 BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_normal_force_traj) {
   ContactSequence cs1 = ContactSequence(0);
   ContactPhase cp0 = ContactPhase(0, 2);
   ContactPhase cp1 = ContactPhase(2, 4.);
   ContactPhase cp2 = ContactPhase(4, 8.);
 
-
   cp1.addContact("right_leg", ContactPatch());
-  curve_ptr_t f_1 = buildRandomPolynomial1D(2.,4.);
-  cp1.addContactNormalForceTrajectory("right_leg",f_1 );
+  curve_ptr_t f_1 = buildRandomPolynomial1D(2., 4.);
+  cp1.addContactNormalForceTrajectory("right_leg", f_1);
 
   cs1.append(cp0);
   cs1.append(cp1);
@@ -1796,9 +1796,7 @@ BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_normal_force_traj) {
   BOOST_CHECK(forces(1.5).isApprox(point1_t::Zero()));
   BOOST_CHECK(forces(4.).isApprox(point1_t::Zero()));
   BOOST_CHECK(forces(7.5).isApprox(point1_t::Zero()));
-
 }
-
 
 BOOST_AUTO_TEST_CASE(contact_sequence_phase_at_time) {
   ContactSequence cs1 = ContactSequence(0);
@@ -1821,7 +1819,6 @@ BOOST_AUTO_TEST_CASE(contact_sequence_phase_at_time) {
   BOOST_CHECK_EQUAL(cs1.phaseIdAtTime(-0.5), -1);
   BOOST_CHECK_EQUAL(cs1.phaseIdAtTime(10.), -1);
 
-
   BOOST_CHECK_EQUAL(cs1.phaseAtTime(0.), cp0);
   BOOST_CHECK_EQUAL(cs1.phaseAtTime(1.), cp0);
   BOOST_CHECK_EQUAL(cs1.phaseAtTime(1.9), cp0);
@@ -1832,9 +1829,6 @@ BOOST_AUTO_TEST_CASE(contact_sequence_phase_at_time) {
   BOOST_CHECK_EQUAL(cs1.phaseAtTime(8.), cp2);
   BOOST_CHECK_THROW(cs1.phaseAtTime(-0.5), std::invalid_argument);
   BOOST_CHECK_THROW(cs1.phaseAtTime(10.), std::invalid_argument);
-
 }
-
-
 
 BOOST_AUTO_TEST_SUITE_END()

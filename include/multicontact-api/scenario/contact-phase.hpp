@@ -462,13 +462,13 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
     m_dc = curve_ptr(c_t.compute_derivate_ptr(1));
     m_ddc = curve_ptr(c_t.compute_derivate_ptr(2));
     */
-    m_c = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
-                      points, time_points)));
-    m_dc = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
-                                       points_derivative, time_points)));
+    m_c = curve_ptr(new piecewise_t(
+        piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points, time_points)));
+    m_dc = curve_ptr(new piecewise_t(
+        piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points_derivative, time_points)));
     m_ddc = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
-                                        points_second_derivative, time_points)));
-    if(m_c->dim() != 3 || m_dc->dim() != 3 || m_ddc->dim() != 3)
+        points_second_derivative, time_points)));
+    if (m_c->dim() != 3 || m_dc->dim() != 3 || m_ddc->dim() != 3)
       throw std::invalid_argument("Dimension of the points must be 3.");
 
     m_c_init = point3_t(points.front());
@@ -498,12 +498,11 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
     m_L = curve_ptr(new piecewise_t(L_t));
     m_dL = curve_ptr(L_t.compute_derivate_ptr(1));
     */
-    m_L = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
-                      points, time_points)));
-    m_dL = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
-                                       points_derivative, time_points)));
-    if(m_L->dim() != 3 || m_dL->dim() != 3 )
-      throw std::invalid_argument("Dimension of the points must be 3.");
+    m_L = curve_ptr(new piecewise_t(
+        piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points, time_points)));
+    m_dL = curve_ptr(new piecewise_t(
+        piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points_derivative, time_points)));
+    if (m_L->dim() != 3 || m_dL->dim() != 3) throw std::invalid_argument("Dimension of the points must be 3.");
 
     m_L_init = point3_t(points.front());
     m_L_final = point3_t(points.back());
@@ -531,12 +530,12 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
     m_dq = curve_ptr(q_t.compute_derivate_ptr(1));
     m_ddq = curve_ptr(q_t.compute_derivate_ptr(2));
     */
-    m_q = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
-                      points, time_points)));
-    m_dq = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
-                                       points_derivative, time_points)));
+    m_q = curve_ptr(new piecewise_t(
+        piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points, time_points)));
+    m_dq = curve_ptr(new piecewise_t(
+        piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points_derivative, time_points)));
     m_ddq = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
-                                        points_second_derivative, time_points)));
+        points_second_derivative, time_points)));
     m_q_init = points.front();
     m_q_final = points.back();
     return;
@@ -549,9 +548,8 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
    */
   t_strings getContactsBroken(const ContactPhase& to) const {
     t_strings res;
-    for(std::string eeName : m_effector_in_contact){
-      if(!to.isEffectorInContact(eeName))
-        res.push_back(eeName);
+    for (std::string eeName : m_effector_in_contact) {
+      if (!to.isEffectorInContact(eeName)) res.push_back(eeName);
     }
     return res;
   }
@@ -563,9 +561,8 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
    */
   t_strings getContactsCreated(const ContactPhase& to) const {
     t_strings res;
-    for(std::string eeName : to.effectorsInContact()){
-      if(!isEffectorInContact(eeName))
-        res.push_back(eeName);
+    for (std::string eeName : to.effectorsInContact()) {
+      if (!isEffectorInContact(eeName)) res.push_back(eeName);
     }
     return res;
   }
@@ -579,10 +576,9 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
   t_strings getContactsRepositioned(const ContactPhase& to) const {
     t_strings res;
     const ContactPatchMap& to_patch_map = to.contactPatches();
-    for(std::string eeName : m_effector_in_contact){
-      if(to.isEffectorInContact(eeName))
-        if(m_contact_patches.at(eeName).placement() != to_patch_map.at(eeName).placement())
-          res.push_back(eeName);
+    for (std::string eeName : m_effector_in_contact) {
+      if (to.isEffectorInContact(eeName))
+        if (m_contact_patches.at(eeName).placement() != to_patch_map.at(eeName).placement()) res.push_back(eeName);
     }
     return res;
   }
@@ -593,19 +589,18 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
    * @return a list of string containing the effectors names
    */
   t_strings getContactsVariations(const ContactPhase& to) const {
-    std::set<std::string> set_res; // use intermediate set to guarantee uniqueness of element
-    for(std::string eeName : getContactsBroken(to)){
+    std::set<std::string> set_res;  // use intermediate set to guarantee uniqueness of element
+    for (std::string eeName : getContactsBroken(to)) {
       set_res.insert(eeName);
     }
-    for(std::string eeName : getContactsCreated(to)){
+    for (std::string eeName : getContactsCreated(to)) {
       set_res.insert(eeName);
     }
-    for(std::string eeName : getContactsRepositioned(to)){
+    for (std::string eeName : getContactsRepositioned(to)) {
       set_res.insert(eeName);
     }
     return t_strings(set_res.begin(), set_res.end());
   }
-
 
   /* End Helpers */
 
