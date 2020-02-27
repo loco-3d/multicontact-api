@@ -1,16 +1,16 @@
 # Copyright (c) 2019, CNRS
 # Authors: Pierre Fernbach <pfernbac@laas.fr>
 import unittest
+from math import cos, sin, sqrt
+from random import uniform
 
 import numpy as np
-from numpy import array, array_equal, random, isclose
-from random import uniform
-from math import sqrt, sin, cos
+from curves import SE3Curve, bezier, piecewise, piecewise_SE3, polynomial
+from numpy import array, array_equal, isclose, random
 
 import pinocchio as pin
-from pinocchio import SE3, Quaternion
-from curves import SE3Curve, polynomial, bezier, piecewise, piecewise_SE3
 from multicontact_api import ContactModelPlanar, ContactPatch, ContactPhase, ContactSequence
+from pinocchio import SE3, Quaternion
 
 pin.switchToNumpyArray()
 
@@ -26,9 +26,11 @@ def randomQuaternion():
     return q
 
 
-# build random piecewise polynomial with 2 polynomial of degree 3
-# between 01 and 12
 def createRandomPiecewisePolynomial(dim, t_min=0, t_max=2):
+    """
+    Build random piecewise polynomial with 2 polynomial of degree 3
+    between 01 and 12
+    """
     t_mid = (t_min + t_max) / 2.
     coefs0 = np.random.rand(dim, 4)  # degree 3
     pol0 = polynomial(coefs0, t_min, t_mid)
@@ -117,7 +119,7 @@ def addRandomContacts(cp):
 def addRandomForcesTrajs(cp):
     fR = createRandomPiecewisePolynomial(12)
     fL = createRandomPiecewisePolynomial(12)
-    fL2 = createRandomPiecewisePolynomial(12)
+    # fL2 = createRandomPiecewisePolynomial(12)
     cp.addContactForceTrajectory("right-leg", fR)
     cp.addContactForceTrajectory("left-leg", fL)
     fR = createRandomPiecewisePolynomial(1)
@@ -1213,25 +1215,25 @@ class ContactPhaseTest(unittest.TestCase):
         time_points = array(random.rand(1, N)).T
         time_points.sort(0)
         cp = ContactPhase()
-        cp.setCOMtrajectoryFromPoints(points,points_derivative,points_second_derivative,time_points)
+        cp.setCOMtrajectoryFromPoints(points, points_derivative, points_second_derivative, time_points)
         self.assertEqual(cp.c_t.min(), time_points[0])
         self.assertEqual(cp.c_t.max(), time_points[-1])
         self.assertEqual(cp.dc_t.dim(), 3)
         for i in range(N):
-            self.assertTrue(isclose(cp.c_t(time_points[i, 0]), points[:,i]).all())
-            self.assertTrue(isclose(cp.dc_t(time_points[i, 0]), points_derivative[:,i]).all())
-            self.assertTrue(isclose(cp.ddc_t(time_points[i, 0]), points_second_derivative[:,i]).all())
+            self.assertTrue(isclose(cp.c_t(time_points[i, 0]), points[:, i]).all())
+            self.assertTrue(isclose(cp.dc_t(time_points[i, 0]), points_derivative[:, i]).all())
+            self.assertTrue(isclose(cp.ddc_t(time_points[i, 0]), points_second_derivative[:, i]).all())
 
-        cp.setAMtrajectoryFromPoints(points,points_derivative,time_points)
+        cp.setAMtrajectoryFromPoints(points, points_derivative, time_points)
         for i in range(N):
-            self.assertTrue(isclose(cp.L_t(time_points[i, 0]), points[:,i]).all())
-            self.assertTrue(isclose(cp.dL_t(time_points[i, 0]), points_derivative[:,i]).all())
+            self.assertTrue(isclose(cp.L_t(time_points[i, 0]), points[:, i]).all())
+            self.assertTrue(isclose(cp.dL_t(time_points[i, 0]), points_derivative[:, i]).all())
 
-        cp.setJointsTrajectoryFromPoints(points,points_derivative,points_second_derivative,time_points)
+        cp.setJointsTrajectoryFromPoints(points, points_derivative, points_second_derivative, time_points)
         for i in range(N):
-            self.assertTrue(isclose(cp.q_t(time_points[i, 0]), points[:,i]).all())
-            self.assertTrue(isclose(cp.dq_t(time_points[i, 0]), points_derivative[:,i]).all())
-            self.assertTrue(isclose(cp.ddq_t(time_points[i, 0]), points_second_derivative[:,i]).all())
+            self.assertTrue(isclose(cp.q_t(time_points[i, 0]), points[:, i]).all())
+            self.assertTrue(isclose(cp.dq_t(time_points[i, 0]), points_derivative[:, i]).all())
+            self.assertTrue(isclose(cp.ddq_t(time_points[i, 0]), points_second_derivative[:, i]).all())
 
 
 class ContactSequenceTest(unittest.TestCase):
