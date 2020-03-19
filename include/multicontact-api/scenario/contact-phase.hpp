@@ -10,19 +10,16 @@
 #include "multicontact-api/serialization/spatial.hpp"
 
 #include <curves/fwd.h>
-#include <curves/curve_abc.h>
 #include <curves/piecewise_curve.h>
+#include <curves/serialization/curves.hpp>
 #include <map>
 #include <vector>
 #include <set>
 #include <string>
 #include <sstream>
-#include <boost/shared_ptr.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/vector.hpp>
-#include <curves/serialization/registeration.hpp>
 
 namespace multicontact_api {
 namespace scenario {
