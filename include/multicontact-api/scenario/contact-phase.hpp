@@ -42,9 +42,9 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
   typedef curves::curve_abc_t curve_t;
   // typedef curves::curve_abc<Scalar, Scalar, true, point3_t> curve_3_t;
   typedef curves::curve_SE3_t curve_SE3_t;
-  typedef boost::shared_ptr<curve_t> curve_ptr;
+  typedef curves::curve_ptr_t curve_ptr;
   // typedef boost::shared_ptr<curve_3_t> curve_3_ptr;
-  typedef boost::shared_ptr<curve_SE3_t> curve_SE3_ptr;
+  typedef curves::curve_SE3_ptr_t curve_SE3_ptr;
   typedef curves::piecewise3_t piecewise3_t;
   typedef curves::piecewise_t piecewise_t;
   typedef piecewise_t::t_time_t t_time_t;
