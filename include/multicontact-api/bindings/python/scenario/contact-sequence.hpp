@@ -229,7 +229,8 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
              "if t equal to the last phase timeFinal, this index is returned.")
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
-        .def("copy", &copy, "Returns a copy of *this.");
+        .def("copy", &copy, "Returns a copy of *this.")
+        .def_pickle(cs_pickle_suite());
   }
 
   static void expose(const std::string& class_name) {
@@ -260,6 +261,25 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
   static bp::list getAllEffectorsInContactAsList(CS& self) {
     return toPythonList<std::string>(self.getAllEffectorsInContact());
   }
+
+  struct cs_pickle_suite : bp::pickle_suite {
+
+      static bp::object getstate (const CS& cs) {
+          std::ostringstream os;
+          boost::archive::text_oarchive oa(os);
+          oa << cs;
+          return bp::str(os.str());
+      }
+
+      static void
+      setstate(CS& cs, bp::object entries) {
+          bp::str s = bp::extract<bp::str> (entries)();
+          std::string st = bp::extract<std::string> (s)();
+          std::istringstream is (st);
+          boost::archive::text_iarchive ia (is);
+          ia >> cs;
+      }
+  };
 };
 }  // namespace python
 }  // namespace multicontact_api
