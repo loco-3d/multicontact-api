@@ -1723,6 +1723,29 @@ BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_effector_traj) {
   BOOST_CHECK(traj(8.).isApprox(traj_2->operator()(8.)));
   BOOST_CHECK(traj(2.5).isApprox(traj_0->operator()(2.)));
   BOOST_CHECK(traj(3.8).isApprox(traj_0->operator()(2.)));
+  BOOST_CHECK_THROW(cs1.concatenateEffectorTrajectories("test"), std::invalid_argument);
+
+  ContactPhase cp3 = ContactPhase(8, 12.);
+  cs1.append(cp3);
+  traj = cs1.concatenateEffectorTrajectories("right_leg");
+  BOOST_CHECK(traj.min() == 0.);
+  BOOST_CHECK(traj.max() == 12.);
+
+  ContactPhase cpm1 = ContactPhase(-2., 0.);
+  ContactSequence cs2 = ContactSequence(0);
+
+  cs2.append(cpm1);
+  cs2.append(cp0);
+  cs2.append(cp1);
+  cs2.append(cp2);
+  traj = cs2.concatenateEffectorTrajectories("right_leg");
+  BOOST_CHECK(traj.min() == -2.);
+  BOOST_CHECK(traj.max() == 8.);
+
+  cs2.append(cp3);
+  traj = cs2.concatenateEffectorTrajectories("right_leg");
+  BOOST_CHECK(traj.min() == -2.);
+  BOOST_CHECK(traj.max() == 12.);
 }
 
 BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_force_traj) {
