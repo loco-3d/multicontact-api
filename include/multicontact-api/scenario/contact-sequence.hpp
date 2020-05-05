@@ -1025,7 +1025,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_SE3_t concatenateEffectorTrajectories(const std::string& eeName) const {
     piecewise_SE3_t res = piecewise_SE3_t();
-    transform_t last_placement;
+    transform_t last_placement, first_placement;
     // first find the first and last phase with a trajectory for this effector
     size_t first_phase = m_contact_phases.size();
     size_t last_phase = 0;
@@ -1034,8 +1034,16 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         last_phase = i;
         if (first_phase > i) {
           first_phase = i;
+          curve_SE3_ptr curve = m_contact_phases.at(i).effectorTrajectories().at(eeName);
+          first_placement = curve->operator()(curve->min());
         }
       }
+    }
+    if(first_phase > 0){
+      // add a first constant phase at the initial placement
+      curve_SE3_ptr ptr_init(new SE3Curve_t(first_placement, first_placement, m_contact_phases.at(0).timeInitial(),
+                                       m_contact_phases.at(first_phase).timeInitial()));
+      res.add_curve_ptr(ptr_init);
     }
     // loop over this phases to concatenate the trajectories
     for (size_t i = first_phase; i <= last_phase; ++i) {
@@ -1048,6 +1056,12 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
                                          m_contact_phases.at(i).timeFinal()));
         res.add_curve_ptr(ptr);
       }
+    }
+    if(last_phase < m_contact_phases.size() - 1){
+      // add a last constant phase until the end of the contact sequence
+      curve_SE3_ptr ptr_final(new SE3Curve_t(last_placement, last_placement, m_contact_phases.at(last_phase).timeFinal(),
+                                       m_contact_phases.back().timeFinal()));
+      res.add_curve_ptr(ptr_final);
     }
     return res;
   }
