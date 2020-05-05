@@ -1039,6 +1039,9 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         }
       }
     }
+    if(first_phase == m_contact_phases.size())
+      throw std::invalid_argument("The contact sequence doesn't have any phase with an effector trajectory"
+                                  " for the given effector name");
     if(first_phase > 0){
       // add a first constant phase at the initial placement
       curve_SE3_ptr ptr_init(new SE3Curve_t(first_placement, first_placement, m_contact_phases.at(0).timeInitial(),
