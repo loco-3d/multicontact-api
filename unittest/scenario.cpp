@@ -1,5 +1,5 @@
-// Copyright (c) 2015-2018, CNRS
-// Authors: Justin Carpentier <jcarpent@laas.fr>
+// Copyright (c) 2019-2020, CNRS
+// Authors: Pierre Fernbach <pierre.fernbach@laas.fr>,
 
 #include <iostream>
 
@@ -13,13 +13,10 @@
 #include "multicontact-api/scenario/contact-sequence.hpp"
 
 #include <curves/fwd.h>
-#include <curves/so3_linear.h>
 #include <curves/se3_curve.h>
 #include <curves/polynomial.h>
 #include <curves/bezier_curve.h>
 #include <curves/piecewise_curve.h>
-#include <curves/exact_cubic.h>
-#include <curves/cubic_hermite_spline.h>
 
 typedef Eigen::Matrix<double, 1, 1> point1_t;
 using curves::point3_t;
@@ -37,20 +34,7 @@ using curves::t_pointX_t;
 using namespace multicontact_api::scenario;
 typedef ContactSequence::ContactPhaseVector ContactPhaseVector;
 
-template <typename Scalar>
-struct ATpl {
-  typedef pinocchio::SE3Tpl<Scalar> SE3;
 
-  explicit ATpl() : data() {}
-  explicit ATpl(const ATpl& other) : data(other.data){};
-
-  bool operator==(const ATpl& other) { return data == other.data; }
-
- protected:
-  SE3 data;
-};
-
-typedef ATpl<double> Ad;
 typedef pinocchio::SE3Tpl<double> SE3;
 
 curve_ptr_t buildPiecewisePolynomialC2() {
