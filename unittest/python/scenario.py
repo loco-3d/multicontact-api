@@ -11,7 +11,7 @@ from numpy import array, array_equal, isclose, random
 import pinocchio as pin
 from multicontact_api import ContactModelPlanar, ContactPatch, ContactPhase, ContactSequence
 from pinocchio import SE3, Quaternion
-
+import pickle
 pin.switchToNumpyArray()
 
 
@@ -182,6 +182,9 @@ class ContactModelTest(unittest.TestCase):
         mp_xml = ContactModelPlanar()
         mp_xml.loadFromXML("mp_test.xml", 'ContactPatch')
         self.assertEqual(mp1, mp_xml)
+        mp_pickled = pickle.dumps(mp1)
+        mp_from_pickle = pickle.loads(mp_pickled)
+        self.assertEqual(mp1, mp_from_pickle)
 
     def test_contact_model_serialization_full(self):
         mu = 0.3
@@ -200,6 +203,9 @@ class ContactModelTest(unittest.TestCase):
         mp_xml = ContactModelPlanar()
         mp_xml.loadFromXML("mp_test.xml", 'ContactPatch')
         self.assertEqual(mp1, mp_xml)
+        mp_pickled = pickle.dumps(mp1)
+        mp_from_pickle = pickle.loads(mp_pickled)
+        self.assertEqual(mp1, mp_from_pickle)
 
 
 class ContactPatchTest(unittest.TestCase):
@@ -278,6 +284,9 @@ class ContactPatchTest(unittest.TestCase):
         cp_xml = ContactPatch()
         cp_xml.loadFromXML("cp_test.xml", 'ContactPatch')
         self.assertEqual(cp1, cp_xml)
+        cp_pickled = pickle.dumps(cp1)
+        cp_from_pickle = pickle.loads(cp_pickled)
+        self.assertEqual(cp1, cp_from_pickle)
 
     def test_serialization_full(self):
         p = SE3()
@@ -295,6 +304,9 @@ class ContactPatchTest(unittest.TestCase):
         cp_xml = ContactPatch()
         cp_xml.loadFromXML("cp_test.xml", 'ContactPatch')
         self.assertEqual(cp1, cp_xml)
+        cp_pickled = pickle.dumps(cp1)
+        cp_from_pickle = pickle.loads(cp_pickled)
+        self.assertEqual(cp1, cp_from_pickle)
 
 
 class ContactPhaseTest(unittest.TestCase):
@@ -1144,6 +1156,9 @@ class ContactPhaseTest(unittest.TestCase):
         cp_xml = ContactPhase()
         cp_xml.loadFromXML("cp_test.xml", 'ContactPhase')
         self.assertEqual(cp1, cp_xml)
+        cp_pickled = pickle.dumps(cp1)
+        cp_from_pickle = pickle.loads(cp_pickled)
+        self.assertEqual(cp1, cp_from_pickle)
 
     def test_contact_phase_serialization_full(self):
         cp1 = buildRandomContactPhase(0., 2.)
@@ -1160,6 +1175,9 @@ class ContactPhaseTest(unittest.TestCase):
         cp_xml.loadFromXML("cp_test_full.xml", 'ContactPhase')
         self.assertEqual(cp1, cp_xml)
         # TODO : check serialization from another file
+        cp_pickled = pickle.dumps(cp1)
+        cp_from_pickle = pickle.loads(cp_pickled)
+        self.assertEqual(cp1, cp_from_pickle)
 
     def test_contact_phase_contacts_variation(self):
         # # contacts repositioned :
@@ -1740,6 +1758,15 @@ class ContactSequenceTest(unittest.TestCase):
             cs1.phaseAtTime(-0.5)
         with self.assertRaises(ValueError):
             cs1.phaseAtTime(10.)
+
+    def test_pickle_contact_sequence(self):
+        cs = ContactSequence()
+        for i in range(10):
+            cp = buildRandomContactPhase(0., 2.)
+            cs.append(cp)
+        cs_pickled = pickle.dumps(cs)
+        cs_from_pickle = pickle.loads(cs_pickled)
+        self.assertEqual(cs_from_pickle, cs)
 
 
 if __name__ == '__main__':

@@ -260,6 +260,7 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
   static bp::list getAllEffectorsInContactAsList(CS& self) {
     return toPythonList<std::string>(self.getAllEffectorsInContact());
   }
+
 };
 }  // namespace python
 }  // namespace multicontact_api
