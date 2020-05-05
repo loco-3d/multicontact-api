@@ -24,6 +24,20 @@ cs = ContactSequence()
 cs.loadFromBinary(filename)
 ```
 
+## Display the motion in gepetto-gui
+
+A script is provided to load a motion and display it in gepetto-gui, this script require pinocchio (with python bindings) and gepetto-gui. 
+
+```
+python3 display_gepetto_gui.py CS_WB_NAME
+```
+
+Optionally, you can specify an environment to load in the viewer (the default is a flat floor at z=0)
+
+```
+python3 display_gepetto_gui.py CS_WB_NAME --env_name  multicontact/plateforme_surfaces
+```
+
 ## Suffix notation
 
 For the same scenario, several files may exist with different Suffixes, here is the meaning of this Suffixes:
