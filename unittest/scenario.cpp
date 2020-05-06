@@ -342,24 +342,24 @@ BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 BOOST_AUTO_TEST_CASE(contact_model) {
   ContactModel mp;
   BOOST_CHECK(mp.m_mu == -1.);
-  BOOST_CHECK(mp.m_contact_type == ContactType::UNDEFINED);
+  BOOST_CHECK(mp.m_contact_type == ContactType::CONTACT_UNDEFINED);
 
   const double mu = 0.3;
   ContactModel mp_mu(mu);
   BOOST_CHECK(mp_mu.m_mu == mu);
-  BOOST_CHECK(mp_mu.m_contact_type == ContactType::UNDEFINED);
+  BOOST_CHECK(mp_mu.m_contact_type == ContactType::CONTACT_UNDEFINED);
 
-  ContactModel mp1(mu, ContactType::PLANAR);
+  ContactModel mp1(mu, ContactType::CONTACT_PLANAR);
   ContactModel mp2(mp1);
   BOOST_CHECK(mp1.m_mu == mu);
-  BOOST_CHECK(mp1.m_contact_type == ContactType::PLANAR);
+  BOOST_CHECK(mp1.m_contact_type == ContactType::CONTACT_PLANAR);
 
   BOOST_CHECK(mp1 == mp2);
   mp1.m_mu = 0.5;
   BOOST_CHECK(mp1 != mp2);
   ContactModel mp3(mp1);
   BOOST_CHECK(mp1 == mp3);
-  mp3.m_contact_type = ContactType::POINT;
+  mp3.m_contact_type = ContactType::CONTACT_POINT;
   BOOST_CHECK(mp1 != mp3);
 
   std::string fileName("fileTest_contactModel");

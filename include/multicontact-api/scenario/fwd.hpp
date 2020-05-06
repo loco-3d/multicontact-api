@@ -29,7 +29,7 @@ template <typename Scalar>
 struct ContactModelTpl;
 typedef ContactModelTpl<double> ContactModel;
 
-enum ContactType { UNDEFINED, PLANAR, POINT };
+enum ContactType { CONTACT_UNDEFINED, CONTACT_PLANAR, CONTACT_POINT };
 enum ConicType { CONIC_SOWC, CONIC_DOUBLE_DESCRIPTION, CONIC_UNDEFINED };
 
 }  // namespace scenario

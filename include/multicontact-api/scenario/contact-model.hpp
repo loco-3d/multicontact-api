@@ -20,10 +20,10 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
   typedef _Scalar Scalar;
 
   /// \brief Default constructor.
-  ContactModelTpl() : m_mu(-1.), m_contact_type(ContactType::UNDEFINED) {}
+  ContactModelTpl() : m_mu(-1.), m_contact_type(ContactType::CONTACT_UNDEFINED) {}
 
   /// \brief Constructor with friction
-  ContactModelTpl(const Scalar mu) : m_mu(mu), m_contact_type(ContactType::UNDEFINED) {}
+  ContactModelTpl(const Scalar mu) : m_mu(mu), m_contact_type(ContactType::CONTACT_UNDEFINED) {}
 
   /// \brief Full constructor
   ContactModelTpl(const Scalar mu, const ContactType contact_type) : m_mu(mu), m_contact_type(contact_type) {}
