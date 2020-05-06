@@ -351,8 +351,29 @@ BOOST_AUTO_TEST_CASE(contact_model) {
   BOOST_CHECK(mp1 == mp2);
   mp1.m_mu = 0.5;
   BOOST_CHECK(mp1 != mp2);
+  ContactModelPlanar mp3(mp1);
+  BOOST_CHECK(mp1 == mp3);
+  mp3.m_ZMP_radius = 0.5;
+  BOOST_CHECK(mp1 != mp3);
 
-  // TODO : check serialization
+  std::cout<<"ContactModel Planar before serialization : \n "<<mp1<<std::endl;
+
+  std::string fileName("fileTest_contactModel");
+  mp1.saveAsText(fileName + ".txt");
+  ContactModelPlanar mp_from_text;
+  mp_from_text.loadFromText(fileName + ".txt");
+  std::cout<<"ContactModel Planar after serialization : \n "<<mp_from_text<<std::endl;
+  BOOST_CHECK(mp1 == mp_from_text);
+
+  mp1.saveAsXML(fileName + ".xml", "ContactModel");
+  ContactModelPlanar mp_from_xml;
+  mp_from_xml.loadFromXML(fileName + ".xml", "ContactModel");
+  BOOST_CHECK(mp1 == mp_from_xml);
+
+  mp1.saveAsBinary(fileName);
+  ContactModelPlanar mp_from_bin;
+  mp_from_bin.loadFromBinary(fileName);
+  BOOST_CHECK(mp1 == mp_from_bin);
 }
 
 BOOST_AUTO_TEST_CASE(contact_patch) {
