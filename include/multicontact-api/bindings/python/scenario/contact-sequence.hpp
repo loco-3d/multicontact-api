@@ -24,7 +24,7 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(cs_createContact_overloads, CS::createContact, 2, 3)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(cs_moveEffectorToPlacement_overloads, CS::moveEffectorToPlacement, 2, 4)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(cs_moveEffectorOf_overloads, CS::moveEffectorOf, 2, 4)
-  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(cs_haveEffectorTrajectories_overloads, CS::haveEffectorsTrajectories, 0, 1)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(cs_haveEffectorTrajectories_overloads, CS::haveEffectorsTrajectories, 0, 2)
 
   template <class PyClass>
   void visit(PyClass& cl) const {
@@ -130,14 +130,16 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
              "and that the trajectories start and end and the correct values defined in each phase.")
         .def("haveEffectorsTrajectories", &CS::haveEffectorsTrajectories,
              cs_haveEffectorTrajectories_overloads(
-                 (bp::args("precision_treshold") = Eigen::NumTraits<typename CS::Scalar>::dummy_precision()),
+                 (bp::args("precision_treshold") = Eigen::NumTraits<typename CS::Scalar>::dummy_precision(),
+                  bp::args("use_rotation") = true),
                  "check that for each phase preceeding a contact creation,"
                  "an SE3 trajectory is defined for the effector that will be in contact.\n"
                  "Also check that this trajectory is defined on the time-interval of the phase.\n"
                  "Also check that the trajectory correctly end at the placement defined for the contact in the next "
                  "phase.\n"
                  "If this effector was in contact in the previous phase,"
-                 "it check that the trajectory start at the previous contact placement."))
+                 "it check that the trajectory start at the previous contact placement.\n"
+                 "If use_rotation == false, only the translation part of the transforms are compared. "))
         .def("haveJointsTrajectories", &CS::haveJointsTrajectories,
              "Check that a q trajectory is defined for each phases.\n"
              "Also check that the time interval of this trajectories matches the one of the phase.\n"

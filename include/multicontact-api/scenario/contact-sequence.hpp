@@ -602,7 +602,8 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * placement.
    * @return
    */
-  bool haveEffectorsTrajectories(const Scalar prec = Eigen::NumTraits<Scalar>::dummy_precision()) const {
+  bool haveEffectorsTrajectories(const Scalar prec = Eigen::NumTraits<Scalar>::dummy_precision(),
+                                 const bool use_rotation = true) const {
     if (!haveTimings()) return false;
     for (size_t i = 0; i < m_contact_phases.size() - 1; ++i) {
       for (std::string eeName : m_contact_phases.at(i).getContactsCreated(m_contact_phases.at(i + 1))) {
@@ -621,7 +622,8 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
           return false;
         }
         ContactPatch::SE3 pMax = ContactPatch::SE3((*traj)(traj->max()).matrix());
-        if (!pMax.isApprox(m_contact_phases.at(i + 1).contactPatches().at(eeName).placement(), prec)) {
+        if ((use_rotation && ! pMax.isApprox(m_contact_phases.at(i + 1).contactPatches().at(eeName).placement(), prec))
+            || (! pMax.translation().isApprox(m_contact_phases.at(i + 1).contactPatches().at(eeName).placement().translation(), prec))) {
           std::cout << "Effector trajectory for " << eeName
                     << " do not end at it's contact placement in the next phase, for phase " << i << std::endl;
           std::cout << "Last point : " << std::endl
@@ -632,7 +634,9 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         }
         if (i > 0 && m_contact_phases.at(i - 1).isEffectorInContact(eeName)) {
           ContactPatch::SE3 pMin = ContactPatch::SE3((*traj)(traj->min()).matrix());
-          if (!pMin.isApprox(m_contact_phases.at(i - 1).contactPatches().at(eeName).placement(), prec)) {
+          if ((use_rotation && ! pMin.isApprox(m_contact_phases.at(i - 1).contactPatches().at(eeName).placement(), prec))
+              || (! pMin.translation().isApprox(m_contact_phases.at(i - 1).contactPatches().at(eeName).placement().translation(), prec)))
+          {
             std::cout << "Effector trajectory for " << eeName
                       << " do not start at it's contact placement in the previous phase, for phase " << i << std::endl;
             std::cout << "First point : " << std::endl
