@@ -20,19 +20,22 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
   typedef _Scalar Scalar;
 
   /// \brief Default constructor.
-  ContactModelTpl() : m_mu(-1.), m_ZMP_radius(-1.) {}
+  ContactModelTpl() : m_mu(-1.), m_contact_type(ContactType::UNDEFINED) {}
 
-  /// \brief Default constructor.
-  ContactModelTpl(const Scalar mu, const Scalar ZMP_radius) : m_mu(mu), m_ZMP_radius(ZMP_radius) {}
+  /// \brief Constructor with friction
+  ContactModelTpl(const Scalar mu) : m_mu(mu), m_contact_type(ContactType::UNDEFINED) {}
+
+  /// \brief Full constructor
+  ContactModelTpl(const Scalar mu, const ContactType contact_type) : m_mu(mu), m_contact_type(contact_type) {}
 
   /// \brief Copy constructor
   template <typename S2>
   explicit ContactModelTpl(const ContactModelTpl<S2>& other)
-      : m_mu(other.mu), m_ZMP_radius(other.ZMP_radius) {}
+      : m_mu(other.mu), m_contact_type(other.m_contact_type) {}
 
   template <typename S2>
   bool operator==(const ContactModelTpl<S2>& other) const {
-    return m_mu == other.m_mu && m_ZMP_radius == other.m_ZMP_radius;
+    return m_mu == other.m_mu && m_contact_type == other.m_contact_type;
   }
 
   template <typename S2>
@@ -41,7 +44,7 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
   }
 
   void disp(std::ostream& os) const {
-    os << "mu: " << m_mu << std::endl << "ZMP radius: " << m_ZMP_radius << std::endl;
+    os << "ContactType : " << m_contact_type << ", mu: " << m_mu << std::endl;
   }
 
   template <typename S2>
@@ -53,7 +56,7 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
   /// \brief Friction coefficient.
   Scalar m_mu;
   /// \brief ZMP radius.
-  Scalar m_ZMP_radius;
+  ContactType m_contact_type;
 
  private:
   // Serialization of the class
@@ -62,13 +65,13 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
   template <class Archive>
   void save(Archive& ar, const unsigned int /*version*/) const {
     ar& boost::serialization::make_nvp("mu", m_mu);
-    ar& boost::serialization::make_nvp("ZMP_radius", m_ZMP_radius);
+    ar& boost::serialization::make_nvp("contact_type", m_contact_type);
   }
 
   template <class Archive>
   void load(Archive& ar, const unsigned int /*version*/) {
     ar >> boost::serialization::make_nvp("mu", m_mu);
-    ar >> boost::serialization::make_nvp("ZMP_radius", m_ZMP_radius);
+    ar >> boost::serialization::make_nvp("contact_type", m_contact_type);
   }
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
