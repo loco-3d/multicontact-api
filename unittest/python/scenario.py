@@ -9,7 +9,7 @@ from curves import SE3Curve, bezier, piecewise, piecewise_SE3, polynomial
 from numpy import array, array_equal, isclose, random
 
 import pinocchio as pin
-from multicontact_api import ContactModel, ContactPatch, ContactPhase, ContactSequence
+from multicontact_api import ContactModel, ContactPatch, ContactPhase, ContactSequence, ContactType
 from pinocchio import SE3, Quaternion
 import pickle
 pin.switchToNumpyArray()
@@ -149,19 +149,28 @@ def buildRandomContactPhase(min=-1, max=-1):
 
 
 class ContactModelTest(unittest.TestCase):
-    def test_contact_model_planar(self):
+    def test_contact_model(self):
         mu = 0.3
-        zmp_radius = 0.01
+        # default constructor
+        mp = ContactModel()
+        self.assertEqual(mp.mu, -1.)
+        self.assertEqual(mp.contact_type, ContactType.CONTACT_UNDEFINED)
+
+        # constructor with friction
+        mp_mu = ContactModel(mu)
+        self.assertEqual(mp_mu.mu, mu)
+        self.assertEqual(mp_mu.contact_type, ContactType.CONTACT_UNDEFINED)
+
         # constructor with both values
-        mp1 = ContactModel(mu, zmp_radius)
+        mp1 = ContactModel(mu, ContactType.CONTACT_PLANAR)
         # test getter bindings
         self.assertEqual(mp1.mu, mu)
-        self.assertEqual(mp1.ZMP_radius, zmp_radius)
+        self.assertEqual(mp1.contact_type, ContactType.CONTACT_PLANAR)
 
         # copy constructor :
         mp2 = ContactModel(mp1)
         self.assertEqual(mp2.mu, mu)
-        self.assertEqual(mp2.ZMP_radius, zmp_radius)
+        self.assertEqual(mp2.contact_type, ContactType.CONTACT_PLANAR)
 
         # test operator ==
         self.assertTrue(mp1 == mp2)
@@ -188,9 +197,8 @@ class ContactModelTest(unittest.TestCase):
 
     def test_contact_model_serialization_full(self):
         mu = 0.3
-        zmp_radius = 0.01
         # constructor with both values
-        mp1 = ContactModel(mu, zmp_radius)
+        mp1 = ContactModel(mu, ContactType.CONTACT_PLANAR)
         mp1.saveAsText("mp_test.txt")
         mp_txt = ContactModel()
         mp_txt.loadFromText("mp_test.txt")

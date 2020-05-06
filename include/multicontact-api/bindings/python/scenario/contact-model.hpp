@@ -5,7 +5,7 @@
 #define __multicontact_api_python_scenario_contact_model_planar_hpp__
 
 #include <string>
-
+#include "multicontact-api/scenario/fwd.hpp"
 #include "multicontact-api/scenario/contact-model.hpp"
 #include "multicontact-api/bindings/python/serialization/archive.hpp"
 #include "multicontact-api/bindings/python/utils/printable.hpp"
@@ -19,14 +19,16 @@ template <typename ContactModel>
 struct ContactModelPythonVisitor
     : public boost::python::def_visitor<ContactModelPythonVisitor<ContactModel> > {
   typedef typename ContactModel::Scalar Scalar;
+  typedef scenario::ContactType ContactType;
 
   template <class PyClass>
   void visit(PyClass& cl) const {
     cl.def(bp::init<>())
-        .def(bp::init<Scalar, Scalar>(bp::args("mu", "ZMP_radius")))
+        .def(bp::init<Scalar>(bp::args("mu")))
+        .def(bp::init<Scalar, ContactType>(bp::args("mu", "contact_type")))
         .def(bp::init<ContactModel>(bp::args("other"), "Copy contructor."))
         .def_readwrite("mu", &ContactModel::m_mu, "Friction coefficient.")
-        .def_readwrite("ZMP_radius", &ContactModel::m_ZMP_radius, "Radius of the ZMP region.")
+        .def_readwrite("contact_type", &ContactModel::m_contact_type, "Enum that define the type of contact.")
 
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
@@ -34,7 +36,7 @@ struct ContactModelPythonVisitor
   }
 
   static void expose(const std::string& class_name) {
-    std::string doc = "Contact Model Planar";
+    std::string doc = "Contact Model";
     bp::class_<ContactModel>(class_name.c_str(), doc.c_str(), bp::no_init)
         .def(ContactModelPythonVisitor<ContactModel>())
         .def(SerializableVisitor<ContactModel>())
