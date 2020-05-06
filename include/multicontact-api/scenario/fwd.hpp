@@ -26,8 +26,8 @@ struct ContactSequenceTpl;
 typedef ContactSequenceTpl<ContactPhase> ContactSequence;
 
 template <typename Scalar>
-struct ContactModelPlanarTpl;
-typedef ContactModelPlanarTpl<double> ContactModelPlanar;
+struct ContactModelTpl;
+typedef ContactModelTpl<double> ContactModel;
 
 enum ConicType { CONIC_SOWC, CONIC_DOUBLE_DESCRIPTION, CONIC_UNDEFINED };
 

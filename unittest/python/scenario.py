@@ -9,7 +9,7 @@ from curves import SE3Curve, bezier, piecewise, piecewise_SE3, polynomial
 from numpy import array, array_equal, isclose, random
 
 import pinocchio as pin
-from multicontact_api import ContactModelPlanar, ContactPatch, ContactPhase, ContactSequence
+from multicontact_api import ContactModel, ContactPatch, ContactPhase, ContactSequence
 from pinocchio import SE3, Quaternion
 import pickle
 pin.switchToNumpyArray()
@@ -153,13 +153,13 @@ class ContactModelTest(unittest.TestCase):
         mu = 0.3
         zmp_radius = 0.01
         # constructor with both values
-        mp1 = ContactModelPlanar(mu, zmp_radius)
+        mp1 = ContactModel(mu, zmp_radius)
         # test getter bindings
         self.assertEqual(mp1.mu, mu)
         self.assertEqual(mp1.ZMP_radius, zmp_radius)
 
         # copy constructor :
-        mp2 = ContactModelPlanar(mp1)
+        mp2 = ContactModel(mp1)
         self.assertEqual(mp2.mu, mu)
         self.assertEqual(mp2.ZMP_radius, zmp_radius)
 
@@ -169,17 +169,17 @@ class ContactModelTest(unittest.TestCase):
         self.assertTrue(mp1 != mp2)
 
     def test_contact_model_serialization_default(self):
-        mp1 = ContactModelPlanar()
+        mp1 = ContactModel()
         mp1.saveAsText("mp_test.txt")
-        mp_txt = ContactModelPlanar()
+        mp_txt = ContactModel()
         mp_txt.loadFromText("mp_test.txt")
         self.assertEqual(mp1, mp_txt)
         mp1.saveAsBinary("mp_test")
-        mp_bin = ContactModelPlanar()
+        mp_bin = ContactModel()
         mp_bin.loadFromBinary("mp_test")
         self.assertEqual(mp1, mp_bin)
         mp1.saveAsXML("mp_test.xml", 'ContactModel')
-        mp_xml = ContactModelPlanar()
+        mp_xml = ContactModel()
         mp_xml.loadFromXML("mp_test.xml", 'ContactPatch')
         self.assertEqual(mp1, mp_xml)
         mp_pickled = pickle.dumps(mp1)
@@ -190,17 +190,17 @@ class ContactModelTest(unittest.TestCase):
         mu = 0.3
         zmp_radius = 0.01
         # constructor with both values
-        mp1 = ContactModelPlanar(mu, zmp_radius)
+        mp1 = ContactModel(mu, zmp_radius)
         mp1.saveAsText("mp_test.txt")
-        mp_txt = ContactModelPlanar()
+        mp_txt = ContactModel()
         mp_txt.loadFromText("mp_test.txt")
         self.assertEqual(mp1, mp_txt)
         mp1.saveAsBinary("mp_test")
-        mp_bin = ContactModelPlanar()
+        mp_bin = ContactModel()
         mp_bin.loadFromBinary("mp_test")
         self.assertEqual(mp1, mp_bin)
         mp1.saveAsXML("mp_test.xml", 'ContactModel')
-        mp_xml = ContactModelPlanar()
+        mp_xml = ContactModel()
         mp_xml.loadFromXML("mp_test.xml", 'ContactPatch')
         self.assertEqual(mp1, mp_xml)
         mp_pickled = pickle.dumps(mp1)
