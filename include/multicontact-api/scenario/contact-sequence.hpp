@@ -415,16 +415,16 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         std::cout << "CoM acceleration trajectory not defined for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_c->dim() != 3){
-        std::cout<<"CoM trajectory is not of dimension 3 for phase : " << i << std::endl;
+      if (phase.m_c->dim() != 3) {
+        std::cout << "CoM trajectory is not of dimension 3 for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_dc->dim() != 3){
-        std::cout<<"CoM velocity trajectory is not of dimension 3 for phase : " << i << std::endl;
+      if (phase.m_dc->dim() != 3) {
+        std::cout << "CoM velocity trajectory is not of dimension 3 for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_ddc->dim() != 3){
-        std::cout<<"CoM acceleration trajectory is not of dimension 3 for phase : " << i << std::endl;
+      if (phase.m_ddc->dim() != 3) {
+        std::cout << "CoM acceleration trajectory is not of dimension 3 for phase : " << i << std::endl;
         return false;
       }
       if (phase.m_c->min() != phase.timeInitial()) {
@@ -520,12 +520,12 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         std::cout << "AM velocity trajectory not defined for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_L->dim() != 3){
-        std::cout<<"AM trajectory is not of dimension 3 for phase : " << i << std::endl;
+      if (phase.m_L->dim() != 3) {
+        std::cout << "AM trajectory is not of dimension 3 for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_dL->dim() != 3){
-        std::cout<<"AM derivative trajectory is not of dimension 3 for phase : " << i << std::endl;
+      if (phase.m_dL->dim() != 3) {
+        std::cout << "AM derivative trajectory is not of dimension 3 for phase : " << i << std::endl;
         return false;
       }
       if (phase.m_L->min() != phase.timeInitial()) {
@@ -622,8 +622,10 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
           return false;
         }
         ContactPatch::SE3 pMax = ContactPatch::SE3((*traj)(traj->max()).matrix());
-        if ((use_rotation && ! pMax.isApprox(m_contact_phases.at(i + 1).contactPatches().at(eeName).placement(), prec))
-            || (! pMax.translation().isApprox(m_contact_phases.at(i + 1).contactPatches().at(eeName).placement().translation(), prec))) {
+        if ((use_rotation &&
+             !pMax.isApprox(m_contact_phases.at(i + 1).contactPatches().at(eeName).placement(), prec)) ||
+            (!pMax.translation().isApprox(
+                m_contact_phases.at(i + 1).contactPatches().at(eeName).placement().translation(), prec))) {
           std::cout << "Effector trajectory for " << eeName
                     << " do not end at it's contact placement in the next phase, for phase " << i << std::endl;
           std::cout << "Last point : " << std::endl
@@ -634,9 +636,10 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         }
         if (i > 0 && m_contact_phases.at(i - 1).isEffectorInContact(eeName)) {
           ContactPatch::SE3 pMin = ContactPatch::SE3((*traj)(traj->min()).matrix());
-          if ((use_rotation && ! pMin.isApprox(m_contact_phases.at(i - 1).contactPatches().at(eeName).placement(), prec))
-              || (! pMin.translation().isApprox(m_contact_phases.at(i - 1).contactPatches().at(eeName).placement().translation(), prec)))
-          {
+          if ((use_rotation &&
+               !pMin.isApprox(m_contact_phases.at(i - 1).contactPatches().at(eeName).placement(), prec)) ||
+              (!pMin.translation().isApprox(
+                  m_contact_phases.at(i - 1).contactPatches().at(eeName).placement().translation(), prec))) {
             std::cout << "Effector trajectory for " << eeName
                       << " do not start at it's contact placement in the previous phase, for phase " << i << std::endl;
             std::cout << "First point : " << std::endl
@@ -853,8 +856,8 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         std::cout << "ZMP trajectory not defined for phase : " << i << std::endl;
         return false;
       }
-      if(phase.m_zmp->dim() != 3){
-        std::cout<<"ZMP trajectory is not of dimension 3 for phase : " << i << std::endl;
+      if (phase.m_zmp->dim() != 3) {
+        std::cout << "ZMP trajectory is not of dimension 3 for phase : " << i << std::endl;
         return false;
       }
       if (phase.m_zmp->min() != phase.timeInitial()) {
