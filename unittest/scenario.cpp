@@ -1815,4 +1815,51 @@ BOOST_AUTO_TEST_CASE(contact_sequence_phase_at_time) {
   BOOST_CHECK_THROW(cs1.phaseAtTime(10.), std::invalid_argument);
 }
 
+
+BOOST_AUTO_TEST_CASE(contact_sequence_have_effector_trajectory){
+  ContactSequence cs1 = ContactSequence(0);
+  ContactPhase cp0 = ContactPhase(0, 1);
+  ContactPhase cp1 = ContactPhase(1, 2);
+  ContactPhase cp2 = ContactPhase(2, 3);
+
+  cp1.addEffectorTrajectory("left_foot", buildRandomSE3LinearTraj(1, 2));
+
+  cp0.addContact("left_foot", ContactPatch(SE3(cp1.effectorTrajectories("left_foot")->operator()(1.).matrix())));
+  cp2.addContact("left_foot", ContactPatch(SE3(cp1.effectorTrajectories("left_foot")->operator()(2.).matrix())));
+
+  cs1.append(cp0);
+  cs1.append(cp1);
+  cs1.append(cp2);
+  BOOST_CHECK(cs1.haveEffectorsTrajectories());
+  BOOST_CHECK(cs1.haveEffectorsTrajectories(1e-3));
+  BOOST_CHECK(cs1.haveEffectorsTrajectories(1e-3, true));
+}
+
+BOOST_AUTO_TEST_CASE(contact_sequence_have_effector_trajectory_no_rotation){
+  ContactSequence cs1 = ContactSequence(0);
+  ContactPhase cp0 = ContactPhase(0, 1);
+  ContactPhase cp1 = ContactPhase(1, 2);
+  ContactPhase cp2 = ContactPhase(2, 3);
+
+  cp1.addEffectorTrajectory("left_foot", buildRandomSE3LinearTraj(1, 2));
+  SE3 p0(cp1.effectorTrajectories("left_foot")->operator()(1.).matrix());
+  SE3 p1(cp1.effectorTrajectories("left_foot")->operator()(2.).matrix());
+  SE3 p0_r = SE3::Identity().setRandom();
+  SE3 p1_r = SE3::Identity().setRandom();
+  p0.rotation() = p0_r.rotation();
+  p1.rotation() = p1_r.rotation();
+
+  cp0.addContact("left_foot", ContactPatch(p0));
+  cp2.addContact("left_foot", ContactPatch(p1));
+
+  cs1.append(cp0);
+  cs1.append(cp1);
+  cs1.append(cp2);
+  BOOST_CHECK(!cs1.haveEffectorsTrajectories());
+  BOOST_CHECK(!cs1.haveEffectorsTrajectories(1e-6));
+  BOOST_CHECK(!cs1.haveEffectorsTrajectories(1e-6, true));
+  BOOST_CHECK(cs1.haveEffectorsTrajectories(1e-6, false));
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
