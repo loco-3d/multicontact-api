@@ -1815,6 +1815,57 @@ BOOST_AUTO_TEST_CASE(contact_sequence_phase_at_time) {
   BOOST_CHECK_THROW(cs1.phaseAtTime(10.), std::invalid_argument);
 }
 
+BOOST_AUTO_TEST_CASE(contact_sequence_have_trajectory){
+  ContactSequence cs1 = ContactSequence(0);
+  ContactPhase cp0 = ContactPhase(0, 2);
+  cp0.m_c = buildRandomPolynomial3D(0,2);
+  cp0.m_c_init = cp0.m_c->operator()(0);
+  cp0.m_c_final = cp0.m_c->operator()(2);
+  cp0.m_dc = buildRandomPolynomial3D(0,2);
+  cp0.m_dc_init = cp0.m_dc->operator()(0);
+  cp0.m_dc_final = cp0.m_dc->operator()(2);
+  cp0.m_ddc = buildRandomPolynomial3D(0,2);
+  cp0.m_ddc_init = cp0.m_ddc->operator()(0);
+  cp0.m_ddc_final = cp0.m_ddc->operator()(2);
+  cp0.m_L = buildRandomPolynomial3D(0,2);
+  cp0.m_L_init = cp0.m_L->operator()(0);
+  cp0.m_L_final = cp0.m_L->operator()(2);
+  cp0.m_dL = buildRandomPolynomial3D(0,2);
+  cp0.m_dL_init = cp0.m_dL->operator()(0);
+  cp0.m_dL_final = cp0.m_dL->operator()(2);
+  cp0.m_zmp = buildRandomPolynomial3D(0,2);
+
+  cs1.append(cp0);
+  BOOST_CHECK(cs1.haveCOMtrajectories());
+  BOOST_CHECK(cs1.haveAMtrajectories());
+  BOOST_CHECK(cs1.haveZMPtrajectories());
+}
+
+BOOST_AUTO_TEST_CASE(contact_sequence_have_trajectory_wrong_dimension){
+  ContactSequence cs1 = ContactSequence(0);
+  ContactPhase cp0 = ContactPhase(0, 2);
+  cp0.m_c = buildRandomPolynomial3D(0,2);
+  cp0.m_c_init = cp0.m_c->operator()(0);
+  cp0.m_c_final = cp0.m_c->operator()(2);
+  cp0.m_dc = buildRandomPolynomial12D(0,2);
+  cp0.m_dc_init = cp0.m_dc->operator()(0).head<3>();
+  cp0.m_dc_final = cp0.m_dc->operator()(2).head<3>();
+  cp0.m_ddc = buildRandomPolynomial3D(0,2);
+  cp0.m_ddc_init = cp0.m_ddc->operator()(0);
+  cp0.m_ddc_final = cp0.m_ddc->operator()(2);
+  cp0.m_L = buildRandomPolynomial12D(0,2);
+  cp0.m_L_init = cp0.m_L->operator()(0).head<3>();
+  cp0.m_L_final = cp0.m_L->operator()(2).head<3>();
+  cp0.m_dL = buildRandomPolynomial3D(0,2);
+  cp0.m_dL_init = cp0.m_dL->operator()(0);
+  cp0.m_dL_final = cp0.m_dL->operator()(2);
+  cp0.m_zmp = buildRandomPolynomial12D(0,2);
+
+  cs1.append(cp0);
+  BOOST_CHECK(! cs1.haveCOMtrajectories());
+  BOOST_CHECK(! cs1.haveAMtrajectories());
+  BOOST_CHECK(! cs1.haveZMPtrajectories());
+}
 
 BOOST_AUTO_TEST_CASE(contact_sequence_have_effector_trajectory){
   ContactSequence cs1 = ContactSequence(0);
