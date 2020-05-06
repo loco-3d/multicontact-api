@@ -415,6 +415,18 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         std::cout << "CoM acceleration trajectory not defined for phase : " << i << std::endl;
         return false;
       }
+      if(phase.m_c->dim() != 3){
+        std::cout<<"CoM trajectory is not of dimension 3 for phase : " << i << std::endl;
+        return false;
+      }
+      if(phase.m_dc->dim() != 3){
+        std::cout<<"CoM velocity trajectory is not of dimension 3 for phase : " << i << std::endl;
+        return false;
+      }
+      if(phase.m_ddc->dim() != 3){
+        std::cout<<"CoM acceleration trajectory is not of dimension 3 for phase : " << i << std::endl;
+        return false;
+      }
       if (phase.m_c->min() != phase.timeInitial()) {
         std::cout << "CoM trajectory do not start at t_init for phase : " << i << std::endl;
         return false;
@@ -506,6 +518,14 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
       }
       if (!phase.m_dL) {
         std::cout << "AM velocity trajectory not defined for phase : " << i << std::endl;
+        return false;
+      }
+      if(phase.m_L->dim() != 3){
+        std::cout<<"AM trajectory is not of dimension 3 for phase : " << i << std::endl;
+        return false;
+      }
+      if(phase.m_dL->dim() != 3){
+        std::cout<<"AM derivative trajectory is not of dimension 3 for phase : " << i << std::endl;
         return false;
       }
       if (phase.m_L->min() != phase.timeInitial()) {
@@ -827,6 +847,10 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     for (const ContactPhase& phase : m_contact_phases) {
       if (!phase.m_zmp) {
         std::cout << "ZMP trajectory not defined for phase : " << i << std::endl;
+        return false;
+      }
+      if(phase.m_zmp->dim() != 3){
+        std::cout<<"ZMP trajectory is not of dimension 3 for phase : " << i << std::endl;
         return false;
       }
       if (phase.m_zmp->min() != phase.timeInitial()) {
