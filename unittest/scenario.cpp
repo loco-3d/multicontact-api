@@ -362,13 +362,10 @@ BOOST_AUTO_TEST_CASE(contact_model) {
   mp3.m_contact_type = ContactType::POINT;
   BOOST_CHECK(mp1 != mp3);
 
-  std::cout<<"ContactModel before serialization : \n "<<mp1<<std::endl;
-
   std::string fileName("fileTest_contactModel");
   mp1.saveAsText(fileName + ".txt");
   ContactModel mp_from_text;
   mp_from_text.loadFromText(fileName + ".txt");
-  std::cout<<"ContactModel after serialization : \n "<<mp_from_text<<std::endl;
   BOOST_CHECK(mp1 == mp_from_text);
 
   mp1.saveAsXML(fileName + ".xml", "ContactModel");
