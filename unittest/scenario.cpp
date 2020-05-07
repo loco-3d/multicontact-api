@@ -34,6 +34,7 @@ using curves::t_pointX_t;
 using namespace multicontact_api::scenario;
 typedef ContactSequence::ContactPhaseVector ContactPhaseVector;
 typedef ContactModel::Matrix3X Matrix3X;
+typedef ContactModel::Matrix6X Matrix6X;
 
 typedef pinocchio::SE3Tpl<double> SE3;
 
@@ -384,6 +385,9 @@ BOOST_AUTO_TEST_CASE(contact_model_points_positions) {
   BOOST_CHECK_EQUAL(mp.num_contact_points(), 6);
   BOOST_CHECK_EQUAL(mp.contact_points_positions().cols(), 6);
   BOOST_CHECK(mp.contact_points_positions().isApprox(positions));
+  Matrix6X generators = mp.generatorMatrix();
+  BOOST_CHECK_EQUAL(generators.rows(), 6);
+  BOOST_CHECK_EQUAL(generators.cols(), 6*3);
 
   mp.num_contact_points(2);
   BOOST_CHECK_EQUAL(mp.num_contact_points(), 2);

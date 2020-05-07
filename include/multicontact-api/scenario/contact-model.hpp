@@ -9,6 +9,7 @@
 #include "multicontact-api/serialization/eigen-matrix.hpp"
 #include <iostream>
 #include <Eigen/Dense>
+#include <pinocchio/spatial/skew.hpp>
 
 namespace multicontact_api {
 namespace scenario {
@@ -18,7 +19,9 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   typedef _Scalar Scalar;
+  typedef Eigen::Matrix<Scalar, 3, 3> Matrix3;
   typedef Eigen::Matrix<Scalar, 3, Eigen::Dynamic> Matrix3X;
+  typedef Eigen::Matrix<Scalar, 6, Eigen::Dynamic> Matrix6X;
 
   /// \brief Default constructor.
   ContactModelTpl()
@@ -85,6 +88,21 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
   void contact_points_positions(const Matrix3X& positions) {
     m_contact_points_positions = positions;
     m_num_contact_points = positions.cols();
+  }
+
+  /**
+   * @brief generatorMatrix Return a 6x(num_contact_points*3) matrix
+   * containing the generator used to compute contact forces.
+   * @return
+   */
+  Matrix6X generatorMatrix() const {
+    Matrix6X gen = Matrix6X::Zero(6, m_num_contact_points * 3);
+    for(size_t i=0; i<m_num_contact_points; i++)
+    {
+      gen.block(0, i*3, 3, 3) = Matrix3::Identity();
+      gen.block(3, i*3, 3, 3) = pinocchio::skew(m_contact_points_positions.col(i));
+    }
+    return gen;
   }
 
   /// \brief Friction coefficient.
