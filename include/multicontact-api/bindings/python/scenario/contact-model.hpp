@@ -21,6 +21,7 @@ struct ContactModelPythonVisitor : public boost::python::def_visitor<ContactMode
   typedef typename ContactModel::Scalar Scalar;
   typedef scenario::ContactType ContactType;
   typedef typename ContactModel::Matrix3X Matrix3X;
+  typedef typename ContactModel::Matrix6X Matrix6X;
 
   template <class PyClass>
   void visit(PyClass& cl) const {
@@ -37,6 +38,9 @@ struct ContactModelPythonVisitor : public boost::python::def_visitor<ContactMode
                       "3xnum_contact_points matrix defining the contact points positions in the frame of the contact "
                       "placement. \n"
                       "num_contact_points is automatically updated to the number of columns of this matrix.")
+        .def("generatorMatrix", &ContactModel::generatorMatrix,
+             "generatorMatrix Return a 6x(num_contact_points*3) matrix"
+             "containing the generator used to compute contact forces.")
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
         .def("copy", &copy, "Returns a copy of *this.");
@@ -50,6 +54,7 @@ struct ContactModelPythonVisitor : public boost::python::def_visitor<ContactMode
         .def(PrintableVisitor<ContactModel>());
 
     ENABLE_SPECIFIC_MATRIX_TYPE(Matrix3X);
+    ENABLE_SPECIFIC_MATRIX_TYPE(Matrix6X);
   }
 
  private:

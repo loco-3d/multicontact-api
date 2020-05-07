@@ -208,6 +208,10 @@ class ContactModelTest(unittest.TestCase):
         self.assertEqual(mp1.contact_points_positions.shape[1], 5)
         self.assertTrue(isclose(mp1.contact_points_positions, pos).all())
 
+        generators = mp1.generatorMatrix()
+        self.assertEqual(generators.shape[0], 6)
+        self.assertEqual(generators.shape[1], 5*3)
+
         mp1.num_contact_points = 2
         self.assertEqual(mp1.num_contact_points, 2)
         self.assertEqual(mp1.contact_points_positions.shape[0], 3)
