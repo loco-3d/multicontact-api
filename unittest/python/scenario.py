@@ -1677,6 +1677,41 @@ class ContactSequenceTest(unittest.TestCase):
         consistent = cs4.haveTimings()
         self.assertFalse(consistent)
 
+    def test_contact_sequence_have_contact_model(self):
+        cs1 = ContactSequence(0)
+        cp0 = buildRandomContactPhase(0, 2)
+        cp1 = buildRandomContactPhase(2, 4.)
+        cs1.append(cp0)
+        cs1.append(cp1)
+        self.assertFalse(cs1.haveContactModelDefined())
+
+        mp1 = ContactModel(0.5, ContactType.CONTACT_PLANAR)
+        pos = np.random.rand(3, 5)
+        mp1.contact_points_positions = pos
+        mp2 = ContactModel(1., ContactType.CONTACT_POINT)
+        pos = np.random.rand(3, 5)
+        mp1.contact_points_positions = pos
+
+        cs1.contactPhases[0].contactPatch("right-leg").contact_model = mp1
+        cs1.contactPhases[0].contactPatch("left-leg").contact_model = mp2
+        cs1.contactPhases[1].contactPatch("right-leg").contact_model = mp1
+        cs1.contactPhases[1].contactPatch("left-leg").contact_model = mp2
+        self.assertTrue(cs1.haveContactModelDefined())
+
+        cp2 = buildRandomContactPhase(6., 8.)
+        cs1.append(cp2)
+        self.assertFalse(cs1.haveContactModelDefined())
+        mp3 = ContactModel(0.2)
+        cs1.contactPhases[2].contactPatch("right-leg").contact_model = mp3
+        cs1.contactPhases[2].contactPatch("left-leg").contact_model = mp2
+        self.assertFalse(cs1.haveContactModelDefined())
+
+        mp3.contact_type = ContactType.CONTACT_PLANAR  # do not change the contact model already in the seqence
+        self.assertFalse(cs1.haveContactModelDefined())
+
+        cs1.contactPhases[2].contactPatch("right-leg").contact_model.contact_type = ContactType.CONTACT_PLANAR
+        self.assertTrue(cs1.haveContactModelDefined())
+
     def test_contact_sequence_concatenate_config_traj(self):
         cs1 = ContactSequence(0)
         cp0 = buildRandomContactPhase(0, 2)
