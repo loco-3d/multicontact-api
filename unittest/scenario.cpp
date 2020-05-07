@@ -485,7 +485,16 @@ BOOST_AUTO_TEST_CASE(contact_patch) {
   cp5.friction() = 2.;
   BOOST_CHECK(cp4 != cp5);
 
+  ContactPatch cp6(cp4);
+  BOOST_CHECK(cp4 == cp6);
+  ContactModel mp1(cp4.friction(), ContactType::CONTACT_PLANAR);
+  Matrix3X positions = Matrix3X::Random(3, 4);
+  mp1.contact_points_positions(positions);
+  cp6.m_contact_model = mp1;
+  BOOST_CHECK(cp4 != cp6);
+
   // serialization :
+  cp3.m_contact_model = mp1;
   std::string fileName("fileTest");
   cp3.saveAsText(fileName);
   ContactPatch cp_from_text;
