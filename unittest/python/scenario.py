@@ -155,27 +155,64 @@ class ContactModelTest(unittest.TestCase):
         mp = ContactModel()
         self.assertEqual(mp.mu, -1.)
         self.assertEqual(mp.contact_type, ContactType.CONTACT_UNDEFINED)
+        self.assertEqual(mp.num_contact_points, 1)
+        self.assertEqual(len(mp.contact_points_positions.shape), 1)
+        self.assertEqual(mp.contact_points_positions.shape[0], 3)
+        self.assertTrue(not mp.contact_points_positions.any())
 
         # constructor with friction
         mp_mu = ContactModel(mu)
         self.assertEqual(mp_mu.mu, mu)
         self.assertEqual(mp_mu.contact_type, ContactType.CONTACT_UNDEFINED)
+        self.assertEqual(mp.num_contact_points, 1)
+        self.assertEqual(len(mp.contact_points_positions.shape), 1)
+        self.assertEqual(mp.contact_points_positions.shape[0], 3)
+        self.assertTrue(not mp.contact_points_positions.any())
 
         # constructor with both values
         mp1 = ContactModel(mu, ContactType.CONTACT_PLANAR)
         # test getter bindings
         self.assertEqual(mp1.mu, mu)
         self.assertEqual(mp1.contact_type, ContactType.CONTACT_PLANAR)
+        self.assertEqual(mp.num_contact_points, 1)
+        self.assertEqual(len(mp.contact_points_positions.shape), 1)
+        self.assertEqual(mp.contact_points_positions.shape[0], 3)
+        self.assertTrue(not mp.contact_points_positions.any())
 
         # copy constructor :
         mp2 = ContactModel(mp1)
         self.assertEqual(mp2.mu, mu)
         self.assertEqual(mp2.contact_type, ContactType.CONTACT_PLANAR)
+        self.assertEqual(mp.num_contact_points, 1)
+        self.assertEqual(len(mp.contact_points_positions.shape), 1)
+        self.assertEqual(mp.contact_points_positions.shape[0], 3)
+        self.assertTrue(not mp.contact_points_positions.any())
 
         # test operator ==
         self.assertTrue(mp1 == mp2)
         mp1.mu = 0.5
         self.assertTrue(mp1 != mp2)
+
+    def test_contact_model_contact_points(self):
+        mp1 = ContactModel(0.5, ContactType.CONTACT_PLANAR)
+        mp1.num_contact_points = 4
+        self.assertEqual(mp1.num_contact_points, 4)
+        self.assertEqual(mp1.contact_points_positions.shape[0], 3)
+        self.assertEqual(mp1.contact_points_positions.shape[1], 4)
+        self.assertTrue(not mp1.contact_points_positions.any())
+
+        pos = np.random.rand(3, 5)
+        mp1.contact_points_positions = pos
+        self.assertEqual(mp1.num_contact_points, 5)
+        self.assertEqual(mp1.contact_points_positions.shape[0], 3)
+        self.assertEqual(mp1.contact_points_positions.shape[1], 5)
+        self.assertTrue(isclose(mp1.contact_points_positions, pos).all())
+
+        mp1.num_contact_points = 2
+        self.assertEqual(mp1.num_contact_points, 2)
+        self.assertEqual(mp1.contact_points_positions.shape[0], 3)
+        self.assertEqual(mp1.contact_points_positions.shape[1], 2)
+        self.assertTrue(not mp1.contact_points_positions.any())
 
     def test_contact_model_serialization_default(self):
         mp1 = ContactModel()
@@ -331,6 +368,13 @@ class ContactPatchTest(unittest.TestCase):
         cp1.friction = 2
         self.assertEqual(cp1.contact_model.mu, 2)
         self.assertEqual(cm.mu, 2)
+
+        pos = np.random.rand(3, 4)
+        cp1.contact_model.contact_points_positions = pos
+        self.assertEqual(cp1.contact_model.num_contact_points, 4)
+        self.assertEqual(cp1.contact_model.contact_points_positions.shape[0], 3)
+        self.assertEqual(cp1.contact_model.contact_points_positions.shape[1], 4)
+        self.assertTrue(isclose(cp1.contact_model.contact_points_positions, pos).all())
 
 
 class ContactPhaseTest(unittest.TestCase):
