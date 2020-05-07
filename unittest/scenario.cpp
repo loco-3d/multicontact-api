@@ -1729,6 +1729,44 @@ BOOST_AUTO_TEST_CASE(contact_sequence_is_time_consistent) {
   BOOST_CHECK(!consistent);
 }
 
+BOOST_AUTO_TEST_CASE(contact_sequence_have_contact_model_defined) {
+  ContactSequence cs1 = ContactSequence(0);
+  ContactPhase cp0 = buildRandomContactPhase(0, 2);
+  ContactPhase cp1 = buildRandomContactPhase(2, 4.);
+  ContactPhase cp2 = buildRandomContactPhase(0, 2);
+  cs1.append(cp0);
+  cs1.append(cp1);
+
+//  cp.addContact("right_hand", ContactPatch(SE3::Identity().setRandom()));
+//  cp.addContact("left_foot", ContactPatch(SE3::Identity().setRandom()));
+  BOOST_CHECK(!cs1.haveContactModelDefined());
+  ContactModel mp1(0.3, ContactType::CONTACT_PLANAR);
+  Matrix3X positions = Matrix3X::Random(3, 4);
+  mp1.contact_points_positions(positions);
+  ContactModel mp2(0.5, ContactType::CONTACT_POINT);
+  Matrix3X positions2 = Matrix3X::Random(3, 1);
+  mp2.contact_points_positions(positions2);
+  cs1.contactPhase(0).contactPatch("right_hand").m_contact_model = mp1;
+  cs1.contactPhase(0).contactPatch("left_foot").m_contact_model = mp2;
+  cs1.contactPhase(1).contactPatch("right_hand").m_contact_model = mp1;
+  cs1.contactPhase(1).contactPatch("left_foot").m_contact_model = mp2;
+  BOOST_CHECK(cs1.haveContactModelDefined());
+
+  cs1.append(cp2);
+  BOOST_CHECK(!cs1.haveContactModelDefined());
+  ContactModel mp3(0.3);
+  cs1.contactPhase(2).contactPatch("right_hand").m_contact_model = mp3;
+  cs1.contactPhase(2).contactPatch("left_foot").m_contact_model = mp2;
+  BOOST_CHECK(!cs1.haveContactModelDefined());
+
+  mp3.m_contact_type = ContactType::CONTACT_PLANAR; // no effect
+  BOOST_CHECK(!cs1.haveContactModelDefined());
+
+  cs1.contactPhase(2).contactPatch("right_hand").m_contact_model.m_contact_type = ContactType::CONTACT_PLANAR;
+  BOOST_CHECK(cs1.haveContactModelDefined());
+}
+
+
 BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_com_traj) {
   ContactSequence cs1 = ContactSequence(0);
   ContactPhase cp0 = buildRandomContactPhase(0, 2);
