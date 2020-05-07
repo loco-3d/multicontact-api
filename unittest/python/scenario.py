@@ -316,6 +316,22 @@ class ContactPatchTest(unittest.TestCase):
         cp_from_pickle = pickle.loads(cp_pickled)
         self.assertEqual(cp1, cp_from_pickle)
 
+    def test_contact_patch_model_accessor(self):
+        p = SE3()
+        p.setRandom()
+        cp1 = ContactPatch(p, 0.9)
+        cm = cp1.contact_model
+        self.assertEqual(cm.mu, 0.9)
+        cm.mu = 0.5
+        self.assertEqual(cp1.friction, 0.5)
+
+        cp1.contact_model.contact_type = ContactType.CONTACT_PLANAR
+        self.assertEqual(cp1.contact_model.contact_type, ContactType.CONTACT_PLANAR)
+
+        cp1.friction = 2
+        self.assertEqual(cp1.contact_model.mu, 2)
+        self.assertEqual(cm.mu, 2)
+
 
 class ContactPhaseTest(unittest.TestCase):
     def test_default_constructor(self):

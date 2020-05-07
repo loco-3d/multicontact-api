@@ -20,16 +20,16 @@ struct ContactPatchTpl : public serialization::Serializable<ContactPatchTpl<_Sca
   typedef pinocchio::SE3Tpl<Scalar, 0> SE3;
 
   /// \brief Default constructor.
-  ContactPatchTpl() : m_placement(SE3::Identity()), m_contact_model() {}
+  ContactPatchTpl() : m_contact_model(), m_placement(SE3::Identity()) {}
 
   /// \brief Init contact patch from a given placement.
-  explicit ContactPatchTpl(const SE3& placement) : m_placement(placement), m_contact_model() {}
+  explicit ContactPatchTpl(const SE3& placement) : m_contact_model(), m_placement(placement) {}
 
   /// \brief Init contact patch from a given placement and a friction coefficient
-  ContactPatchTpl(const SE3& placement, const Scalar mu) : m_placement(placement), m_contact_model(mu) {}
+  ContactPatchTpl(const SE3& placement, const Scalar mu) : m_contact_model(mu), m_placement(placement) {}
 
   /// \brief Copy constructor
-  ContactPatchTpl(const ContactPatchTpl& other) : m_placement(other.m_placement), m_contact_model(other.m_contact_model) {}
+  ContactPatchTpl(const ContactPatchTpl& other) : m_contact_model(other.m_contact_model), m_placement(other.m_placement) {}
 
   const SE3& placement() const { return m_placement; }
   SE3& placement() { return m_placement; }
@@ -57,11 +57,12 @@ struct ContactPatchTpl : public serialization::Serializable<ContactPatchTpl<_Sca
     return os;
   }
 
+  /// \brief Contact model of this contact
+  ContactModel m_contact_model;
+
  protected:
   /// \brief Placement of the contact patch
   SE3 m_placement;
-  /// \brief friction coefficient for this contact
-  ContactModel m_contact_model;
 
  private:
   // Serialization of the class

@@ -29,7 +29,6 @@ struct ContactModelPythonVisitor
         .def(bp::init<ContactModel>(bp::args("other"), "Copy contructor."))
         .def_readwrite("mu", &ContactModel::m_mu, "Friction coefficient.")
         .def_readwrite("contact_type", &ContactModel::m_contact_type, "Enum that define the type of contact.")
-
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
         .def("copy", &copy, "Returns a copy of *this.");
