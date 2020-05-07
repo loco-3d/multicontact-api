@@ -26,7 +26,9 @@ void exposeEnumContactType() {
       .value("CONTACT_POINT", CONTACT_POINT);
 }
 
-
-void exposeScenarioEnums() { exposeEnumConicType(); exposeEnumContactType();}
+void exposeScenarioEnums() {
+  exposeEnumConicType();
+  exposeEnumContactType();
+}
 }  // namespace python
 }  // namespace multicontact_api

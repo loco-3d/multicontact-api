@@ -29,7 +29,8 @@ struct ContactPatchTpl : public serialization::Serializable<ContactPatchTpl<_Sca
   ContactPatchTpl(const SE3& placement, const Scalar mu) : m_contact_model(mu), m_placement(placement) {}
 
   /// \brief Copy constructor
-  ContactPatchTpl(const ContactPatchTpl& other) : m_contact_model(other.m_contact_model), m_placement(other.m_placement) {}
+  ContactPatchTpl(const ContactPatchTpl& other)
+      : m_contact_model(other.m_contact_model), m_placement(other.m_placement) {}
 
   const SE3& placement() const { return m_placement; }
   SE3& placement() { return m_placement; }
