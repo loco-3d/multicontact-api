@@ -819,6 +819,24 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
   }
 
   /**
+   * @brief haveContactModelDefined check that all the contact patch have a contact_model defined
+   * @return
+   */
+  bool haveContactModelDefined() const {
+    size_t i = 0;
+    for (const ContactPhase& phase : m_contact_phases) {
+      for (const std::string& eeName : phase.effectorsInContact()) {
+        if (phase.contactPatches().at(eeName).m_contact_model.m_contact_type == ContactType::CONTACT_UNDEFINED) {
+          std::cout << "ContactModel not defined for phase " << i << " and effector " << eeName << std::endl;
+          return false;
+        }
+      }
+      ++i;
+    }
+    return true;
+  }
+
+  /**
    * @brief haveZMPtrajectories check that all the contact phases have a zmp trajectory
    * @return
    */

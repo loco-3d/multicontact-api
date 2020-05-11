@@ -19,6 +19,16 @@ void exposeEnumConicType() {
       .value("CONIC_UNDEFINED", CONIC_UNDEFINED);
 }
 
-void exposeScenarioEnums() { exposeEnumConicType(); }
+void exposeEnumContactType() {
+  bp::enum_<ContactType>("ContactType")
+      .value("CONTACT_UNDEFINED", CONTACT_UNDEFINED)
+      .value("CONTACT_PLANAR", CONTACT_PLANAR)
+      .value("CONTACT_POINT", CONTACT_POINT);
+}
+
+void exposeScenarioEnums() {
+  exposeEnumConicType();
+  exposeEnumContactType();
+}
 }  // namespace python
 }  // namespace multicontact_api

@@ -160,6 +160,8 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
         .def("haveFriction", &CS::haveFriction,
              "check that all the contact patch used in the sequence have"
              "a friction coefficient initialized.")
+        .def("haveContactModelDefined", &CS::haveContactModelDefined,
+             "haveContactModelDefined check that all the contact patch have a contact_model defined")
         .def("haveZMPtrajectories", &CS::haveZMPtrajectories,
              "check that all the contact phases have a ZMP trajectory.")
         .def("getAllEffectorsInContact", &getAllEffectorsInContactAsList,
@@ -260,7 +262,6 @@ struct ContactSequencePythonVisitor : public bp::def_visitor<ContactSequencePyth
   static bp::list getAllEffectorsInContactAsList(CS& self) {
     return toPythonList<std::string>(self.getAllEffectorsInContact());
   }
-
 };
 }  // namespace python
 }  // namespace multicontact_api

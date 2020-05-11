@@ -7,7 +7,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/utility/binary.hpp>
 
-#include "multicontact-api/scenario/contact-model-planar.hpp"
+#include "multicontact-api/scenario/contact-model.hpp"
 #include "multicontact-api/scenario/contact-patch.hpp"
 #include "multicontact-api/scenario/contact-phase.hpp"
 #include "multicontact-api/scenario/contact-sequence.hpp"
@@ -33,7 +33,8 @@ using curves::t_point3_t;
 using curves::t_pointX_t;
 using namespace multicontact_api::scenario;
 typedef ContactSequence::ContactPhaseVector ContactPhaseVector;
-
+typedef ContactModel::Matrix3X Matrix3X;
+typedef ContactModel::Matrix6X Matrix6X;
 
 typedef pinocchio::SE3Tpl<double> SE3;
 
@@ -340,19 +341,107 @@ void explicitContactPhaseAssertEqual(ContactPhase& cp1, ContactPhase& cp2) {
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
 BOOST_AUTO_TEST_CASE(contact_model) {
-  const double mu = 0.3;
-  const double ZMP_radius = 0.01;
+  ContactModel mp;
+  BOOST_CHECK(mp.m_mu == -1.);
+  BOOST_CHECK(mp.m_contact_type == ContactType::CONTACT_UNDEFINED);
+  BOOST_CHECK(mp.num_contact_points() == 1);
+  BOOST_CHECK(mp.contact_points_positions().cols() == 1);
+  BOOST_CHECK(mp.contact_points_positions().isZero());
 
-  ContactModelPlanar mp1(mu, ZMP_radius);
-  ContactModelPlanar mp2(mp1);
+  const double mu = 0.3;
+  ContactModel mp_mu(mu);
+  BOOST_CHECK(mp_mu.m_mu == mu);
+  BOOST_CHECK(mp_mu.m_contact_type == ContactType::CONTACT_UNDEFINED);
+  BOOST_CHECK(mp_mu.num_contact_points() == 1);
+  BOOST_CHECK(mp_mu.contact_points_positions().cols() == 1);
+  BOOST_CHECK(mp_mu.contact_points_positions().isZero());
+
+  ContactModel mp1(mu, ContactType::CONTACT_PLANAR);
   BOOST_CHECK(mp1.m_mu == mu);
-  BOOST_CHECK(mp1.m_ZMP_radius == ZMP_radius);
+  BOOST_CHECK(mp1.m_contact_type == ContactType::CONTACT_PLANAR);
+  BOOST_CHECK(mp1.num_contact_points() == 1);
+  BOOST_CHECK(mp1.contact_points_positions().cols() == 1);
+  BOOST_CHECK(mp1.contact_points_positions().isZero());
+
+  ContactModel mp2(mp1);
+  BOOST_CHECK(mp2.m_mu == mu);
+  BOOST_CHECK(mp2.m_contact_type == ContactType::CONTACT_PLANAR);
+  BOOST_CHECK(mp2.num_contact_points() == 1);
+  BOOST_CHECK(mp2.contact_points_positions().cols() == 1);
+  BOOST_CHECK(mp2.contact_points_positions().isZero());
+}
+
+BOOST_AUTO_TEST_CASE(contact_model_points_positions) {
+  const double mu = 0.3;
+  ContactModel mp(mu, ContactType::CONTACT_PLANAR);
+
+  mp.num_contact_points(4);
+  BOOST_CHECK_EQUAL(mp.num_contact_points(), 4);
+  BOOST_CHECK_EQUAL(mp.contact_points_positions().cols(), 4);
+  BOOST_CHECK(mp.contact_points_positions().isZero());
+
+  Matrix3X positions = Matrix3X::Random(3, 6);
+  mp.contact_points_positions(positions);
+  BOOST_CHECK_EQUAL(mp.num_contact_points(), 6);
+  BOOST_CHECK_EQUAL(mp.contact_points_positions().cols(), 6);
+  BOOST_CHECK(mp.contact_points_positions().isApprox(positions));
+  Matrix6X generators = mp.generatorMatrix();
+  BOOST_CHECK_EQUAL(generators.rows(), 6);
+  BOOST_CHECK_EQUAL(generators.cols(), 6*3);
+
+  mp.num_contact_points(2);
+  BOOST_CHECK_EQUAL(mp.num_contact_points(), 2);
+  BOOST_CHECK_EQUAL(mp.contact_points_positions().cols(), 2);
+  BOOST_CHECK(mp.contact_points_positions().isZero());
+}
+
+BOOST_AUTO_TEST_CASE(contact_model_operator_equal) {
+  ContactModel mp1(0.3, ContactType::CONTACT_PLANAR);
+  Matrix3X positions = Matrix3X::Random(3, 4);
+  mp1.contact_points_positions(positions);
+
+  ContactModel mp2(0.3, ContactType::CONTACT_PLANAR);
+  mp2.contact_points_positions(positions);
+
+  ContactModel mp3(mp1);
 
   BOOST_CHECK(mp1 == mp2);
-  mp1.m_mu = 0.5;
-  BOOST_CHECK(mp1 != mp2);
+  BOOST_CHECK(mp1 == mp3);
 
-  // TODO : check serialization
+  ContactModel mp_n1(0.3, ContactType::CONTACT_PLANAR);
+  ContactModel mp_n2(1., ContactType::CONTACT_PLANAR);
+  mp1.contact_points_positions(positions);
+  ContactModel mp_n3(0.3, ContactType::CONTACT_UNDEFINED);
+  mp1.contact_points_positions(positions);
+  ContactModel mp_n4(0.3, ContactType::CONTACT_PLANAR);
+  mp_n4.num_contact_points(4);
+
+  BOOST_CHECK(mp1 != mp_n1);
+  BOOST_CHECK(mp1 != mp_n2);
+  BOOST_CHECK(mp1 != mp_n3);
+  BOOST_CHECK(mp1 != mp_n4);
+}
+
+BOOST_AUTO_TEST_CASE(contact_model_serialization) {
+  ContactModel mp1(0.3, ContactType::CONTACT_PLANAR);
+  Matrix3X positions = Matrix3X::Random(3, 4);
+  mp1.contact_points_positions(positions);
+
+  std::string fileName("fileTest_contactModel");
+  mp1.saveAsText(fileName + ".txt");
+  ContactModel mp_from_text;
+  mp_from_text.loadFromText(fileName + ".txt");
+  BOOST_CHECK(mp1 == mp_from_text);
+
+  mp1.saveAsXML(fileName + ".xml", "ContactModel");
+  ContactModel mp_from_xml;
+  mp_from_xml.loadFromXML(fileName + ".xml", "ContactModel");
+  BOOST_CHECK(mp1 == mp_from_xml);
+
+  mp1.saveAsBinary(fileName);
+  ContactModel mp_from_bin;
+  mp_from_bin.loadFromBinary(fileName);
+  BOOST_CHECK(mp1 == mp_from_bin);
 }
 
 BOOST_AUTO_TEST_CASE(contact_patch) {
@@ -400,7 +489,16 @@ BOOST_AUTO_TEST_CASE(contact_patch) {
   cp5.friction() = 2.;
   BOOST_CHECK(cp4 != cp5);
 
+  ContactPatch cp6(cp4);
+  BOOST_CHECK(cp4 == cp6);
+  ContactModel mp1(cp4.friction(), ContactType::CONTACT_PLANAR);
+  Matrix3X positions = Matrix3X::Random(3, 4);
+  mp1.contact_points_positions(positions);
+  cp6.m_contact_model = mp1;
+  BOOST_CHECK(cp4 != cp6);
+
   // serialization :
+  cp3.m_contact_model = mp1;
   std::string fileName("fileTest");
   cp3.saveAsText(fileName);
   ContactPatch cp_from_text;
@@ -1634,6 +1732,44 @@ BOOST_AUTO_TEST_CASE(contact_sequence_is_time_consistent) {
   consistent = cs4.haveTimings();
   BOOST_CHECK(!consistent);
 }
+
+BOOST_AUTO_TEST_CASE(contact_sequence_have_contact_model_defined) {
+  ContactSequence cs1 = ContactSequence(0);
+  ContactPhase cp0 = buildRandomContactPhase(0, 2);
+  ContactPhase cp1 = buildRandomContactPhase(2, 4.);
+  ContactPhase cp2 = buildRandomContactPhase(0, 2);
+  cs1.append(cp0);
+  cs1.append(cp1);
+
+//  cp.addContact("right_hand", ContactPatch(SE3::Identity().setRandom()));
+//  cp.addContact("left_foot", ContactPatch(SE3::Identity().setRandom()));
+  BOOST_CHECK(!cs1.haveContactModelDefined());
+  ContactModel mp1(0.3, ContactType::CONTACT_PLANAR);
+  Matrix3X positions = Matrix3X::Random(3, 4);
+  mp1.contact_points_positions(positions);
+  ContactModel mp2(0.5, ContactType::CONTACT_POINT);
+  Matrix3X positions2 = Matrix3X::Random(3, 1);
+  mp2.contact_points_positions(positions2);
+  cs1.contactPhase(0).contactPatch("right_hand").m_contact_model = mp1;
+  cs1.contactPhase(0).contactPatch("left_foot").m_contact_model = mp2;
+  cs1.contactPhase(1).contactPatch("right_hand").m_contact_model = mp1;
+  cs1.contactPhase(1).contactPatch("left_foot").m_contact_model = mp2;
+  BOOST_CHECK(cs1.haveContactModelDefined());
+
+  cs1.append(cp2);
+  BOOST_CHECK(!cs1.haveContactModelDefined());
+  ContactModel mp3(0.3);
+  cs1.contactPhase(2).contactPatch("right_hand").m_contact_model = mp3;
+  cs1.contactPhase(2).contactPatch("left_foot").m_contact_model = mp2;
+  BOOST_CHECK(!cs1.haveContactModelDefined());
+
+  mp3.m_contact_type = ContactType::CONTACT_PLANAR; // no effect
+  BOOST_CHECK(!cs1.haveContactModelDefined());
+
+  cs1.contactPhase(2).contactPatch("right_hand").m_contact_model.m_contact_type = ContactType::CONTACT_PLANAR;
+  BOOST_CHECK(cs1.haveContactModelDefined());
+}
+
 
 BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_com_traj) {
   ContactSequence cs1 = ContactSequence(0);

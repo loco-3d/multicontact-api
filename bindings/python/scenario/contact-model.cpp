@@ -2,12 +2,12 @@
 // Authors: Justin Carpentier <jcarpent@laas.fr>
 
 #include "multicontact-api/bindings/python/scenario/expose-scenario.hpp"
-#include "multicontact-api/bindings/python/scenario/contact-model-planar.hpp"
+#include "multicontact-api/bindings/python/scenario/contact-model.hpp"
 
 namespace multicontact_api {
 namespace python {
 void exposeContactModels() {
-  ContactModelPlanarPythonVisitor<multicontact_api::scenario::ContactModelPlanar>::expose("ContactModelPlanar");
+  ContactModelPythonVisitor<multicontact_api::scenario::ContactModel>::expose("ContactModel");
 }
 }  // namespace python
 }  // namespace multicontact_api

@@ -15,7 +15,7 @@ SET(${PROJECT_NAME}_SERIALIZATION_HEADERS
   )
 
 SET(${PROJECT_NAME}_SCENARIO_HEADERS
-  scenario/contact-model-planar.hpp
+  scenario/contact-model.hpp
   scenario/contact-patch.hpp
   scenario/contact-phase.hpp
   scenario/contact-sequence.hpp
@@ -29,7 +29,7 @@ SET(${PROJECT_NAME}_PYTHON_HEADERS
   bindings/python/geometry/linear-cone.hpp
   bindings/python/geometry/second-order-cone.hpp
   bindings/python/serialization/archive.hpp
-  bindings/python/scenario/contact-model-planar.hpp
+  bindings/python/scenario/contact-model.hpp
   bindings/python/scenario/contact-patch.hpp
   bindings/python/scenario/contact-phase.hpp
   bindings/python/scenario/contact-sequence.hpp

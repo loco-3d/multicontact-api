@@ -34,6 +34,7 @@ struct ContactPatchPythonVisitor : public boost::python::def_visitor<ContactPatc
                       "Placement of the patch represented as a pinocchio SE3 object.")
         .add_property("friction", &getFriction, &setFriction,
                       "Friction coefficient between the robot and the environment for this contact.")
+        .def_readwrite("contact_model", &ContactPatch::m_contact_model, "The contact model defining this contact.")
         .def(bp::self == bp::self)
         .def(bp::self != bp::self)
         .def("copy", &copy, "Returns a copy of *this.");
