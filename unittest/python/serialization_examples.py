@@ -149,6 +149,7 @@ class ExamplesSerialization(unittest.TestCase):
         self.assertTrue(cs.haveCentroidalValues())
         self.assertTrue(cs.haveCentroidalTrajectories())
         self.assertTrue(cs.haveEffectorsTrajectories())
+        self.assertTrue(cs.haveEffectorsTrajectories(1e-6, False))
         checkCS(self, cs, root=True, effector=True, wholeBody=False)
 
     def test_step_in_place_WB(self):

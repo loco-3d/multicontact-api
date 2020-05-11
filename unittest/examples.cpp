@@ -80,6 +80,7 @@ BOOST_AUTO_TEST_CASE(step_in_place_REF) {
   BOOST_CHECK(cs.haveCentroidalValues());
   BOOST_CHECK(cs.haveCentroidalTrajectories());
   BOOST_CHECK(cs.haveEffectorsTrajectories());
+  BOOST_CHECK(cs.haveEffectorsTrajectories(1e-6, false));
 }
 
 BOOST_AUTO_TEST_CASE(step_in_place_WB) {
