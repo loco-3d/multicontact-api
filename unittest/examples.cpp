@@ -143,14 +143,14 @@ BOOST_AUTO_TEST_CASE(step_in_place_quasistatic_WB) {
 BOOST_AUTO_TEST_CASE(walk_20cm) {
   ContactSequence cs;
   cs.loadFromBinary(path + "walk_20cm.cs");
-  BOOST_CHECK_EQUAL(cs.size(), 15);
+  BOOST_CHECK_EQUAL(cs.size(), 23);
   BOOST_CHECK(cs.haveConsistentContacts());
 }
 
 BOOST_AUTO_TEST_CASE(walk_20cm_COM) {
   ContactSequence cs;
   cs.loadFromBinary(path + "walk_20cm_COM.cs");
-  BOOST_CHECK_EQUAL(cs.size(), 15);
+  BOOST_CHECK_EQUAL(cs.size(), 23);
   BOOST_CHECK(cs.haveConsistentContacts());
   BOOST_CHECK(cs.haveTimings());
   BOOST_CHECK(cs.haveCentroidalValues());
@@ -160,18 +160,18 @@ BOOST_AUTO_TEST_CASE(walk_20cm_COM) {
 BOOST_AUTO_TEST_CASE(walk_20cm_REF) {
   ContactSequence cs;
   cs.loadFromBinary(path + "walk_20cm_REF.cs");
-  BOOST_CHECK_EQUAL(cs.size(), 15);
+  BOOST_CHECK_EQUAL(cs.size(), 23);
   BOOST_CHECK(cs.haveConsistentContacts());
   BOOST_CHECK(cs.haveTimings());
   BOOST_CHECK(cs.haveCentroidalValues());
   BOOST_CHECK(cs.haveCentroidalTrajectories());
-  BOOST_CHECK(cs.haveEffectorsTrajectories(1e-2));
+  BOOST_CHECK(cs.haveEffectorsTrajectories());
 }
 
 BOOST_AUTO_TEST_CASE(walk_20cm_WB) {
   ContactSequence cs;
   cs.loadFromBinary(path + "walk_20cm_WB.cs");
-  BOOST_CHECK_EQUAL(cs.size(), 15);
+  BOOST_CHECK_EQUAL(cs.size(), 23);
   BOOST_CHECK(cs.haveConsistentContacts());
   BOOST_CHECK(cs.haveTimings());
   BOOST_CHECK(cs.haveCentroidalValues());
