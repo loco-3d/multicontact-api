@@ -415,6 +415,18 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         std::cout << "CoM acceleration trajectory not defined for phase : " << i << std::endl;
         return false;
       }
+      if (phase.m_c->dim() != 3) {
+        std::cout << "CoM trajectory is not of dimension 3 for phase : " << i << std::endl;
+        return false;
+      }
+      if (phase.m_dc->dim() != 3) {
+        std::cout << "CoM velocity trajectory is not of dimension 3 for phase : " << i << std::endl;
+        return false;
+      }
+      if (phase.m_ddc->dim() != 3) {
+        std::cout << "CoM acceleration trajectory is not of dimension 3 for phase : " << i << std::endl;
+        return false;
+      }
       if (phase.m_c->min() != phase.timeInitial()) {
         std::cout << "CoM trajectory do not start at t_init for phase : " << i << std::endl;
         return false;
@@ -508,6 +520,14 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         std::cout << "AM velocity trajectory not defined for phase : " << i << std::endl;
         return false;
       }
+      if (phase.m_L->dim() != 3) {
+        std::cout << "AM trajectory is not of dimension 3 for phase : " << i << std::endl;
+        return false;
+      }
+      if (phase.m_dL->dim() != 3) {
+        std::cout << "AM derivative trajectory is not of dimension 3 for phase : " << i << std::endl;
+        return false;
+      }
       if (phase.m_L->min() != phase.timeInitial()) {
         std::cout << "AM trajectory do not start at t_init for phase : " << i << std::endl;
         return false;
@@ -582,7 +602,8 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    * placement.
    * @return
    */
-  bool haveEffectorsTrajectories(const Scalar prec = Eigen::NumTraits<Scalar>::dummy_precision()) const {
+  bool haveEffectorsTrajectories(const Scalar prec = Eigen::NumTraits<Scalar>::dummy_precision(),
+                                 const bool use_rotation = true) const {
     if (!haveTimings()) return false;
     for (size_t i = 0; i < m_contact_phases.size() - 1; ++i) {
       for (std::string eeName : m_contact_phases.at(i).getContactsCreated(m_contact_phases.at(i + 1))) {
@@ -601,7 +622,10 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
           return false;
         }
         ContactPatch::SE3 pMax = ContactPatch::SE3((*traj)(traj->max()).matrix());
-        if (!pMax.isApprox(m_contact_phases.at(i + 1).contactPatches().at(eeName).placement(), prec)) {
+        if ((use_rotation &&
+             !pMax.isApprox(m_contact_phases.at(i + 1).contactPatches().at(eeName).placement(), prec)) ||
+            (!pMax.translation().isApprox(
+                m_contact_phases.at(i + 1).contactPatches().at(eeName).placement().translation(), prec))) {
           std::cout << "Effector trajectory for " << eeName
                     << " do not end at it's contact placement in the next phase, for phase " << i << std::endl;
           std::cout << "Last point : " << std::endl
@@ -612,7 +636,10 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         }
         if (i > 0 && m_contact_phases.at(i - 1).isEffectorInContact(eeName)) {
           ContactPatch::SE3 pMin = ContactPatch::SE3((*traj)(traj->min()).matrix());
-          if (!pMin.isApprox(m_contact_phases.at(i - 1).contactPatches().at(eeName).placement(), prec)) {
+          if ((use_rotation &&
+               !pMin.isApprox(m_contact_phases.at(i - 1).contactPatches().at(eeName).placement(), prec)) ||
+              (!pMin.translation().isApprox(
+                  m_contact_phases.at(i - 1).contactPatches().at(eeName).placement().translation(), prec))) {
             std::cout << "Effector trajectory for " << eeName
                       << " do not start at it's contact placement in the previous phase, for phase " << i << std::endl;
             std::cout << "First point : " << std::endl
@@ -819,6 +846,24 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
   }
 
   /**
+   * @brief haveContactModelDefined check that all the contact patch have a contact_model defined
+   * @return
+   */
+  bool haveContactModelDefined() const {
+    size_t i = 0;
+    for (const ContactPhase& phase : m_contact_phases) {
+      for (const std::string& eeName : phase.effectorsInContact()) {
+        if (phase.contactPatches().at(eeName).m_contact_model.m_contact_type == ContactType::CONTACT_UNDEFINED) {
+          std::cout << "ContactModel not defined for phase " << i << " and effector " << eeName << std::endl;
+          return false;
+        }
+      }
+      ++i;
+    }
+    return true;
+  }
+
+  /**
    * @brief haveZMPtrajectories check that all the contact phases have a zmp trajectory
    * @return
    */
@@ -827,6 +872,10 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
     for (const ContactPhase& phase : m_contact_phases) {
       if (!phase.m_zmp) {
         std::cout << "ZMP trajectory not defined for phase : " << i << std::endl;
+        return false;
+      }
+      if (phase.m_zmp->dim() != 3) {
+        std::cout << "ZMP trajectory is not of dimension 3 for phase : " << i << std::endl;
         return false;
       }
       if (phase.m_zmp->min() != phase.timeInitial()) {
@@ -1025,7 +1074,7 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
    */
   piecewise_SE3_t concatenateEffectorTrajectories(const std::string& eeName) const {
     piecewise_SE3_t res = piecewise_SE3_t();
-    transform_t last_placement;
+    transform_t last_placement, first_placement;
     // first find the first and last phase with a trajectory for this effector
     size_t first_phase = m_contact_phases.size();
     size_t last_phase = 0;
@@ -1034,8 +1083,19 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         last_phase = i;
         if (first_phase > i) {
           first_phase = i;
+          curve_SE3_ptr curve = m_contact_phases.at(i).effectorTrajectories().at(eeName);
+          first_placement = curve->operator()(curve->min());
         }
       }
+    }
+    if(first_phase == m_contact_phases.size())
+      throw std::invalid_argument("The contact sequence doesn't have any phase with an effector trajectory"
+                                  " for the given effector name");
+    if(first_phase > 0){
+      // add a first constant phase at the initial placement
+      curve_SE3_ptr ptr_init(new SE3Curve_t(first_placement, first_placement, m_contact_phases.at(0).timeInitial(),
+                                       m_contact_phases.at(first_phase).timeInitial()));
+      res.add_curve_ptr(ptr_init);
     }
     // loop over this phases to concatenate the trajectories
     for (size_t i = first_phase; i <= last_phase; ++i) {
@@ -1048,6 +1108,12 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
                                          m_contact_phases.at(i).timeFinal()));
         res.add_curve_ptr(ptr);
       }
+    }
+    if(last_phase < m_contact_phases.size() - 1){
+      // add a last constant phase until the end of the contact sequence
+      curve_SE3_ptr ptr_final(new SE3Curve_t(last_placement, last_placement, m_contact_phases.at(last_phase).timeFinal(),
+                                       m_contact_phases.back().timeFinal()));
+      res.add_curve_ptr(ptr_final);
     }
     return res;
   }

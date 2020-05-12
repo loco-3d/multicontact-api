@@ -9,9 +9,9 @@ from curves import SE3Curve, bezier, piecewise, piecewise_SE3, polynomial
 from numpy import array, array_equal, isclose, random
 
 import pinocchio as pin
-from multicontact_api import ContactModelPlanar, ContactPatch, ContactPhase, ContactSequence
+from multicontact_api import ContactModel, ContactPatch, ContactPhase, ContactSequence, ContactType
 from pinocchio import SE3, Quaternion
-
+import pickle
 pin.switchToNumpyArray()
 
 
@@ -149,57 +149,112 @@ def buildRandomContactPhase(min=-1, max=-1):
 
 
 class ContactModelTest(unittest.TestCase):
-    def test_contact_model_planar(self):
+    def test_contact_model(self):
         mu = 0.3
-        zmp_radius = 0.01
+        # default constructor
+        mp = ContactModel()
+        self.assertEqual(mp.mu, -1.)
+        self.assertEqual(mp.contact_type, ContactType.CONTACT_UNDEFINED)
+        self.assertEqual(mp.num_contact_points, 1)
+        self.assertEqual(len(mp.contact_points_positions.shape), 1)
+        self.assertEqual(mp.contact_points_positions.shape[0], 3)
+        self.assertTrue(not mp.contact_points_positions.any())
+
+        # constructor with friction
+        mp_mu = ContactModel(mu)
+        self.assertEqual(mp_mu.mu, mu)
+        self.assertEqual(mp_mu.contact_type, ContactType.CONTACT_UNDEFINED)
+        self.assertEqual(mp.num_contact_points, 1)
+        self.assertEqual(len(mp.contact_points_positions.shape), 1)
+        self.assertEqual(mp.contact_points_positions.shape[0], 3)
+        self.assertTrue(not mp.contact_points_positions.any())
+
         # constructor with both values
-        mp1 = ContactModelPlanar(mu, zmp_radius)
+        mp1 = ContactModel(mu, ContactType.CONTACT_PLANAR)
         # test getter bindings
         self.assertEqual(mp1.mu, mu)
-        self.assertEqual(mp1.ZMP_radius, zmp_radius)
+        self.assertEqual(mp1.contact_type, ContactType.CONTACT_PLANAR)
+        self.assertEqual(mp.num_contact_points, 1)
+        self.assertEqual(len(mp.contact_points_positions.shape), 1)
+        self.assertEqual(mp.contact_points_positions.shape[0], 3)
+        self.assertTrue(not mp.contact_points_positions.any())
 
         # copy constructor :
-        mp2 = ContactModelPlanar(mp1)
+        mp2 = ContactModel(mp1)
         self.assertEqual(mp2.mu, mu)
-        self.assertEqual(mp2.ZMP_radius, zmp_radius)
+        self.assertEqual(mp2.contact_type, ContactType.CONTACT_PLANAR)
+        self.assertEqual(mp.num_contact_points, 1)
+        self.assertEqual(len(mp.contact_points_positions.shape), 1)
+        self.assertEqual(mp.contact_points_positions.shape[0], 3)
+        self.assertTrue(not mp.contact_points_positions.any())
 
         # test operator ==
         self.assertTrue(mp1 == mp2)
         mp1.mu = 0.5
         self.assertTrue(mp1 != mp2)
 
+    def test_contact_model_contact_points(self):
+        mp1 = ContactModel(0.5, ContactType.CONTACT_PLANAR)
+        mp1.num_contact_points = 4
+        self.assertEqual(mp1.num_contact_points, 4)
+        self.assertEqual(mp1.contact_points_positions.shape[0], 3)
+        self.assertEqual(mp1.contact_points_positions.shape[1], 4)
+        self.assertTrue(not mp1.contact_points_positions.any())
+
+        pos = np.random.rand(3, 5)
+        mp1.contact_points_positions = pos
+        self.assertEqual(mp1.num_contact_points, 5)
+        self.assertEqual(mp1.contact_points_positions.shape[0], 3)
+        self.assertEqual(mp1.contact_points_positions.shape[1], 5)
+        self.assertTrue(isclose(mp1.contact_points_positions, pos).all())
+
+        generators = mp1.generatorMatrix()
+        self.assertEqual(generators.shape[0], 6)
+        self.assertEqual(generators.shape[1], 5*3)
+
+        mp1.num_contact_points = 2
+        self.assertEqual(mp1.num_contact_points, 2)
+        self.assertEqual(mp1.contact_points_positions.shape[0], 3)
+        self.assertEqual(mp1.contact_points_positions.shape[1], 2)
+        self.assertTrue(not mp1.contact_points_positions.any())
+
     def test_contact_model_serialization_default(self):
-        mp1 = ContactModelPlanar()
+        mp1 = ContactModel()
         mp1.saveAsText("mp_test.txt")
-        mp_txt = ContactModelPlanar()
+        mp_txt = ContactModel()
         mp_txt.loadFromText("mp_test.txt")
         self.assertEqual(mp1, mp_txt)
         mp1.saveAsBinary("mp_test")
-        mp_bin = ContactModelPlanar()
+        mp_bin = ContactModel()
         mp_bin.loadFromBinary("mp_test")
         self.assertEqual(mp1, mp_bin)
         mp1.saveAsXML("mp_test.xml", 'ContactModel')
-        mp_xml = ContactModelPlanar()
+        mp_xml = ContactModel()
         mp_xml.loadFromXML("mp_test.xml", 'ContactPatch')
         self.assertEqual(mp1, mp_xml)
+        mp_pickled = pickle.dumps(mp1)
+        mp_from_pickle = pickle.loads(mp_pickled)
+        self.assertEqual(mp1, mp_from_pickle)
 
     def test_contact_model_serialization_full(self):
         mu = 0.3
-        zmp_radius = 0.01
         # constructor with both values
-        mp1 = ContactModelPlanar(mu, zmp_radius)
+        mp1 = ContactModel(mu, ContactType.CONTACT_PLANAR)
         mp1.saveAsText("mp_test.txt")
-        mp_txt = ContactModelPlanar()
+        mp_txt = ContactModel()
         mp_txt.loadFromText("mp_test.txt")
         self.assertEqual(mp1, mp_txt)
         mp1.saveAsBinary("mp_test")
-        mp_bin = ContactModelPlanar()
+        mp_bin = ContactModel()
         mp_bin.loadFromBinary("mp_test")
         self.assertEqual(mp1, mp_bin)
         mp1.saveAsXML("mp_test.xml", 'ContactModel')
-        mp_xml = ContactModelPlanar()
+        mp_xml = ContactModel()
         mp_xml.loadFromXML("mp_test.xml", 'ContactPatch')
         self.assertEqual(mp1, mp_xml)
+        mp_pickled = pickle.dumps(mp1)
+        mp_from_pickle = pickle.loads(mp_pickled)
+        self.assertEqual(mp1, mp_from_pickle)
 
 
 class ContactPatchTest(unittest.TestCase):
@@ -278,6 +333,9 @@ class ContactPatchTest(unittest.TestCase):
         cp_xml = ContactPatch()
         cp_xml.loadFromXML("cp_test.xml", 'ContactPatch')
         self.assertEqual(cp1, cp_xml)
+        cp_pickled = pickle.dumps(cp1)
+        cp_from_pickle = pickle.loads(cp_pickled)
+        self.assertEqual(cp1, cp_from_pickle)
 
     def test_serialization_full(self):
         p = SE3()
@@ -295,6 +353,32 @@ class ContactPatchTest(unittest.TestCase):
         cp_xml = ContactPatch()
         cp_xml.loadFromXML("cp_test.xml", 'ContactPatch')
         self.assertEqual(cp1, cp_xml)
+        cp_pickled = pickle.dumps(cp1)
+        cp_from_pickle = pickle.loads(cp_pickled)
+        self.assertEqual(cp1, cp_from_pickle)
+
+    def test_contact_patch_model_accessor(self):
+        p = SE3()
+        p.setRandom()
+        cp1 = ContactPatch(p, 0.9)
+        cm = cp1.contact_model
+        self.assertEqual(cm.mu, 0.9)
+        cm.mu = 0.5
+        self.assertEqual(cp1.friction, 0.5)
+
+        cp1.contact_model.contact_type = ContactType.CONTACT_PLANAR
+        self.assertEqual(cp1.contact_model.contact_type, ContactType.CONTACT_PLANAR)
+
+        cp1.friction = 2
+        self.assertEqual(cp1.contact_model.mu, 2)
+        self.assertEqual(cm.mu, 2)
+
+        pos = np.random.rand(3, 4)
+        cp1.contact_model.contact_points_positions = pos
+        self.assertEqual(cp1.contact_model.num_contact_points, 4)
+        self.assertEqual(cp1.contact_model.contact_points_positions.shape[0], 3)
+        self.assertEqual(cp1.contact_model.contact_points_positions.shape[1], 4)
+        self.assertTrue(isclose(cp1.contact_model.contact_points_positions, pos).all())
 
 
 class ContactPhaseTest(unittest.TestCase):
@@ -1144,6 +1228,9 @@ class ContactPhaseTest(unittest.TestCase):
         cp_xml = ContactPhase()
         cp_xml.loadFromXML("cp_test.xml", 'ContactPhase')
         self.assertEqual(cp1, cp_xml)
+        cp_pickled = pickle.dumps(cp1)
+        cp_from_pickle = pickle.loads(cp_pickled)
+        self.assertEqual(cp1, cp_from_pickle)
 
     def test_contact_phase_serialization_full(self):
         cp1 = buildRandomContactPhase(0., 2.)
@@ -1160,6 +1247,9 @@ class ContactPhaseTest(unittest.TestCase):
         cp_xml.loadFromXML("cp_test_full.xml", 'ContactPhase')
         self.assertEqual(cp1, cp_xml)
         # TODO : check serialization from another file
+        cp_pickled = pickle.dumps(cp1)
+        cp_from_pickle = pickle.loads(cp_pickled)
+        self.assertEqual(cp1, cp_from_pickle)
 
     def test_contact_phase_contacts_variation(self):
         # # contacts repositioned :
@@ -1591,6 +1681,41 @@ class ContactSequenceTest(unittest.TestCase):
         consistent = cs4.haveTimings()
         self.assertFalse(consistent)
 
+    def test_contact_sequence_have_contact_model(self):
+        cs1 = ContactSequence(0)
+        cp0 = buildRandomContactPhase(0, 2)
+        cp1 = buildRandomContactPhase(2, 4.)
+        cs1.append(cp0)
+        cs1.append(cp1)
+        self.assertFalse(cs1.haveContactModelDefined())
+
+        mp1 = ContactModel(0.5, ContactType.CONTACT_PLANAR)
+        pos = np.random.rand(3, 5)
+        mp1.contact_points_positions = pos
+        mp2 = ContactModel(1., ContactType.CONTACT_POINT)
+        pos = np.random.rand(3, 5)
+        mp1.contact_points_positions = pos
+
+        cs1.contactPhases[0].contactPatch("right-leg").contact_model = mp1
+        cs1.contactPhases[0].contactPatch("left-leg").contact_model = mp2
+        cs1.contactPhases[1].contactPatch("right-leg").contact_model = mp1
+        cs1.contactPhases[1].contactPatch("left-leg").contact_model = mp2
+        self.assertTrue(cs1.haveContactModelDefined())
+
+        cp2 = buildRandomContactPhase(6., 8.)
+        cs1.append(cp2)
+        self.assertFalse(cs1.haveContactModelDefined())
+        mp3 = ContactModel(0.2)
+        cs1.contactPhases[2].contactPatch("right-leg").contact_model = mp3
+        cs1.contactPhases[2].contactPatch("left-leg").contact_model = mp2
+        self.assertFalse(cs1.haveContactModelDefined())
+
+        mp3.contact_type = ContactType.CONTACT_PLANAR  # do not change the contact model already in the seqence
+        self.assertFalse(cs1.haveContactModelDefined())
+
+        cs1.contactPhases[2].contactPatch("right-leg").contact_model.contact_type = ContactType.CONTACT_PLANAR
+        self.assertTrue(cs1.haveContactModelDefined())
+
     def test_contact_sequence_concatenate_config_traj(self):
         cs1 = ContactSequence(0)
         cp0 = buildRandomContactPhase(0, 2)
@@ -1740,6 +1865,15 @@ class ContactSequenceTest(unittest.TestCase):
             cs1.phaseAtTime(-0.5)
         with self.assertRaises(ValueError):
             cs1.phaseAtTime(10.)
+
+    def test_pickle_contact_sequence(self):
+        cs = ContactSequence()
+        for i in range(10):
+            cp = buildRandomContactPhase(0., 2.)
+            cs.append(cp)
+        cs_pickled = pickle.dumps(cs)
+        cs_from_pickle = pickle.loads(cs_pickled)
+        self.assertEqual(cs_from_pickle, cs)
 
 
 if __name__ == '__main__':
