@@ -13,6 +13,22 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/version.hpp>
+
+const unsigned int API_VERSION = 1;  // must be increased everytime the save() method of a class is modified
+
+// Macro used to define the serialization version of a templated class
+#define DEFINE_CLASS_TEMPLATE_VERSION(Template, Type)  \
+  namespace boost {                                    \
+  namespace serialization {                            \
+  template <Template>                                  \
+  struct version<Type> {                               \
+    static constexpr unsigned int value = API_VERSION; \
+  };                                                   \
+  template <Template>                                  \
+  constexpr unsigned int version<Type>::value;         \
+  }                                                    \
+  }
 
 namespace multicontact_api {
 namespace serialization {

@@ -140,4 +140,6 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
 }  // namespace scenario
 }  // namespace multicontact_api
 
+DEFINE_CLASS_TEMPLATE_VERSION(typename Scalar, multicontact_api::scenario::ContactModelTpl<Scalar>)
+
 #endif  // ifndef __multicontact_api_scenario_contact_model_planar_hpp__

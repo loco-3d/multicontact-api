@@ -699,4 +699,6 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
 }  // namespace scenario
 }  // namespace multicontact_api
 
+DEFINE_CLASS_TEMPLATE_VERSION(typename Scalar, multicontact_api::scenario::ContactPhaseTpl<Scalar>)
+
 #endif  // CONTACTPHASE_HPP
