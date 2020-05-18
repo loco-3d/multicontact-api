@@ -76,9 +76,15 @@ struct ContactPatchTpl : public serialization::Serializable<ContactPatchTpl<_Sca
   }
 
   template <class Archive>
-  void load(Archive& ar, const unsigned int /*version*/) {
+  void load(Archive& ar, const unsigned int version) {
     ar >> boost::serialization::make_nvp("placement", m_placement);
-    ar >> boost::serialization::make_nvp("contact_model", m_contact_model);
+    if (version >= 1) {
+      ar >> boost::serialization::make_nvp("contact_model", m_contact_model);
+    } else {
+      double mu;
+      ar >> boost::serialization::make_nvp("mu", mu);
+      m_contact_model = ContactModel(mu);
+    }
   }
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()  // why is it required ? using only serialize() lead to compilation error,
