@@ -1088,13 +1088,14 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         }
       }
     }
-    if(first_phase == m_contact_phases.size())
-      throw std::invalid_argument("The contact sequence doesn't have any phase with an effector trajectory"
-                                  " for the given effector name");
-    if(first_phase > 0){
+    if (first_phase == m_contact_phases.size())
+      throw std::invalid_argument(
+          "The contact sequence doesn't have any phase with an effector trajectory"
+          " for the given effector name");
+    if (first_phase > 0) {
       // add a first constant phase at the initial placement
       curve_SE3_ptr ptr_init(new SE3Curve_t(first_placement, first_placement, m_contact_phases.at(0).timeInitial(),
-                                       m_contact_phases.at(first_phase).timeInitial()));
+                                            m_contact_phases.at(first_phase).timeInitial()));
       res.add_curve_ptr(ptr_init);
     }
     // loop over this phases to concatenate the trajectories
@@ -1109,10 +1110,11 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
         res.add_curve_ptr(ptr);
       }
     }
-    if(last_phase < m_contact_phases.size() - 1){
+    if (last_phase < m_contact_phases.size() - 1) {
       // add a last constant phase until the end of the contact sequence
-      curve_SE3_ptr ptr_final(new SE3Curve_t(last_placement, last_placement, m_contact_phases.at(last_phase).timeFinal(),
-                                       m_contact_phases.back().timeFinal()));
+      curve_SE3_ptr ptr_final(new SE3Curve_t(last_placement, last_placement,
+                                             m_contact_phases.at(last_phase).timeFinal(),
+                                             m_contact_phases.back().timeFinal()));
       res.add_curve_ptr(ptr_final);
     }
     return res;

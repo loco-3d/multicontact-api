@@ -97,10 +97,9 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
    */
   Matrix6X generatorMatrix() const {
     Matrix6X gen = Matrix6X::Zero(6, m_num_contact_points * 3);
-    for(size_t i=0; i<m_num_contact_points; i++)
-    {
-      gen.block(0, i*3, 3, 3) = Matrix3::Identity();
-      gen.block(3, i*3, 3, 3) = pinocchio::skew(m_contact_points_positions.col(i));
+    for (size_t i = 0; i < m_num_contact_points; i++) {
+      gen.block(0, i * 3, 3, 3) = Matrix3::Identity();
+      gen.block(3, i * 3, 3, 3) = pinocchio::skew(m_contact_points_positions.col(i));
     }
     return gen;
   }
