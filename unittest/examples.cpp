@@ -1,5 +1,5 @@
-// Copyright (c) 2015-2018, CNRS
-// Authors: Justin Carpentier <jcarpent@laas.fr>
+// Copyright (c) 2019-2020, CNRS
+// Authors: Pierre Fernbach <pierre.fernbach@laas.fr>,
 
 #include <iostream>
 
