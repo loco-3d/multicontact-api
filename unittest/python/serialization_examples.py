@@ -129,6 +129,8 @@ class ExamplesSerialization(unittest.TestCase):
         cs.loadFromBinary(str(PATH / "step_in_place.cs"))
         self.assertEqual(cs.size(), 9)
         self.assertTrue(cs.haveConsistentContacts())
+        self.assertFalse(cs.haveFriction())
+        self.assertFalse(cs.haveContactModelDefined())
 
     def test_step_in_place_COM(self):
         cs = ContactSequence()
@@ -138,6 +140,8 @@ class ExamplesSerialization(unittest.TestCase):
         self.assertTrue(cs.haveTimings())
         self.assertTrue(cs.haveCentroidalValues())
         self.assertTrue(cs.haveCentroidalTrajectories())
+        self.assertFalse(cs.haveFriction())
+        self.assertFalse(cs.haveContactModelDefined())
         checkCS(self, cs, effector=False, wholeBody=False)
 
     def test_step_in_place_REF(self):
@@ -150,6 +154,8 @@ class ExamplesSerialization(unittest.TestCase):
         self.assertTrue(cs.haveCentroidalTrajectories())
         self.assertTrue(cs.haveEffectorsTrajectories())
         self.assertTrue(cs.haveEffectorsTrajectories(1e-6, False))
+        self.assertTrue(cs.haveFriction())
+        self.assertTrue(cs.haveContactModelDefined())
         checkCS(self, cs, root=True, effector=True, wholeBody=False)
 
     def test_step_in_place_WB(self):
@@ -165,6 +171,8 @@ class ExamplesSerialization(unittest.TestCase):
         self.assertTrue(cs.haveJointsDerivativesTrajectories())
         self.assertTrue(cs.haveContactForcesTrajectories())
         self.assertTrue(cs.haveZMPtrajectories())
+        self.assertTrue(cs.haveFriction())
+        self.assertTrue(cs.haveContactModelDefined())
         checkCS(self, cs, effector=True, wholeBody=True)
 
     def test_step_in_place_quasistatic(self):
@@ -172,6 +180,8 @@ class ExamplesSerialization(unittest.TestCase):
         cs.loadFromBinary(str(PATH / "step_in_place_quasistatic.cs"))
         self.assertEqual(cs.size(), 9)
         self.assertTrue(cs.haveConsistentContacts())
+        self.assertFalse(cs.haveFriction())
+        self.assertFalse(cs.haveContactModelDefined())
 
     def test_step_in_place_quasistatic_COM(self):
         cs = ContactSequence()
@@ -181,6 +191,8 @@ class ExamplesSerialization(unittest.TestCase):
         self.assertTrue(cs.haveTimings())
         self.assertTrue(cs.haveCentroidalValues())
         self.assertTrue(cs.haveCentroidalTrajectories())
+        self.assertFalse(cs.haveFriction())
+        self.assertFalse(cs.haveContactModelDefined())
         checkCS(self, cs, quasistatic=True, effector=False, wholeBody=False)
 
     def test_step_in_place_quasistatic_REF(self):
@@ -192,6 +204,8 @@ class ExamplesSerialization(unittest.TestCase):
         self.assertTrue(cs.haveCentroidalValues())
         self.assertTrue(cs.haveCentroidalTrajectories())
         self.assertTrue(cs.haveEffectorsTrajectories())
+        self.assertTrue(cs.haveFriction())
+        self.assertTrue(cs.haveContactModelDefined())
         checkCS(self, cs, root=True, quasistatic=True, effector=True, wholeBody=False)
 
     def test_step_in_place_quasistatic_WB(self):
@@ -207,12 +221,16 @@ class ExamplesSerialization(unittest.TestCase):
         self.assertTrue(cs.haveJointsDerivativesTrajectories())
         self.assertTrue(cs.haveContactForcesTrajectories())
         self.assertTrue(cs.haveZMPtrajectories())
+        self.assertTrue(cs.haveFriction())
+        self.assertTrue(cs.haveContactModelDefined())
         checkCS(self, cs, quasistatic=True, effector=True, wholeBody=True)
 
     def test_walk_20cm(self):
         cs = ContactSequence()
         cs.loadFromBinary(str(PATH / "walk_20cm.cs"))
         self.assertEqual(cs.size(), 23)
+        self.assertFalse(cs.haveFriction())
+        self.assertFalse(cs.haveContactModelDefined())
         self.assertTrue(cs.haveConsistentContacts())
 
     def test_walk_20cm_COM(self):
@@ -223,6 +241,8 @@ class ExamplesSerialization(unittest.TestCase):
         self.assertTrue(cs.haveTimings())
         self.assertTrue(cs.haveCentroidalValues())
         self.assertTrue(cs.haveCentroidalTrajectories())
+        self.assertFalse(cs.haveFriction())
+        self.assertFalse(cs.haveContactModelDefined())
         checkCS(self, cs, effector=False, wholeBody=False)
 
     def test_walk_20cm_REF(self):
@@ -234,6 +254,8 @@ class ExamplesSerialization(unittest.TestCase):
         self.assertTrue(cs.haveCentroidalValues())
         self.assertTrue(cs.haveCentroidalTrajectories())
         self.assertTrue(cs.haveEffectorsTrajectories())
+        self.assertTrue(cs.haveFriction())
+        self.assertTrue(cs.haveContactModelDefined())
         checkCS(self, cs, root=True, effector=True, wholeBody=False)
 
     def test_walk_20cm_WB(self):
@@ -249,12 +271,16 @@ class ExamplesSerialization(unittest.TestCase):
         self.assertTrue(cs.haveJointsDerivativesTrajectories())
         self.assertTrue(cs.haveContactForcesTrajectories())
         self.assertTrue(cs.haveZMPtrajectories())
+        self.assertTrue(cs.haveFriction())
+        self.assertTrue(cs.haveContactModelDefined())
         checkCS(self, cs, effector=True, wholeBody=True)
 
     def test_walk_20cm_quasistatic(self):
         cs = ContactSequence()
         cs.loadFromBinary(str(PATH / "walk_20cm_quasistatic.cs"))
         self.assertEqual(cs.size(), 23)
+        self.assertFalse(cs.haveFriction())
+        self.assertFalse(cs.haveContactModelDefined())
         self.assertTrue(cs.haveConsistentContacts())
 
     def test_walk_20cm_quasistatic_COM(self):
@@ -265,6 +291,8 @@ class ExamplesSerialization(unittest.TestCase):
         self.assertTrue(cs.haveTimings())
         self.assertTrue(cs.haveCentroidalValues())
         self.assertTrue(cs.haveCentroidalTrajectories())
+        self.assertFalse(cs.haveFriction())
+        self.assertFalse(cs.haveContactModelDefined())
         checkCS(self, cs, quasistatic=True, effector=False, wholeBody=False)
 
     def test_walk_20cm_quasistatic_REF(self):
@@ -276,6 +304,8 @@ class ExamplesSerialization(unittest.TestCase):
         self.assertTrue(cs.haveCentroidalValues())
         self.assertTrue(cs.haveCentroidalTrajectories())
         self.assertTrue(cs.haveEffectorsTrajectories())
+        self.assertTrue(cs.haveFriction())
+        self.assertTrue(cs.haveContactModelDefined())
         checkCS(self, cs, root=True, quasistatic=True, effector=True, wholeBody=False)
 
     def test_walk_20cm_quasistatic_WB(self):
@@ -291,6 +321,8 @@ class ExamplesSerialization(unittest.TestCase):
         self.assertTrue(cs.haveJointsDerivativesTrajectories())
         self.assertTrue(cs.haveContactForcesTrajectories())
         self.assertTrue(cs.haveZMPtrajectories())
+        self.assertTrue(cs.haveFriction())
+        self.assertTrue(cs.haveContactModelDefined())
         checkCS(self, cs, quasistatic=True, effector=True, wholeBody=True)
 
 

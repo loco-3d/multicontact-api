@@ -59,6 +59,8 @@ BOOST_AUTO_TEST_CASE(step_in_place) {
   cs.loadFromBinary(path + "step_in_place.cs");
   BOOST_CHECK_EQUAL(cs.size(), 9);
   BOOST_CHECK(cs.haveConsistentContacts());
+  BOOST_CHECK(!cs.haveFriction());
+  BOOST_CHECK(!cs.haveContactModelDefined());
 }
 
 BOOST_AUTO_TEST_CASE(step_in_place_COM) {
@@ -69,6 +71,9 @@ BOOST_AUTO_TEST_CASE(step_in_place_COM) {
   BOOST_CHECK(cs.haveTimings());
   BOOST_CHECK(cs.haveCentroidalValues());
   BOOST_CHECK(cs.haveCentroidalTrajectories());
+  BOOST_CHECK(!cs.haveFriction());
+  BOOST_CHECK(!cs.haveContactModelDefined());
+
 }
 
 BOOST_AUTO_TEST_CASE(step_in_place_REF) {
@@ -81,6 +86,9 @@ BOOST_AUTO_TEST_CASE(step_in_place_REF) {
   BOOST_CHECK(cs.haveCentroidalTrajectories());
   BOOST_CHECK(cs.haveEffectorsTrajectories());
   BOOST_CHECK(cs.haveEffectorsTrajectories(1e-6, false));
+  BOOST_CHECK(cs.haveFriction());
+  BOOST_CHECK(cs.haveContactModelDefined());
+
 }
 
 BOOST_AUTO_TEST_CASE(step_in_place_WB) {
@@ -96,6 +104,8 @@ BOOST_AUTO_TEST_CASE(step_in_place_WB) {
   BOOST_CHECK(cs.haveJointsDerivativesTrajectories());
   BOOST_CHECK(cs.haveContactForcesTrajectories());
   BOOST_CHECK(cs.haveZMPtrajectories());
+  BOOST_CHECK(cs.haveFriction());
+  BOOST_CHECK(cs.haveContactModelDefined());
 }
 
 BOOST_AUTO_TEST_CASE(step_in_place_quasistatic) {
@@ -103,6 +113,8 @@ BOOST_AUTO_TEST_CASE(step_in_place_quasistatic) {
   cs.loadFromBinary(path + "step_in_place_quasistatic.cs");
   BOOST_CHECK_EQUAL(cs.size(), 9);
   BOOST_CHECK(cs.haveConsistentContacts());
+  BOOST_CHECK(!cs.haveFriction());
+  BOOST_CHECK(!cs.haveContactModelDefined());
 }
 
 BOOST_AUTO_TEST_CASE(step_in_place_quasistatic_COM) {
@@ -113,6 +125,8 @@ BOOST_AUTO_TEST_CASE(step_in_place_quasistatic_COM) {
   BOOST_CHECK(cs.haveTimings());
   BOOST_CHECK(cs.haveCentroidalValues());
   BOOST_CHECK(cs.haveCentroidalTrajectories());
+  BOOST_CHECK(!cs.haveFriction());
+  BOOST_CHECK(!cs.haveContactModelDefined());
 }
 
 BOOST_AUTO_TEST_CASE(step_in_place_quasistatic_REF) {
@@ -124,6 +138,8 @@ BOOST_AUTO_TEST_CASE(step_in_place_quasistatic_REF) {
   BOOST_CHECK(cs.haveCentroidalValues());
   BOOST_CHECK(cs.haveCentroidalTrajectories());
   BOOST_CHECK(cs.haveEffectorsTrajectories());
+  BOOST_CHECK(cs.haveFriction());
+  BOOST_CHECK(cs.haveContactModelDefined());
 }
 
 BOOST_AUTO_TEST_CASE(step_in_place_quasistatic_WB) {
@@ -139,6 +155,8 @@ BOOST_AUTO_TEST_CASE(step_in_place_quasistatic_WB) {
   BOOST_CHECK(cs.haveJointsDerivativesTrajectories());
   BOOST_CHECK(cs.haveContactForcesTrajectories());
   BOOST_CHECK(cs.haveZMPtrajectories());
+  BOOST_CHECK(cs.haveFriction());
+  BOOST_CHECK(cs.haveContactModelDefined());
 }
 
 BOOST_AUTO_TEST_CASE(walk_20cm) {
@@ -146,6 +164,8 @@ BOOST_AUTO_TEST_CASE(walk_20cm) {
   cs.loadFromBinary(path + "walk_20cm.cs");
   BOOST_CHECK_EQUAL(cs.size(), 23);
   BOOST_CHECK(cs.haveConsistentContacts());
+  BOOST_CHECK(!cs.haveFriction());
+  BOOST_CHECK(!cs.haveContactModelDefined());
 }
 
 BOOST_AUTO_TEST_CASE(walk_20cm_COM) {
@@ -156,6 +176,8 @@ BOOST_AUTO_TEST_CASE(walk_20cm_COM) {
   BOOST_CHECK(cs.haveTimings());
   BOOST_CHECK(cs.haveCentroidalValues());
   BOOST_CHECK(cs.haveCentroidalTrajectories());
+  BOOST_CHECK(!cs.haveFriction());
+  BOOST_CHECK(!cs.haveContactModelDefined());
 }
 
 BOOST_AUTO_TEST_CASE(walk_20cm_REF) {
@@ -167,6 +189,8 @@ BOOST_AUTO_TEST_CASE(walk_20cm_REF) {
   BOOST_CHECK(cs.haveCentroidalValues());
   BOOST_CHECK(cs.haveCentroidalTrajectories());
   BOOST_CHECK(cs.haveEffectorsTrajectories());
+  BOOST_CHECK(cs.haveFriction());
+  BOOST_CHECK(cs.haveContactModelDefined());
 }
 
 BOOST_AUTO_TEST_CASE(walk_20cm_WB) {
@@ -182,6 +206,8 @@ BOOST_AUTO_TEST_CASE(walk_20cm_WB) {
   BOOST_CHECK(cs.haveJointsDerivativesTrajectories());
   BOOST_CHECK(cs.haveContactForcesTrajectories());
   BOOST_CHECK(cs.haveZMPtrajectories());
+  BOOST_CHECK(cs.haveFriction());
+  BOOST_CHECK(cs.haveContactModelDefined());
 }
 
 BOOST_AUTO_TEST_CASE(walk_20cm_quasistatic) {
@@ -189,6 +215,8 @@ BOOST_AUTO_TEST_CASE(walk_20cm_quasistatic) {
   cs.loadFromBinary(path + "walk_20cm_quasistatic.cs");
   BOOST_CHECK_EQUAL(cs.size(), 23);
   BOOST_CHECK(cs.haveConsistentContacts());
+  BOOST_CHECK(!cs.haveFriction());
+  BOOST_CHECK(!cs.haveContactModelDefined());
 }
 
 BOOST_AUTO_TEST_CASE(walk_20cm_quasistatic_COM) {
@@ -199,6 +227,8 @@ BOOST_AUTO_TEST_CASE(walk_20cm_quasistatic_COM) {
   BOOST_CHECK(cs.haveTimings());
   BOOST_CHECK(cs.haveCentroidalValues());
   BOOST_CHECK(cs.haveCentroidalTrajectories());
+  BOOST_CHECK(!cs.haveFriction());
+  BOOST_CHECK(!cs.haveContactModelDefined());
 }
 
 BOOST_AUTO_TEST_CASE(walk_20cm_quasistatic_REF) {
@@ -210,6 +240,8 @@ BOOST_AUTO_TEST_CASE(walk_20cm_quasistatic_REF) {
   BOOST_CHECK(cs.haveCentroidalValues());
   BOOST_CHECK(cs.haveCentroidalTrajectories());
   BOOST_CHECK(cs.haveEffectorsTrajectories());
+  BOOST_CHECK(cs.haveFriction());
+  BOOST_CHECK(cs.haveContactModelDefined());
 }
 
 BOOST_AUTO_TEST_CASE(walk_20cm_quasistatic_WB) {
@@ -225,6 +257,8 @@ BOOST_AUTO_TEST_CASE(walk_20cm_quasistatic_WB) {
   BOOST_CHECK(cs.haveJointsDerivativesTrajectories());
   BOOST_CHECK(cs.haveContactForcesTrajectories());
   BOOST_CHECK(cs.haveZMPtrajectories());
+  BOOST_CHECK(cs.haveFriction());
+  BOOST_CHECK(cs.haveContactModelDefined());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
