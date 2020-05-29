@@ -97,10 +97,9 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
    */
   Matrix6X generatorMatrix() const {
     Matrix6X gen = Matrix6X::Zero(6, m_num_contact_points * 3);
-    for(size_t i=0; i<m_num_contact_points; i++)
-    {
-      gen.block(0, i*3, 3, 3) = Matrix3::Identity();
-      gen.block(3, i*3, 3, 3) = pinocchio::skew(m_contact_points_positions.col(i));
+    for (size_t i = 0; i < m_num_contact_points; i++) {
+      gen.block(0, i * 3, 3, 3) = Matrix3::Identity();
+      gen.block(3, i * 3, 3, 3) = pinocchio::skew(m_contact_points_positions.col(i));
     }
     return gen;
   }
@@ -139,5 +138,7 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
 };
 }  // namespace scenario
 }  // namespace multicontact_api
+
+DEFINE_CLASS_TEMPLATE_VERSION(typename Scalar, multicontact_api::scenario::ContactModelTpl<Scalar>)
 
 #endif  // ifndef __multicontact_api_scenario_contact_model_planar_hpp__
