@@ -45,5 +45,4 @@ BOOST_AUTO_TEST_CASE(api_0) {
   BOOST_CHECK(!cs.haveContactModelDefined());
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()
