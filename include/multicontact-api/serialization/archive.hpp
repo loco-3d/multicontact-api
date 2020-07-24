@@ -15,7 +15,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/serialization/version.hpp>
 
-const unsigned int API_VERSION = 1;  // must be increased everytime the save() method of a class is modified
+const unsigned int API_VERSION = 2;  // must be increased everytime the save() method of a class is modified
 
 // Macro used to define the serialization version of a templated class
 #define DEFINE_CLASS_TEMPLATE_VERSION(Template, Type)  \
