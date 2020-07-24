@@ -658,9 +658,15 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
   friend class boost::serialization::access;
 
   template <class Archive>
-  void serialize(Archive& ar, const unsigned int /*version*/) {
+  void serialize(Archive& ar, const unsigned int version) {
     // ar& boost::serialization::make_nvp("placement", m_placement);
-    curves::serialization::register_types<Archive>(ar);
+    unsigned int curve_version; // Curves API version related to the archive multicontact-api API version
+    if(version <2){
+      curve_version = 0;
+    }else{
+      curve_version = 1;
+    }
+    curves::serialization::register_types<Archive>(ar, curve_version);
     ar& boost::serialization::make_nvp("c_init", m_c_init);
     ar& boost::serialization::make_nvp("dc_init", m_dc_init);
     ar& boost::serialization::make_nvp("ddc_init", m_ddc_init);
