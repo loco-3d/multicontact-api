@@ -45,5 +45,22 @@ BOOST_AUTO_TEST_CASE(api_0) {
   BOOST_CHECK(!cs.haveContactModelDefined());
 }
 
+BOOST_AUTO_TEST_CASE(api_1) {
+  ContactSequence cs;
+  cs.loadFromBinary(path + "previous_versions/api_1.cs");
+  BOOST_CHECK_EQUAL(cs.size(), 9);
+  BOOST_CHECK(cs.haveConsistentContacts());
+  BOOST_CHECK(cs.haveTimings());
+  BOOST_CHECK(cs.haveCentroidalValues());
+  BOOST_CHECK(cs.haveCentroidalTrajectories());
+  BOOST_CHECK(cs.haveEffectorsTrajectories(1e-1));
+  BOOST_CHECK(cs.haveJointsTrajectories());
+  BOOST_CHECK(cs.haveJointsDerivativesTrajectories());
+  BOOST_CHECK(cs.haveContactForcesTrajectories());
+  BOOST_CHECK(cs.haveZMPtrajectories());
+  BOOST_CHECK(cs.haveFriction());
+  BOOST_CHECK(cs.haveContactModelDefined());
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

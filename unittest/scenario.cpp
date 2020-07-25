@@ -387,7 +387,7 @@ BOOST_AUTO_TEST_CASE(contact_model_points_positions) {
   BOOST_CHECK(mp.contact_points_positions().isApprox(positions));
   Matrix6X generators = mp.generatorMatrix();
   BOOST_CHECK_EQUAL(generators.rows(), 6);
-  BOOST_CHECK_EQUAL(generators.cols(), 6*3);
+  BOOST_CHECK_EQUAL(generators.cols(), 6 * 3);
 
   mp.num_contact_points(2);
   BOOST_CHECK_EQUAL(mp.num_contact_points(), 2);
@@ -1741,8 +1741,8 @@ BOOST_AUTO_TEST_CASE(contact_sequence_have_contact_model_defined) {
   cs1.append(cp0);
   cs1.append(cp1);
 
-//  cp.addContact("right_hand", ContactPatch(SE3::Identity().setRandom()));
-//  cp.addContact("left_foot", ContactPatch(SE3::Identity().setRandom()));
+  //  cp.addContact("right_hand", ContactPatch(SE3::Identity().setRandom()));
+  //  cp.addContact("left_foot", ContactPatch(SE3::Identity().setRandom()));
   BOOST_CHECK(!cs1.haveContactModelDefined());
   ContactModel mp1(0.3, ContactType::CONTACT_PLANAR);
   Matrix3X positions = Matrix3X::Random(3, 4);
@@ -1763,13 +1763,12 @@ BOOST_AUTO_TEST_CASE(contact_sequence_have_contact_model_defined) {
   cs1.contactPhase(2).contactPatch("left_foot").m_contact_model = mp2;
   BOOST_CHECK(!cs1.haveContactModelDefined());
 
-  mp3.m_contact_type = ContactType::CONTACT_PLANAR; // no effect
+  mp3.m_contact_type = ContactType::CONTACT_PLANAR;  // no effect
   BOOST_CHECK(!cs1.haveContactModelDefined());
 
   cs1.contactPhase(2).contactPatch("right_hand").m_contact_model.m_contact_type = ContactType::CONTACT_PLANAR;
   BOOST_CHECK(cs1.haveContactModelDefined());
 }
-
 
 BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_com_traj) {
   ContactSequence cs1 = ContactSequence(0);

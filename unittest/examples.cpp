@@ -73,7 +73,6 @@ BOOST_AUTO_TEST_CASE(step_in_place_COM) {
   BOOST_CHECK(cs.haveCentroidalTrajectories());
   BOOST_CHECK(!cs.haveFriction());
   BOOST_CHECK(!cs.haveContactModelDefined());
-
 }
 
 BOOST_AUTO_TEST_CASE(step_in_place_REF) {
@@ -88,7 +87,6 @@ BOOST_AUTO_TEST_CASE(step_in_place_REF) {
   BOOST_CHECK(cs.haveEffectorsTrajectories(1e-6, false));
   BOOST_CHECK(cs.haveFriction());
   BOOST_CHECK(cs.haveContactModelDefined());
-
 }
 
 BOOST_AUTO_TEST_CASE(step_in_place_WB) {
