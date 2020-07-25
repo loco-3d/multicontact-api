@@ -827,9 +827,8 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   cp2.addContactForceTrajectory("right_hand", buildRandomPolynomial12D());
   cp2.addContactNormalForceTrajectory("right_hand", buildRandomPolynomial1D());
   int num_ctc = 0;
-  for (ContactPhase::CurveMap_t::const_iterator mit = cp2.contactForces().begin(); mit != cp2.contactForces().end();
-       ++mit) {
-    BOOST_CHECK(mit->first == "right_hand" || mit->first == "left_leg");
+  for (auto const& mit : cp2.contactForces()) {
+    BOOST_CHECK(mit.first == "right_hand" || mit.first == "left_leg");
     num_ctc++;
   }
   BOOST_CHECK(num_ctc == 2);
