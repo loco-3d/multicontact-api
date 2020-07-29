@@ -61,7 +61,7 @@ if __name__ == '__main__':
     rp = RosPack()
     urdf = rp.get_path(robot_package_name) + '/urdf/' + urdf_name + '.urdf'
     robot = pin.RobotWrapper.BuildFromURDF(urdf, pin.StdVec_StdString(), pin.JointModelFreeFlyer())
-    robot.initDisplay(loadModel=True)
+    robot.initViewer(loadModel=True)
     robot.displayCollisions(False)
     robot.displayVisuals(True)
 
