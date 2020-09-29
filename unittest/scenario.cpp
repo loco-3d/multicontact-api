@@ -468,6 +468,15 @@ BOOST_AUTO_TEST_CASE(contact_patch) {
   BOOST_CHECK(cp2.placement() == p);
   BOOST_CHECK(cp2.friction() == 0.9);
 
+  // constructor with contact_model
+  ContactModel cm(0.5, ContactType::CONTACT_PLANAR);
+  cm.num_contact_points(4);
+  ContactPatch cp_with_model(p, cm);
+  BOOST_CHECK(cp_with_model.placement() == p);
+  BOOST_CHECK(cp_with_model.friction() == 0.5);
+  BOOST_CHECK(cp_with_model.m_contact_model.num_contact_points() == 4);
+
+
   // check comparison operator
   BOOST_CHECK(cp1 != cp2);
   ContactPatch cp3(p, 0.9);
