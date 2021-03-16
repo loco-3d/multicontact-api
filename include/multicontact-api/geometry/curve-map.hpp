@@ -4,7 +4,7 @@
 #ifndef __multicontact_api_geometry_curve_map_hpp__
 #define __multicontact_api_geometry_curve_map_hpp__
 
-#include <curves/curve_abc.h>
+#include <ndcurves/curve_abc.h>
 #include <map>
 #include <string>
 
@@ -15,7 +15,7 @@
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/base_object.hpp>
-#include <curves/serialization/registeration.hpp>
+#include <ndcurves/serialization/registeration.hpp>
 
 template <typename Curve>
 struct CurveMap : public std::map<std::string, Curve> {

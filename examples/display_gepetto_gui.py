@@ -4,7 +4,7 @@ import os
 import subprocess
 import time
 
-import curves
+import ndcurves
 import gepetto.corbaserver
 from multicontact_api import ContactSequence
 from rospkg import RosPack

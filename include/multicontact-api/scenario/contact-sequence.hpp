@@ -3,11 +3,11 @@
 
 #include "multicontact-api/scenario/fwd.hpp"
 #include "multicontact-api/scenario/contact-phase.hpp"
-#include <curves/fwd.h>
-#include <curves/curve_abc.h>
-#include <curves/piecewise_curve.h>
-#include <curves/polynomial.h>
-#include <curves/se3_curve.h>
+#include <ndcurves/fwd.h>
+#include <ndcurves/curve_abc.h>
+#include <ndcurves/piecewise_curve.h>
+#include <ndcurves/polynomial.h>
+#include <ndcurves/se3_curve.h>
 #include "multicontact-api/serialization/archive.hpp"
 
 #include <vector>
@@ -25,16 +25,16 @@ struct ContactSequenceTpl : public serialization::Serializable<ContactSequenceTp
   typedef typename ContactPhase::SE3 SE3;
   typedef std::vector<ContactPhase> ContactPhaseVector;
 
-  typedef curves::pointX_t pointX_t;
-  typedef curves::transform_t transform_t;
-  typedef curves::curve_abc_t curve_t;
-  typedef curves::curve_SE3_t curve_SE3_t;
+  typedef ndcurves::pointX_t pointX_t;
+  typedef ndcurves::transform_t transform_t;
+  typedef ndcurves::curve_abc_t curve_t;
+  typedef ndcurves::curve_SE3_t curve_SE3_t;
   typedef boost::shared_ptr<curve_t> curve_ptr;
   typedef boost::shared_ptr<curve_SE3_t> curve_SE3_ptr;
-  typedef curves::piecewise_t piecewise_t;
-  typedef curves::piecewise_SE3_t piecewise_SE3_t;
-  typedef curves::SE3Curve_t SE3Curve_t;
-  typedef curves::polynomial_t polynomial_t;
+  typedef ndcurves::piecewise_t piecewise_t;
+  typedef ndcurves::piecewise_SE3_t piecewise_SE3_t;
+  typedef ndcurves::SE3Curve_t SE3Curve_t;
+  typedef ndcurves::polynomial_t polynomial_t;
 
   ContactSequenceTpl(const size_t size = 0) : m_contact_phases(size) {}
 
