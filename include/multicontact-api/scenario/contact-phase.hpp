@@ -9,9 +9,9 @@
 #include "multicontact-api/serialization/eigen-matrix.hpp"
 #include "multicontact-api/serialization/spatial.hpp"
 
-#include <curves/fwd.h>
-#include <curves/piecewise_curve.h>
-#include <curves/serialization/curves.hpp>
+#include <ndcurves/fwd.h>
+#include <ndcurves/piecewise_curve.h>
+#include <ndcurves/serialization/curves.hpp>
 #include <map>
 #include <vector>
 #include <set>
@@ -31,22 +31,22 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
   typedef _Scalar Scalar;
 
   // Eigen types
-  typedef curves::pointX_t pointX_t;
-  typedef curves::point3_t point3_t;
-  typedef curves::point6_t point6_t;
-  typedef curves::t_point3_t t_point3_t;
-  typedef curves::t_pointX_t t_pointX_t;
-  typedef curves::transform_t transform_t;
+  typedef ndcurves::pointX_t pointX_t;
+  typedef ndcurves::point3_t point3_t;
+  typedef ndcurves::point6_t point6_t;
+  typedef ndcurves::t_point3_t t_point3_t;
+  typedef ndcurves::t_pointX_t t_pointX_t;
+  typedef ndcurves::transform_t transform_t;
 
   // Curves types
-  typedef curves::curve_abc_t curve_t;
-  // typedef curves::curve_abc<Scalar, Scalar, true, point3_t> curve_3_t;
-  typedef curves::curve_SE3_t curve_SE3_t;
-  typedef curves::curve_ptr_t curve_ptr;
+  typedef ndcurves::curve_abc_t curve_t;
+  // typedef ndcurves::curve_abc<Scalar, Scalar, true, point3_t> curve_3_t;
+  typedef ndcurves::curve_SE3_t curve_SE3_t;
+  typedef ndcurves::curve_ptr_t curve_ptr;
   // typedef boost::shared_ptr<curve_3_t> curve_3_ptr;
-  typedef curves::curve_SE3_ptr_t curve_SE3_ptr;
-  typedef curves::piecewise3_t piecewise3_t;
-  typedef curves::piecewise_t piecewise_t;
+  typedef ndcurves::curve_SE3_ptr_t curve_SE3_ptr;
+  typedef ndcurves::piecewise3_t piecewise3_t;
+  typedef ndcurves::piecewise_t piecewise_t;
   typedef piecewise_t::t_time_t t_time_t;
 
   typedef std::vector<std::string> t_strings;
@@ -452,7 +452,7 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
   void setCOMtrajectoryFromPoints(const t_pointX_t& points, const t_pointX_t& points_derivative,
                                   const t_pointX_t& points_second_derivative, const t_time_t& time_points) {
     /*
-    piecewise_t c_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+    piecewise_t c_t = piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(
         points, points_derivative, points_second_derivative, time_points);
     if (c_t.dim() != 3) throw std::invalid_argument("Dimension of the points must be 3.");
     m_c = curve_ptr(new piecewise_t(c_t));
@@ -460,10 +460,10 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
     m_ddc = curve_ptr(c_t.compute_derivate_ptr(2));
     */
     m_c = curve_ptr(new piecewise_t(
-        piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points, time_points)));
+        piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(points, time_points)));
     m_dc = curve_ptr(new piecewise_t(
-        piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points_derivative, time_points)));
-    m_ddc = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+        piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(points_derivative, time_points)));
+    m_ddc = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(
         points_second_derivative, time_points)));
     if (m_c->dim() != 3 || m_dc->dim() != 3 || m_ddc->dim() != 3)
       throw std::invalid_argument("Dimension of the points must be 3.");
@@ -489,16 +489,16 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
   void setAMtrajectoryFromPoints(const t_pointX_t& points, const t_pointX_t& points_derivative,
                                  const t_time_t& time_points) {
     /*
-    piecewise_t L_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+    piecewise_t L_t = piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(
         points, points_derivative, time_points);
     if (L_t.dim() != 3) throw std::invalid_argument("Dimension of the points must be 3.");
     m_L = curve_ptr(new piecewise_t(L_t));
     m_dL = curve_ptr(L_t.compute_derivate_ptr(1));
     */
     m_L = curve_ptr(new piecewise_t(
-        piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points, time_points)));
+        piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(points, time_points)));
     m_dL = curve_ptr(new piecewise_t(
-        piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points_derivative, time_points)));
+        piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(points_derivative, time_points)));
     if (m_L->dim() != 3 || m_dL->dim() != 3) throw std::invalid_argument("Dimension of the points must be 3.");
 
     m_L_init = point3_t(points.front());
@@ -521,17 +521,17 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
   void setJointsTrajectoryFromPoints(const t_pointX_t& points, const t_pointX_t& points_derivative,
                                      const t_pointX_t& points_second_derivative, const t_time_t& time_points) {
     /*
-    piecewise_t q_t = piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+    piecewise_t q_t = piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(
         points, points_derivative, points_second_derivative, time_points);
     m_q = curve_ptr(new piecewise_t(q_t));
     m_dq = curve_ptr(q_t.compute_derivate_ptr(1));
     m_ddq = curve_ptr(q_t.compute_derivate_ptr(2));
     */
     m_q = curve_ptr(new piecewise_t(
-        piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points, time_points)));
+        piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(points, time_points)));
     m_dq = curve_ptr(new piecewise_t(
-        piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points_derivative, time_points)));
-    m_ddq = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+        piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(points_derivative, time_points)));
+    m_ddq = curve_ptr(new piecewise_t(piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(
         points_second_derivative, time_points)));
     m_q_init = points.front();
     m_q_final = points.back();
@@ -660,13 +660,13 @@ struct ContactPhaseTpl : public serialization::Serializable<ContactPhaseTpl<_Sca
   template <class Archive>
   void serialize(Archive& ar, const unsigned int version) {
     // ar& boost::serialization::make_nvp("placement", m_placement);
-    unsigned int curve_version; // Curves API version related to the archive multicontact-api API version
-    if(version <2){
+    unsigned int curve_version;  // Curves API version related to the archive multicontact-api API version
+    if (version < 2) {
       curve_version = 0;
-    }else{
+    } else {
       curve_version = 1;
     }
-    curves::serialization::register_types<Archive>(ar, curve_version);
+    ndcurves::serialization::register_types<Archive>(ar, curve_version);
     ar& boost::serialization::make_nvp("c_init", m_c_init);
     ar& boost::serialization::make_nvp("dc_init", m_dc_init);
     ar& boost::serialization::make_nvp("ddc_init", m_ddc_init);
