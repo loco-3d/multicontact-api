@@ -38,7 +38,7 @@ SET(CMAKE_CXX_STANDARD 11)
 ADD_PROJECT_DEPENDENCY(pinocchio REQUIRED PKG_CONFIG_REQUIRES "pinocchio >= 2.0.0")
 ADD_PROJECT_DEPENDENCY(ndcurves 1.0.0 REQUIRED PKG_CONFIG_REQUIRES "ndcurves >= 0.5.1")
 IF(NOT CURVES_WITH_PINOCCHIO_SUPPORT)
-  MESSAGE(FATAL_ERROR "you need to use a curves version compiled with pinocchio support")
+  MESSAGE(FATAL_ERROR "you need to use a ndcurves version compiled with pinocchio support")
 ENDIF(NOT CURVES_WITH_PINOCCHIO_SUPPORT)
 SET(BOOST_COMPONENTS unit_test_framework serialization)
 
