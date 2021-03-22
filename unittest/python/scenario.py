@@ -289,6 +289,20 @@ class ContactPatchTest(unittest.TestCase):
         self.assertTrue(cp.friction == 0.9)
         self.assertTrue(cp.placement == p)
 
+    def test_constructor_with_contact_model(self):
+        cm = ContactModel(0.5, ContactType.CONTACT_PLANAR)
+        cm.num_contact_points = 4
+        p = SE3()
+        p.setRandom()
+        cp = ContactPatch(p, cm)
+        self.assertTrue(cp.friction == 0.5)
+        self.assertTrue(cp.placement == p)
+        self.assertTrue(cp.contact_model.num_contact_points == 4)
+
+        # check that the value have been copied and it's not the same pointer anymore :
+        cm.num_contact_points = 6
+        self.assertTrue(cp.contact_model.num_contact_points == 4)
+
     def test_operator_equal(self):
         cp1 = ContactPatch()
         cp2 = ContactPatch()

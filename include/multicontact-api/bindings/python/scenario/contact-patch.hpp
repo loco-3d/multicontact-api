@@ -19,6 +19,7 @@ template <typename ContactPatch>
 struct ContactPatchPythonVisitor : public boost::python::def_visitor<ContactPatchPythonVisitor<ContactPatch> > {
   typedef typename ContactPatch::Scalar Scalar;
   typedef typename ContactPatch::SE3 SE3;
+  typedef typename ContactPatch::ContactModel ContactModel;
 
   template <class PyClass>
   void visit(PyClass& cl) const {
@@ -26,6 +27,8 @@ struct ContactPatchPythonVisitor : public boost::python::def_visitor<ContactPatc
         .def(bp::init<SE3>(bp::arg("placement"), "Init with a given placement."))
         .def(bp::init<SE3, Scalar>(bp::args("placement", "friction"),
                                    "Init with a given placement and friction coefficient."))
+        .def(bp::init<SE3, ContactModel>(bp::args("placement", "contact_model"),
+                                   "Init with a given placement and contact model."))
         .def(bp::init<ContactPatch>(bp::arg("other"), "Copy contructor."))
         .add_property("placement",
                       // getter require to use "make_function" to pass the return_internal_reference policy (return ref
