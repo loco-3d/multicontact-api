@@ -12,25 +12,25 @@
 #include "multicontact-api/scenario/contact-phase.hpp"
 #include "multicontact-api/scenario/contact-sequence.hpp"
 
-#include <curves/fwd.h>
-#include <curves/se3_curve.h>
-#include <curves/polynomial.h>
-#include <curves/bezier_curve.h>
-#include <curves/piecewise_curve.h>
+#include <ndcurves/fwd.h>
+#include <ndcurves/se3_curve.h>
+#include <ndcurves/polynomial.h>
+#include <ndcurves/bezier_curve.h>
+#include <ndcurves/piecewise_curve.h>
 
 typedef Eigen::Matrix<double, 1, 1> point1_t;
-using curves::point3_t;
-using curves::point6_t;
+using ndcurves::point3_t;
+using ndcurves::point6_t;
 typedef Eigen::Matrix<double, 12, 1> point12_t;
-using curves::curve_ptr_t;
-using curves::curve_SE3_ptr_t;
-using curves::matrix3_t;
-using curves::piecewise_SE3_t;
-using curves::piecewise_t;
-using curves::pointX_t;
-using curves::quaternion_t;
-using curves::t_point3_t;
-using curves::t_pointX_t;
+using ndcurves::curve_ptr_t;
+using ndcurves::curve_SE3_ptr_t;
+using ndcurves::matrix3_t;
+using ndcurves::piecewise_SE3_t;
+using ndcurves::piecewise_t;
+using ndcurves::pointX_t;
+using ndcurves::quaternion_t;
+using ndcurves::t_point3_t;
+using ndcurves::t_pointX_t;
 using namespace multicontact_api::scenario;
 typedef ContactSequence::ContactPhaseVector ContactPhaseVector;
 typedef ContactModel::Matrix3X Matrix3X;
@@ -76,9 +76,9 @@ curve_ptr_t buildPiecewisePolynomialC2() {
   time_points.push_back(t2);
   time_points.push_back(t3);
 
-  curves::piecewise_t ppc_C2 = curves::piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(
+  ndcurves::piecewise_t ppc_C2 = ndcurves::piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(
       points, points_derivative, points_second_derivative, time_points);
-  curve_ptr_t res(new curves::piecewise_t(ppc_C2));
+  curve_ptr_t res(new ndcurves::piecewise_t(ppc_C2));
   return res;
 }
 
@@ -99,7 +99,7 @@ curve_ptr_t buildRandomPolynomial(double min = -1, double max = -1) {
   vec.push_back(b);
   vec.push_back(c);
   vec.push_back(d);
-  curve_ptr_t res(new curves::polynomial_t(vec.begin(), vec.end(), min, max));
+  curve_ptr_t res(new ndcurves::polynomial_t(vec.begin(), vec.end(), min, max));
   return res;
 }
 
@@ -123,7 +123,7 @@ curve_SE3_ptr_t buildPiecewiseSE3() {
   quaternion_t q1(0., 1., 0, 0);
   pointX_t p0 = point3_t(1., 1.5, -2.);
   pointX_t p1 = point3_t(3., 0, 1.);
-  curve_SE3_ptr_t cLinear(new curves::SE3Curve_t(p0, p1, q0, q1, min, mid));
+  curve_SE3_ptr_t cLinear(new ndcurves::SE3Curve_t(p0, p1, q0, q1, min, mid));
   point3_t a(1, 2, 3);
   point3_t b(2, 3, 4);
   point3_t c(3, 4, 5);
@@ -133,12 +133,13 @@ curve_SE3_ptr_t buildPiecewiseSE3() {
   params.push_back(b);
   params.push_back(c);
   params.push_back(d);
-  boost::shared_ptr<curves::bezier_t> translation_bezier(new curves::bezier_t(params.begin(), params.end(), mid, max));
-  curve_SE3_ptr_t cBezier(new curves::SE3Curve_t(translation_bezier, q0.toRotationMatrix(), q1.toRotationMatrix()));
+  boost::shared_ptr<ndcurves::bezier_t> translation_bezier(
+      new ndcurves::bezier_t(params.begin(), params.end(), mid, max));
+  curve_SE3_ptr_t cBezier(new ndcurves::SE3Curve_t(translation_bezier, q0.toRotationMatrix(), q1.toRotationMatrix()));
 
-  curves::piecewise_SE3_t piecewiseSE3(cLinear);
+  ndcurves::piecewise_SE3_t piecewiseSE3(cLinear);
   piecewiseSE3.add_curve_ptr(cBezier);
-  curve_SE3_ptr_t res = boost::make_shared<curves::piecewise_SE3_t>(piecewiseSE3);
+  curve_SE3_ptr_t res = boost::make_shared<ndcurves::piecewise_SE3_t>(piecewiseSE3);
   return res;
 }
 
@@ -157,7 +158,7 @@ curve_SE3_ptr_t buildRandomSE3LinearTraj(const double min, const double max) {
   pointX_t p0 = point3_t::Random();
   pointX_t p1 = point3_t::Random();
 
-  curve_SE3_ptr_t res(new curves::SE3Curve_t(p0, p1, q0, q1, min, max));
+  curve_SE3_ptr_t res(new ndcurves::SE3Curve_t(p0, p1, q0, q1, min, max));
   return res;
 }
 
@@ -608,7 +609,7 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   pointX_t f1 = point12_t::Random();
   const double min = 0.5;
   const double max = 2.;
-  curve_ptr_t force12d(new curves::polynomial_t(f0, f1, min, max));
+  curve_ptr_t force12d(new ndcurves::polynomial_t(f0, f1, min, max));
   bool newTraj = cp2.addContactForceTrajectory("left_leg", force12d);
   BOOST_CHECK(newTraj);
   newTraj = cp2.addContactForceTrajectory("left_leg", force12d);
@@ -621,7 +622,7 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   BOOST_CHECK((*cp2.contactForces("left_leg"))(1.2) == (*force12d)(1.2));
   pointX_t f0_1 = point12_t::Random();
   pointX_t f1_1 = point12_t::Random();
-  curve_ptr_t force12d_1(new curves::polynomial_t(f0_1, f1_1, min, max));
+  curve_ptr_t force12d_1(new ndcurves::polynomial_t(f0_1, f1_1, min, max));
   cp2.contactForces().insert(
       std::pair<std::string, curve_ptr_t>("right_leg", force12d_1));  // should not have any effect only const getter
   BOOST_CHECK(cp2.contactForces().count("right_leg") == 0);
@@ -642,7 +643,7 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   nf0 << 56.3;
   pointX_t nf1(1);
   nf1 << 5893.2;
-  curve_ptr_t force1d(new curves::polynomial_t(nf0, nf1, min, max));
+  curve_ptr_t force1d(new ndcurves::polynomial_t(nf0, nf1, min, max));
   newTraj = cp2.addContactNormalForceTrajectory("left_leg", force1d);
   BOOST_CHECK(newTraj);
   newTraj = cp2.addContactNormalForceTrajectory("left_leg", force1d);
@@ -657,7 +658,7 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   nf0_1 << 147.2;
   pointX_t nf1_1(1);
   nf1_1 << 562;
-  curve_ptr_t force1d_1(new curves::polynomial_t(nf0_1, nf1_1, min, max));
+  curve_ptr_t force1d_1(new ndcurves::polynomial_t(nf0_1, nf1_1, min, max));
   cp2.contactNormalForces().insert(
       std::pair<std::string, curve_ptr_t>("right_leg", force1d_1));  // should not have any effect only const getter
   BOOST_CHECK(cp2.contactNormalForces().count("right_leg") == 0);
@@ -1807,12 +1808,12 @@ BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_com_traj) {
   time_points2.push_back(t3);
   time_points2.push_back(t4);
 
-  curves::piecewise_t c1 =
-      curves::piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points1, time_points1);
-  curve_ptr_t c1_ptr(new curves::piecewise_t(c1));
-  curves::piecewise_t c2 =
-      curves::piecewise_t::convert_discrete_points_to_polynomial<curves::polynomial_t>(points2, time_points2);
-  curve_ptr_t c2_ptr(new curves::piecewise_t(c2));
+  ndcurves::piecewise_t c1 =
+      ndcurves::piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(points1, time_points1);
+  curve_ptr_t c1_ptr(new ndcurves::piecewise_t(c1));
+  ndcurves::piecewise_t c2 =
+      ndcurves::piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(points2, time_points2);
+  curve_ptr_t c2_ptr(new ndcurves::piecewise_t(c2));
   cp0.m_c = c1_ptr;
   cp1.m_c = c2_ptr;
   BOOST_CHECK(cp0.m_c->min() == 0.);
@@ -1846,8 +1847,8 @@ BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_effector_traj) {
   pointX_t p1 = point3_t::Random();
   pointX_t p2 = point3_t::Random();
 
-  curve_SE3_ptr_t traj_0(new curves::SE3Curve_t(p0, p1, q0, q1, 0., 2.));
-  curve_SE3_ptr_t traj_2(new curves::SE3Curve_t(p1, p2, q1, q2, 4., 8.));
+  curve_SE3_ptr_t traj_0(new ndcurves::SE3Curve_t(p0, p1, q0, q1, 0., 2.));
+  curve_SE3_ptr_t traj_2(new ndcurves::SE3Curve_t(p1, p2, q1, q2, 4., 8.));
   cp0.addEffectorTrajectory("right_leg", traj_0);
   cp2.addEffectorTrajectory("right_leg", traj_2);
 

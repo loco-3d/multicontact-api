@@ -5,7 +5,7 @@ from math import cos, sin, sqrt
 from random import uniform
 
 import numpy as np
-from curves import SE3Curve, bezier, piecewise, piecewise_SE3, polynomial
+from ndcurves import SE3Curve, bezier, piecewise, piecewise_SE3, polynomial
 from numpy import array, array_equal, isclose, random
 
 import pinocchio as pin
