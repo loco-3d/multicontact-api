@@ -4,7 +4,7 @@
 #ifndef __multicontact_api_python_serialization_archive_hpp__
 #define __multicontact_api_python_serialization_archive_hpp__
 
-#include <boost/python.hpp>
+#include "multicontact-api/bindings/python/fwd.hpp"
 
 namespace multicontact_api {
 namespace python {
