@@ -41,13 +41,13 @@ make test
 
 ## Main classes
 
-This package define 3 main classes representing physical concepts of legged locomotion. Contact Patch, Contact Phase and Contact Sequence.
+This package define 4 main classes representing physical concepts of legged locomotion. Contact Model, Contact Patch, Contact Phase and Contact Sequence.
+
+A Contact Model define the physical properties of a contact. A Contact Patch define completely a contact between a part of the robot and the environment, it contain a Contact Model. A Contact Phase is defined by a constant set of contacts, it contains one or more Contact Patches. Finally, a Contact Sequence is a sequence of Contact Phases.
 
 ### Contact Patch
 
-A contact patch define the placement (in SE(3), in the world frame) of a contact as long as the friction coefficient for this contact.
-
-Future work will also include the type of contact (eg planar, punctual, bilateral ...), a representation of the friction cone or additional information about the contact.
+A contact patch define the placement (in SE(3), in the world frame) of a contact between a part of the robot and the environment. It contains a ContactModel.
 
 ### Contact Phase
 
