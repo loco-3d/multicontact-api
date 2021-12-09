@@ -144,8 +144,8 @@ curve_SE3_ptr_t buildPiecewiseSE3() {
 }
 
 quaternion_t randomQuaternion() {  // already included in newest eigen release
-  const double u1 = Eigen::internal::random<double>(0, 1), u2 = Eigen::internal::random<double>(0, 2 * EIGEN_PI),
-               u3 = Eigen::internal::random<double>(0, 2 * EIGEN_PI);
+  const double u1 = Eigen::internal::random<double>(0, 1), u2 = Eigen::internal::random<double>(0, 2 * static_cast<double>(EIGEN_PI)),
+               u3 = Eigen::internal::random<double>(0, 2 * static_cast<double>(EIGEN_PI));
   const double a = sqrt(1 - u1), b = sqrt(u1);
   return quaternion_t(a * sin(u2), a * cos(u2), b * sin(u3), b * cos(u3)).normalized();
 }

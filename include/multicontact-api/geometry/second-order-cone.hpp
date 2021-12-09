@@ -72,7 +72,11 @@ struct SecondOrderCone : public serialization::Serializable<SecondOrderCone<_Sca
   Scalar rhsValue(const VectorD& point) const { return m_direction.dot(point); }
 
   /// \returns true if the point is inside the cone
-  bool check(const VectorD& point, const Scalar factor = 1.) const {
+  bool check(const VectorD& point) const {
+    return check(point, 1.);
+  }
+
+  bool check(const VectorD& point, const Scalar factor) const {
     return lhsValue(point) <= factor * rhsValue(point);
   }
 

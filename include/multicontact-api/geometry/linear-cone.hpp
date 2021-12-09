@@ -148,8 +148,12 @@ struct ForceConeTpl : public LinearCone<_Scalar, 3, _Options> {
   explicit ForceConeTpl(const Index size) : Base(size) {}
 
   /// \returns a linear cone built from a friction coefficient and the number of rays along the Z axis.
+  static ForceConeTpl RegularCone(const Scalar mu, const VectorD& direction, const int num_rays) {
+    return RegularCone(mu, direction, num_rays, 0.);
+  }
+
   static ForceConeTpl RegularCone(const Scalar mu, const VectorD& direction, const int num_rays,
-                                  const Scalar theta_offset = 0.) {
+                                  const Scalar theta_offset) {
     assert(mu >= 0. && "mu must be positive");
     assert(num_rays >= 1 && "The number of rays must be at least one");
 
