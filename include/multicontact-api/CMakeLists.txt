@@ -24,6 +24,7 @@ SET(${PROJECT_NAME}_SCENARIO_HEADERS
 
 
 SET(${PROJECT_NAME}_PYTHON_HEADERS
+  bindings/python/fwd.hpp
   bindings/python/geometry/ellipsoid.hpp
   bindings/python/geometry/expose-geometry.hpp
   bindings/python/geometry/linear-cone.hpp
