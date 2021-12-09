@@ -5,8 +5,8 @@
 #define __multicontact_api_python_geometry_ellipsoid_hpp__
 
 #include <pinocchio/fwd.hpp>
-#include <boost/python.hpp>
 
+#include "multicontact-api/bindings/python/fwd.hpp"
 #include "multicontact-api/geometry/ellipsoid.hpp"
 
 namespace multicontact_api {
