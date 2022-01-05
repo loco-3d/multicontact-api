@@ -4,7 +4,7 @@
 [![Coverage report](https://gepgitlab.laas.fr/loco-3d/multicontact-api/badges/master/coverage.svg?job=doc-coverage)](http://projects.laas.fr/gepetto/doc/loco-3d/multicontact-api/master/coverage/)
 
 
-This package is extracted from an original work of Justin Carpentier (jcarpent@laas.fr),
+This package is extracted from an original work of Justin Carpentier (@jcarpent).
 with the goal to simplify the library, make it more generic and remove old dependencies.
 
 This package provide C++ structures with python bindings used to define and store contact phases and contact sequences.
@@ -12,29 +12,29 @@ This package provide C++ structures with python bindings used to define and stor
 # Dependencies
 
 * Eigen
+* [Eigenpy](https://github.com/stack-of-tasks/eigenpy) (Only for python bindings)
 * [Pinocchio](https://github.com/stack-of-tasks/pinocchio)
 * [NDCurves](https://github.com/loco-3d/ndcurves)
-* [Eigenpy](https://github.com/stack-of-tasks/eigenpy) (Only for python bindings)
 
 # Installation procedure
 
 ## From binary
-This package is available as binary in [robotpkg/wip](http://robotpkg.openrobots.org/robotpkg-wip.html)
+This package is available as binary in [robotpkg](http://robotpkg.openrobots.org/debian.html)
 
 ## From sources
-Install the required dependencies, eg. (choose for python version):
+Install the required dependencies, eg.:
 
 ```
-sudo apt-get install robotpkg-py35-pinocchio robotpkg-py3\*-curves
+sudo apt-get install robotpkg-py3\*-pinocchio robotpkg-py3\*-ndcurves
 ```
 
 Clone the repository and build the package:
 
 ```
-git clone --recursive git@gepgitlab.laas.fr:loco-3d/multicontact-api.git
-cd multicontact-api && mkdir build && cd build
-cmake .. && make
-make test
+git clone --recursive https://github.com/loco-3d/multicontact-api.git
+cmake -B multicontact-api/build -S multicontact-api
+cmake --build multicontact-api/build
+cmake --build multicontact-api/build -t test
 ```
 
 # Usage
