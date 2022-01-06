@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>multicontact-api</name>
+  <version>3.0.0</version>
+  <description>
+      tt
+  </description>
+  <maintainer email="guilhem.saurel@laas.fr">Guilhem Saurel</maintainer>
+  <author>Rohan Budhiraja</author>
+  <author>Justin Carpentier</author>
+  <author>Jason Chemin</author>
+  <author>Pierre Fernbach</author>
+  <license>BSD</license>
+
+  <url>http://github.com/loco-3d/multicontact-api</url>
+
+  <build_depend>git</build_depend>
+  <build_depend>doxygen</build_depend>
+  <buildtool_depend>cmake</buildtool_depend>
+  <!-- The following tags are recommended by REP-136 -->
+  <exec_depend condition="$ROS_VERSION == 1">catkin</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">ament_cmake</exec_depend>
+  <depend>boost</depend>
+  <depend>eigen</depend>
+  <depend>eigenpy</depend>
+  <depend>graphviz</depend>
+  <depend>pinocchio</depend>
+  <depend>ndcurves</depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>
