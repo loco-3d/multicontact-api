@@ -12,6 +12,7 @@ import pinocchio as pin
 from multicontact_api import ContactModel, ContactPatch, ContactPhase, ContactSequence, ContactType
 from pinocchio import SE3, Quaternion
 import pickle
+
 pin.switchToNumpyArray()
 
 
@@ -210,7 +211,7 @@ class ContactModelTest(unittest.TestCase):
 
         generators = mp1.generatorMatrix()
         self.assertEqual(generators.shape[0], 6)
-        self.assertEqual(generators.shape[1], 5*3)
+        self.assertEqual(generators.shape[1], 5 * 3)
 
         mp1.num_contact_points = 2
         self.assertEqual(mp1.num_contact_points, 2)

@@ -5,6 +5,7 @@ import unittest
 import numpy as np
 
 import multicontact_api
+
 multicontact_api.switchToNumpyArray()
 
 

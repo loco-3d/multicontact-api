@@ -144,7 +144,8 @@ curve_SE3_ptr_t buildPiecewiseSE3() {
 }
 
 quaternion_t randomQuaternion() {  // already included in newest eigen release
-  const double u1 = Eigen::internal::random<double>(0, 1), u2 = Eigen::internal::random<double>(0, 2 * static_cast<double>(EIGEN_PI)),
+  const double u1 = Eigen::internal::random<double>(0, 1),
+               u2 = Eigen::internal::random<double>(0, 2 * static_cast<double>(EIGEN_PI)),
                u3 = Eigen::internal::random<double>(0, 2 * static_cast<double>(EIGEN_PI));
   const double a = sqrt(1 - u1), b = sqrt(u1);
   return quaternion_t(a * sin(u2), a * cos(u2), b * sin(u3), b * cos(u3)).normalized();
@@ -476,7 +477,6 @@ BOOST_AUTO_TEST_CASE(contact_patch) {
   BOOST_CHECK(cp_with_model.placement() == p);
   BOOST_CHECK(cp_with_model.friction() == 0.5);
   BOOST_CHECK(cp_with_model.m_contact_model.num_contact_points() == 4);
-
 
   // check comparison operator
   BOOST_CHECK(cp1 != cp2);
