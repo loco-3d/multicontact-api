@@ -249,6 +249,7 @@ The ContactSequence class also contains methods for easier access to the data co
 
 Finally, methods exists to return the complete trajectory along the contact sequence, concatenating the trajectories of each phases (eg. `concatenateCtrajectories` return the complete c(t) trajectory for all the contact sequence).
 
-## Serialization
 
-All classes have Boost Serialization features. This is intended for data transfert between processes, and not long-term storage.
+## Examples
+
+[Examples](examples/README.md) provide several serialized ContactSequence files with descriptions.
