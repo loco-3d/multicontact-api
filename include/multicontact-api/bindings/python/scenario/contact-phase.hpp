@@ -4,12 +4,13 @@
 #ifndef __multicontact_api_python_scenario_contact_phase_hpp__
 #define __multicontact_api_python_scenario_contact_phase_hpp__
 
+#include <pinocchio/fwd.hpp>
+// Include pinocchio before everything else
 #include <ndcurves/python/python_definitions.h>
 
 #include <boost/python/suite/indexing/map_indexing_suite.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <eigenpy/eigenpy.hpp>
-#include <pinocchio/fwd.hpp>
 #include <typeinfo>
 
 #include "multicontact-api/bindings/python/serialization/archive.hpp"

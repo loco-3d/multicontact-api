@@ -1,9 +1,7 @@
 // Copyright (c) 2015-2018, CNRS
 // Authors: Justin Carpentier <jcarpent@laas.fr>
 
-#include "multicontact-api/bindings/python/scenario/contact-phase.hpp"
-
-#include "multicontact-api/bindings/python/scenario/expose-scenario.hpp"
+#include <pinocchio/fwd.hpp>
 
 // required because of the serialization of the curves pointer :
 #include <ndcurves/bezier_curve.h>
@@ -14,6 +12,11 @@
 #include <ndcurves/polynomial.h>
 #include <ndcurves/se3_curve.h>
 #include <ndcurves/so3_linear.h>
+
+// multicontact-api headers
+
+#include "multicontact-api/bindings/python/scenario/contact-phase.hpp"
+#include "multicontact-api/bindings/python/scenario/expose-scenario.hpp"
 
 namespace multicontact_api {
 namespace python {

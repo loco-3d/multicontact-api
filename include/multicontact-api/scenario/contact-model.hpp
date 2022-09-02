@@ -6,6 +6,7 @@
 
 #include <Eigen/Dense>
 #include <iostream>
+#include <pinocchio/fwd.hpp>
 #include <pinocchio/spatial/skew.hpp>
 
 #include "multicontact-api/scenario/fwd.hpp"

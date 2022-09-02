@@ -4,6 +4,9 @@
 #ifndef __multicontact_api_python_serialization_archive_hpp__
 #define __multicontact_api_python_serialization_archive_hpp__
 
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+
 #include "multicontact-api/bindings/python/fwd.hpp"
 
 namespace multicontact_api {
