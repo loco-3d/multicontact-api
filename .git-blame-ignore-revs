@@ -1,0 +1,23 @@
+# format (Guilhem Saurel, 2022-09-02)
+8fc67cd1a357b875770080f7e14306f9d233d2da
+
+# format (Guilhem Saurel, 2022-01-07)
+4b2c619eec5124e3aa5c8a76e7e781abf0c1f471
+
+# [Format] fix format changes introduced by previous merge (Pierre Fernbach, 2020-05-18)
+c2030738ca4d97e7e1166710b74ed78c310d92d9
+
+# [Format] fix format (Pierre Fernbach, 2020-05-06)
+3ea4d75a52600128ff5952f1d88fbe7ae0a2b4f0
+
+# format (Guilhem Saurel, 2020-02-27)
+41868547eb94a0862044ac8f7e7ae235cb92f63d
+
+# [Format][Python] fix format in scenario.py (Pierre Fernbach, 2020-01-28)
+8319b8328044e87bcc74863a19621be32dbc93e9
+
+# [Format] run yapf for python files (Pierre Fernbach, 2020-01-28)
+b9c43e60f94611875fb394d22e4dda44301fdb29
+
+# [Format] run gepetto/linters (Pierre Fernbach, 2020-01-28)
+23c4ada3f026718cdd0d2d23ffa1b51458483050
