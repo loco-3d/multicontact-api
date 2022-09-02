@@ -1,18 +1,15 @@
-# Copyright (c) 2015-2020, CNRS
-# Authors: Justin Carpentier <jcarpent@laas.fr>, Guilhem Saurel
+# Copyright (c) 2015-2020, CNRS Authors: Justin Carpentier <jcarpent@laas.fr>,
+# Guilhem Saurel
 
-ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK)
+add_definitions(-DBOOST_TEST_DYN_LINK)
 
-SET(${PROJECT_NAME}_TESTS
-  geometry
-  scenario
-  )
+set(${PROJECT_NAME}_TESTS geometry scenario)
 
-FOREACH(TEST ${${PROJECT_NAME}_TESTS})
-  ADD_UNIT_TEST(${TEST} "${TEST}.cpp")
-  TARGET_LINK_LIBRARIES(${TEST} ${PROJECT_NAME} Boost::unit_test_framework)
-ENDFOREACH(TEST ${${PROJECT_NAME}_TESTS})
+foreach(TEST ${${PROJECT_NAME}_TESTS})
+  add_unit_test(${TEST} "${TEST}.cpp")
+  target_link_libraries(${TEST} ${PROJECT_NAME} Boost::unit_test_framework)
+endforeach(TEST ${${PROJECT_NAME}_TESTS})
 
-IF(BUILD_PYTHON_INTERFACE)
-  ADD_SUBDIRECTORY(python)
-ENDIF(BUILD_PYTHON_INTERFACE)
+if(BUILD_PYTHON_INTERFACE)
+  add_subdirectory(python)
+endif(BUILD_PYTHON_INTERFACE)

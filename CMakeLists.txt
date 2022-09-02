@@ -1,64 +1,73 @@
-# Copyright (c) 2015-2020, CNRS
-# Authors: Justin Carpentier <jcarpent@laas.fr>, Guilhem Saurel
+# Copyright (c) 2015-2020, CNRS Authors: Justin Carpentier <jcarpent@laas.fr>,
+# Guilhem Saurel
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
+cmake_minimum_required(VERSION 3.1)
 
 # Project properties
-SET(PROJECT_ORG loco-3d)
-SET(PROJECT_NAME multicontact-api)
-SET(PROJECT_DESCRIPTION "API to define and store Contact phases and Contact Sequences")
-SET(PROJECT_URL "https://github.com/${PROJECT_ORG}/${PROJECT_NAME}")
+set(PROJECT_ORG loco-3d)
+set(PROJECT_NAME multicontact-api)
+set(PROJECT_DESCRIPTION
+    "API to define and store Contact phases and Contact Sequences")
+set(PROJECT_URL "https://github.com/${PROJECT_ORG}/${PROJECT_NAME}")
 
 # Project options
-OPTION(BUILD_PYTHON_INTERFACE "Build the python bindings" ON)
-OPTION(INSTALL_PYTHON_INTERFACE_ONLY "Install *ONLY* the python bindings" OFF)
-OPTION(SUFFIX_SO_VERSION "Suffix library name with its version" ON)
+option(BUILD_PYTHON_INTERFACE "Build the python bindings" ON)
+option(INSTALL_PYTHON_INTERFACE_ONLY "Install *ONLY* the python bindings" OFF)
+option(SUFFIX_SO_VERSION "Suffix library name with its version" ON)
 
 # Project configuration
-IF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
-  SET(PROJECT_USE_CMAKE_EXPORT TRUE)
-ENDIF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
-SET(CUSTOM_HEADER_DIR "${PROJECT_NAME}")
-SET(CXX_DISABLE_WERROR TRUE)
-SET(DOXYGEN_USE_MATHJAX YES)
+if(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+  set(PROJECT_USE_CMAKE_EXPORT TRUE)
+endif(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+set(CUSTOM_HEADER_DIR "${PROJECT_NAME}")
+set(CXX_DISABLE_WERROR TRUE)
+set(DOXYGEN_USE_MATHJAX YES)
 
 # JRL-cmakemodule setup
-INCLUDE(cmake/base.cmake)
-INCLUDE(cmake/boost.cmake)
-INCLUDE(cmake/ide.cmake)
+include(cmake/base.cmake)
+include(cmake/boost.cmake)
+include(cmake/ide.cmake)
 
 # Project definition
-COMPUTE_PROJECT_ARGS(PROJECT_ARGS LANGUAGES CXX)
-PROJECT(${PROJECT_NAME} ${PROJECT_ARGS})
-CHECK_MINIMAL_CXX_STANDARD(11 ENFORCE)
+compute_project_args(PROJECT_ARGS LANGUAGES CXX)
+project(${PROJECT_NAME} ${PROJECT_ARGS})
+check_minimal_cxx_standard(11 ENFORCE)
 
 # Project dependencies
-IF(BUILD_PYTHON_INTERFACE)
-  ADD_PROJECT_DEPENDENCY(eigenpy 2.7.12 REQUIRED)
-  STRING(REGEX REPLACE "-" "_" PY_NAME ${PROJECT_NAME})
-  SET(${PY_NAME}_INSTALL_DIR ${PYTHON_SITELIB}/${PY_NAME})
-ENDIF(BUILD_PYTHON_INTERFACE)
+if(BUILD_PYTHON_INTERFACE)
+  add_project_dependency(eigenpy 2.7.12 REQUIRED)
+  string(REGEX REPLACE "-" "_" PY_NAME ${PROJECT_NAME})
+  set(${PY_NAME}_INSTALL_DIR ${PYTHON_SITELIB}/${PY_NAME})
+endif(BUILD_PYTHON_INTERFACE)
 
-ADD_PROJECT_DEPENDENCY(pinocchio REQUIRED)
-ADD_PROJECT_DEPENDENCY(ndcurves 1.0.0 REQUIRED)
-IF(NOT CURVES_WITH_PINOCCHIO_SUPPORT)
-  MESSAGE(FATAL_ERROR "you need to use a ndcurves version compiled with pinocchio support")
-ENDIF(NOT CURVES_WITH_PINOCCHIO_SUPPORT)
-ADD_PROJECT_DEPENDENCY(Boost REQUIRED COMPONENTS unit_test_framework serialization)
+add_project_dependency(pinocchio REQUIRED)
+add_project_dependency(ndcurves 1.0.0 REQUIRED)
+if(NOT CURVES_WITH_PINOCCHIO_SUPPORT)
+  message(
+    FATAL_ERROR
+      "you need to use a ndcurves version compiled with pinocchio support")
+endif(NOT CURVES_WITH_PINOCCHIO_SUPPORT)
+add_project_dependency(Boost REQUIRED COMPONENTS unit_test_framework
+                       serialization)
 
 # Main Library
 
-ADD_LIBRARY(${PROJECT_NAME} INTERFACE)
-TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} INTERFACE $<INSTALL_INTERFACE:include>)
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} INTERFACE pinocchio::pinocchio ndcurves::ndcurves)
+add_library(${PROJECT_NAME} INTERFACE)
+target_include_directories(${PROJECT_NAME}
+                           INTERFACE $<INSTALL_INTERFACE:include>)
+target_link_libraries(${PROJECT_NAME} INTERFACE pinocchio::pinocchio
+                                                ndcurves::ndcurves)
 
-IF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
-  INSTALL(TARGETS ${PROJECT_NAME} EXPORT ${TARGETS_EXPORT_NAME} DESTINATION lib)
-ENDIF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+if(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+  install(
+    TARGETS ${PROJECT_NAME}
+    EXPORT ${TARGETS_EXPORT_NAME}
+    DESTINATION lib)
+endif(NOT INSTALL_PYTHON_INTERFACE_ONLY)
 
-IF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
-  ADD_SUBDIRECTORY(include/${CUSTOM_HEADER_DIR})
-  INSTALL(FILES package.xml DESTINATION share/${PROJECT_NAME})
-ENDIF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
-ADD_SUBDIRECTORY(bindings)
-ADD_SUBDIRECTORY(unittest)
+if(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+  add_subdirectory(include/${CUSTOM_HEADER_DIR})
+  install(FILES package.xml DESTINATION share/${PROJECT_NAME})
+endif(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+add_subdirectory(bindings)
+add_subdirectory(unittest)

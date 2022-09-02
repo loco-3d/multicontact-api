@@ -15,7 +15,8 @@ namespace python {
 namespace bp = boost::python;
 
 template <typename Ellipsoid>
-struct EllipsoidPythonVisitor : public boost::python::def_visitor<EllipsoidPythonVisitor<Ellipsoid> > {
+struct EllipsoidPythonVisitor
+    : public boost::python::def_visitor<EllipsoidPythonVisitor<Ellipsoid> > {
   typedef typename Ellipsoid::Matrix Matrix;
   typedef typename Ellipsoid::Vector Vector;
 
@@ -23,12 +24,16 @@ struct EllipsoidPythonVisitor : public boost::python::def_visitor<EllipsoidPytho
   void visit(PyClass& cl) const {
     cl.def(bp::init<Matrix, Vector>((bp::arg("A"), bp::arg("center"))))
         .def("__str__", &toString)
-        .def("lhsValue", &Ellipsoid::lhsValue, bp::arg("point"), "Returns the value of norm(A*(x-c)).")
-        .add_property("center", &get_center, &set_center, "Accessor to the center property.")
+        .def("lhsValue", &Ellipsoid::lhsValue, bp::arg("point"),
+             "Returns the value of norm(A*(x-c)).")
+        .add_property("center", &get_center, &set_center,
+                      "Accessor to the center property.")
         .add_property("A", &get_A, &set_A, "Accessor to the A property.");
   }
 
-  static void set_center(Ellipsoid& e, const Vector& center) { e.center() = center; }
+  static void set_center(Ellipsoid& e, const Vector& center) {
+    e.center() = center;
+  }
   static Vector get_center(const Ellipsoid& e) { return e.center(); }
 
   static void set_A(Ellipsoid& e, const Matrix& A) { e.A() = A; }
@@ -37,7 +42,8 @@ struct EllipsoidPythonVisitor : public boost::python::def_visitor<EllipsoidPytho
   static void expose(const std::string& class_name) {
     std::string doc = "Ellipsoid of dimension " + Ellipsoid::dim;
     doc += " defined by its matrix A and its center.";
-    bp::class_<Ellipsoid>(class_name.c_str(), doc.c_str(), bp::no_init).def(EllipsoidPythonVisitor<Ellipsoid>());
+    bp::class_<Ellipsoid>(class_name.c_str(), doc.c_str(), bp::no_init)
+        .def(EllipsoidPythonVisitor<Ellipsoid>());
   }
 
  protected:

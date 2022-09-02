@@ -23,7 +23,9 @@ struct Ellipsoid {
 
   Ellipsoid(const Matrix& A, const Vector& center) : m_A(A), m_center(center) {}
 
-  Scalar lhsValue(const Vector& point) const { return (m_A * (point - m_center)).norm(); }
+  Scalar lhsValue(const Vector& point) const {
+    return (m_A * (point - m_center)).norm();
+  }
 
   const Matrix& A() const { return m_A; }
   Matrix& A() { return m_A; }
@@ -31,7 +33,9 @@ struct Ellipsoid {
   Vector& center() { return m_center; }
 
   void disp(std::ostream& os) const {
-    os << "A:\n" << m_A << std::endl << "center: " << m_center.transpose() << std::endl;
+    os << "A:\n"
+       << m_A << std::endl
+       << "center: " << m_center.transpose() << std::endl;
   }
 
   friend std::ostream& operator<<(std::ostream& os, const Ellipsoid& E) {

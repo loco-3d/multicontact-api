@@ -9,7 +9,13 @@ from ndcurves import SE3Curve, bezier, piecewise, piecewise_SE3, polynomial
 from numpy import array, array_equal, isclose, random
 
 import pinocchio as pin
-from multicontact_api import ContactModel, ContactPatch, ContactPhase, ContactSequence, ContactType
+from multicontact_api import (
+    ContactModel,
+    ContactPatch,
+    ContactPhase,
+    ContactSequence,
+    ContactType,
+)
 from pinocchio import SE3, Quaternion
 import pickle
 
@@ -17,9 +23,9 @@ pin.switchToNumpyArray()
 
 
 def randomQuaternion():
-    u1 = uniform(0., 1.)
-    u2 = uniform(0., 2. * np.pi)
-    u3 = uniform(0., 2. * np.pi)
+    u1 = uniform(0.0, 1.0)
+    u2 = uniform(0.0, 2.0 * np.pi)
+    u3 = uniform(0.0, 2.0 * np.pi)
     a = sqrt(1 - u1)
     b = sqrt(u1)
     q = Quaternion(a * sin(u2), a * cos(u2), b * sin(u3), b * cos(u3))
@@ -32,7 +38,7 @@ def createRandomPiecewisePolynomial(dim, t_min=0, t_max=2):
     Build random piecewise polynomial with 2 polynomial of degree 3
     between 01 and 12
     """
-    t_mid = (t_min + t_max) / 2.
+    t_mid = (t_min + t_max) / 2.0
     coefs0 = np.random.rand(dim, 4)  # degree 3
     pol0 = polynomial(coefs0, t_min, t_mid)
     pc = piecewise(pol0)
@@ -154,7 +160,7 @@ class ContactModelTest(unittest.TestCase):
         mu = 0.3
         # default constructor
         mp = ContactModel()
-        self.assertEqual(mp.mu, -1.)
+        self.assertEqual(mp.mu, -1.0)
         self.assertEqual(mp.contact_type, ContactType.CONTACT_UNDEFINED)
         self.assertEqual(mp.num_contact_points, 1)
         self.assertEqual(len(mp.contact_points_positions.shape), 1)
@@ -229,9 +235,9 @@ class ContactModelTest(unittest.TestCase):
         mp_bin = ContactModel()
         mp_bin.loadFromBinary("mp_test")
         self.assertEqual(mp1, mp_bin)
-        mp1.saveAsXML("mp_test.xml", 'ContactModel')
+        mp1.saveAsXML("mp_test.xml", "ContactModel")
         mp_xml = ContactModel()
-        mp_xml.loadFromXML("mp_test.xml", 'ContactPatch')
+        mp_xml.loadFromXML("mp_test.xml", "ContactPatch")
         self.assertEqual(mp1, mp_xml)
         mp_pickled = pickle.dumps(mp1)
         mp_from_pickle = pickle.loads(mp_pickled)
@@ -249,9 +255,9 @@ class ContactModelTest(unittest.TestCase):
         mp_bin = ContactModel()
         mp_bin.loadFromBinary("mp_test")
         self.assertEqual(mp1, mp_bin)
-        mp1.saveAsXML("mp_test.xml", 'ContactModel')
+        mp1.saveAsXML("mp_test.xml", "ContactModel")
         mp_xml = ContactModel()
-        mp_xml.loadFromXML("mp_test.xml", 'ContactPatch')
+        mp_xml.loadFromXML("mp_test.xml", "ContactPatch")
         self.assertEqual(mp1, mp_xml)
         mp_pickled = pickle.dumps(mp1)
         mp_from_pickle = pickle.loads(mp_pickled)
@@ -344,9 +350,9 @@ class ContactPatchTest(unittest.TestCase):
         cp_bin = ContactPatch()
         cp_bin.loadFromBinary("cp_test")
         self.assertEqual(cp1, cp_bin)
-        cp1.saveAsXML("cp_test.xml", 'ContactPatch')
+        cp1.saveAsXML("cp_test.xml", "ContactPatch")
         cp_xml = ContactPatch()
-        cp_xml.loadFromXML("cp_test.xml", 'ContactPatch')
+        cp_xml.loadFromXML("cp_test.xml", "ContactPatch")
         self.assertEqual(cp1, cp_xml)
         cp_pickled = pickle.dumps(cp1)
         cp_from_pickle = pickle.loads(cp_pickled)
@@ -364,9 +370,9 @@ class ContactPatchTest(unittest.TestCase):
         cp_bin = ContactPatch()
         cp_bin.loadFromBinary("cp_test")
         self.assertEqual(cp1, cp_bin)
-        cp1.saveAsXML("cp_test.xml", 'ContactPatch')
+        cp1.saveAsXML("cp_test.xml", "ContactPatch")
         cp_xml = ContactPatch()
-        cp_xml.loadFromXML("cp_test.xml", 'ContactPatch')
+        cp_xml.loadFromXML("cp_test.xml", "ContactPatch")
         self.assertEqual(cp1, cp_xml)
         cp_pickled = pickle.dumps(cp1)
         cp_from_pickle = pickle.loads(cp_pickled)
@@ -418,16 +424,16 @@ class ContactPhaseTest(unittest.TestCase):
     def test_timings_setter(self):
         cp = ContactPhase()
         cp.timeInitial = 1.5
-        cp.timeFinal = 3.
+        cp.timeFinal = 3.0
         self.assertEqual(cp.timeInitial, 1.5)
-        self.assertEqual(cp.timeFinal, 3.)
+        self.assertEqual(cp.timeFinal, 3.0)
         self.assertEqual(cp.duration, 1.5)
-        cp.duration = 2.
+        cp.duration = 2.0
         self.assertEqual(cp.timeInitial, 1.5)
         self.assertEqual(cp.timeFinal, 3.5)
-        self.assertEqual(cp.duration, 2.)
+        self.assertEqual(cp.duration, 2.0)
         with self.assertRaises(ValueError):
-            cp.timeFinal = 1.
+            cp.timeFinal = 1.0
         with self.assertRaises(ValueError):
             cp.duration = -0.5
 
@@ -498,10 +504,10 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertNotEqual(patchRF, cp.contactPatch("right-leg"))
         patchRF = ContactPatch(cp.contactPatch("right-leg"))
         # check that the getter of contactPatch is a non const reference:
-        cp.contactPatch('right-leg').placement.setRandom()
+        cp.contactPatch("right-leg").placement.setRandom()
         self.assertNotEqual(patchRF, cp.contactPatch("right-leg"))
         patchRF = ContactPatch(cp.contactPatch("right-leg"))
-        cp.contactPatch('right-leg').friction = 0.7
+        cp.contactPatch("right-leg").friction = 0.7
         self.assertNotEqual(patchRF, cp.contactPatch("right-leg"))
         patchRF = ContactPatch(cp.contactPatch("right-leg"))
         cp.contactPatch("right-leg").placement.translation += np.array([0, 0.1, 0])
@@ -572,7 +578,9 @@ class ContactPhaseTest(unittest.TestCase):
         init_pose.translation = array([0.2, -0.7, 0.6])
         end_pose.translation = array([3.6, -2.2, -0.9])
         init_pose.rotation = Quaternion.Identity().normalized().matrix()
-        end_pose.rotation = Quaternion(sqrt(2.) / 2., sqrt(2.) / 2., 0, 0).normalized().matrix()
+        end_pose.rotation = (
+            Quaternion(sqrt(2.0) / 2.0, sqrt(2.0) / 2.0, 0, 0).normalized().matrix()
+        )
         effL = SE3Curve(init_pose, end_pose, 0.5, 2.5)
         # add the trajectory to the contact phase :
         new = cp.addEffectorTrajectory("left-leg", effL)
@@ -582,15 +590,21 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertEqual(cp.effectorTrajectory("left-leg"), effL)
         self.assertEqual(cp.effectorTrajectory("left-leg").min(), 0.5)
         self.assertEqual(cp.effectorTrajectory("left-leg").max(), 2.5)
-        self.assertTrue(cp.effectorTrajectory("left-leg").evaluateAsSE3(0.5).isApprox(init_pose))
-        self.assertTrue(cp.effectorTrajectory("left-leg").evaluateAsSE3(2.5).isApprox(end_pose))
+        self.assertTrue(
+            cp.effectorTrajectory("left-leg").evaluateAsSE3(0.5).isApprox(init_pose)
+        )
+        self.assertTrue(
+            cp.effectorTrajectory("left-leg").evaluateAsSE3(2.5).isApprox(end_pose)
+        )
 
         # check with piecewise SE3
         effH = piecewise_SE3(effL)
         end_pose2 = SE3.Identity()
         end_pose2.translation = array([-4.9, 0.8, 0.9])
-        end_pose2.rotation = Quaternion(sqrt(2.) / 2., 0., sqrt(2.) / 2., 0).normalized().matrix()
-        effH.append(end_pose2, 4.)
+        end_pose2.rotation = (
+            Quaternion(sqrt(2.0) / 2.0, 0.0, sqrt(2.0) / 2.0, 0).normalized().matrix()
+        )
+        effH.append(end_pose2, 4.0)
         new = cp.addEffectorTrajectory("hand", effH)
         self.assertTrue(new)
         self.assertTrue(cp.effectorHaveAtrajectory("left-leg"))
@@ -600,31 +614,39 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertEqual(cp.effectorTrajectory("left-leg"), effL)
         self.assertEqual(cp.effectorTrajectory("hand"), effH)
         self.assertEqual(cp.effectorTrajectory("hand").min(), 0.5)
-        self.assertEqual(cp.effectorTrajectory("hand").max(), 4.)
-        self.assertTrue(cp.effectorTrajectory("hand").evaluateAsSE3(0.5).isApprox(init_pose))
-        self.assertTrue(cp.effectorTrajectory("hand").evaluateAsSE3(4).isApprox(end_pose2))
+        self.assertEqual(cp.effectorTrajectory("hand").max(), 4.0)
+        self.assertTrue(
+            cp.effectorTrajectory("hand").evaluateAsSE3(0.5).isApprox(init_pose)
+        )
+        self.assertTrue(
+            cp.effectorTrajectory("hand").evaluateAsSE3(4).isApprox(end_pose2)
+        )
 
         # check that the getter return a pointer to a non const object :
         end_pose3 = SE3.Identity()
         end_pose3.setRandom()
         cp.effectorTrajectory("hand").append(end_pose3, 6.5)
         self.assertEqual(cp.effectorTrajectory("hand").max(), 6.5)
-        self.assertTrue(cp.effectorTrajectory("hand").evaluateAsSE3(6.5).isApprox(end_pose3))
+        self.assertTrue(
+            cp.effectorTrajectory("hand").evaluateAsSE3(6.5).isApprox(end_pose3)
+        )
 
         effH = cp.effectorTrajectory("hand")
         end_pose4 = SE3.Identity()
         end_pose4.setRandom()
-        effH.append(end_pose4, 10.)
-        self.assertEqual(cp.effectorTrajectory("hand").max(), 10.)
-        self.assertTrue(cp.effectorTrajectory("hand").evaluateAsSE3(10.).isApprox(end_pose4))
+        effH.append(end_pose4, 10.0)
+        self.assertEqual(cp.effectorTrajectory("hand").max(), 10.0)
+        self.assertTrue(
+            cp.effectorTrajectory("hand").evaluateAsSE3(10.0).isApprox(end_pose4)
+        )
 
         # check errors :
         with self.assertRaises(ValueError):
             cp.addEffectorTrajectory("right-leg", effL)
 
         # check that we cannot add other kind of trajectories than SE3 :
-        waypoints = array([[1., 2., 3.], [4., 5., 6.]]).transpose()
-        a = bezier(waypoints, 0., 1.)
+        waypoints = array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]).transpose()
+        a = bezier(waypoints, 0.0, 1.0)
         with self.assertRaises(BaseException):
             cp.addEffectorTrajectory("other-leg", a)
 
@@ -640,7 +662,9 @@ class ContactPhaseTest(unittest.TestCase):
         init_pose.translation = array([0.2, -0.7, 0.6])
         end_pose.translation = array([3.6, -2.2, -0.9])
         init_pose.rotation = Quaternion.Identity().normalized().matrix()
-        end_pose.rotation = Quaternion(sqrt(2.) / 2., sqrt(2.) / 2., 0, 0).normalized().matrix()
+        end_pose.rotation = (
+            Quaternion(sqrt(2.0) / 2.0, sqrt(2.0) / 2.0, 0, 0).normalized().matrix()
+        )
         effL = SE3Curve(init_pose, end_pose, 0.5, 2.5)
         # add the trajectory to the contact phase :
         cp.addEffectorTrajectory("left-leg", effL)
@@ -657,8 +681,10 @@ class ContactPhaseTest(unittest.TestCase):
         effH = piecewise_SE3(effL)
         end_pose2 = SE3.Identity()
         end_pose2.translation = array([-4.9, 0.8, 0.9])
-        end_pose2.rotation = Quaternion(sqrt(2.) / 2., 0., sqrt(2.) / 2., 0).normalized().matrix()
-        effH.append(end_pose2, 4.)
+        end_pose2.rotation = (
+            Quaternion(sqrt(2.0) / 2.0, 0.0, sqrt(2.0) / 2.0, 0).normalized().matrix()
+        )
+        effH.append(end_pose2, 4.0)
         dict.update({"hand": effH})
         self.assertFalse("hand" in cp.effectorTrajectories().keys())
         # check that the map is const
@@ -681,7 +707,7 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertTrue(new)
         self.assertEqual(cp.contactForce("right-leg"), fR)
         self.assertEqual(cp.contactForce("right-leg").min(), 0)
-        self.assertEqual(cp.contactForce("right-leg").max(), 2.)
+        self.assertEqual(cp.contactForce("right-leg").max(), 2.0)
         self.assertTrue(array_equal(cp.contactForce("right-leg")(0.5), fR(0.5)))
         self.assertTrue(array_equal(cp.contactForce("right-leg")(1.5), fR(1.5)))
 
@@ -689,7 +715,7 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertTrue(new)
         self.assertEqual(cp.contactForce("left-leg"), fL)
         self.assertEqual(cp.contactForce("left-leg").min(), 0)
-        self.assertEqual(cp.contactForce("left-leg").max(), 2.)
+        self.assertEqual(cp.contactForce("left-leg").max(), 2.0)
         self.assertTrue(array_equal(cp.contactForce("left-leg")(0.5), fL(0.5)))
         self.assertTrue(array_equal(cp.contactForce("left-leg")(1.5), fL(1.5)))
 
@@ -701,9 +727,9 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertEqual(cp.contactForce("left-leg").max(), 3.5)
 
         pc = cp.contactForce("left-leg")
-        pc.append(np.random.rand(12, 1), 6.)
-        self.assertEqual(cp.contactForce("left-leg").max(), 6.)
-        self.assertTrue(array_equal(cp.contactForce("left-leg")(6.), pc(6.)))
+        pc.append(np.random.rand(12, 1), 6.0)
+        self.assertEqual(cp.contactForce("left-leg").max(), 6.0)
+        self.assertTrue(array_equal(cp.contactForce("left-leg")(6.0), pc(6.0)))
 
         # check errors :
         with self.assertRaises(ValueError):
@@ -727,7 +753,7 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertTrue("right-leg" in dict.keys())
         self.assertEqual(dict["right-leg"], fR)
         self.assertEqual(dict["right-leg"].min(), 0)
-        self.assertEqual(dict["right-leg"].max(), 2.)
+        self.assertEqual(dict["right-leg"].max(), 2.0)
         self.assertTrue(array_equal(dict["right-leg"](0.5), fR(0.5)))
         self.assertTrue(array_equal(dict["right-leg"](1.5), fR(1.5)))
 
@@ -764,7 +790,7 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertTrue(new)
         self.assertEqual(cp.contactNormalForce("right-leg"), fR)
         self.assertEqual(cp.contactNormalForce("right-leg").min(), 0)
-        self.assertEqual(cp.contactNormalForce("right-leg").max(), 2.)
+        self.assertEqual(cp.contactNormalForce("right-leg").max(), 2.0)
         self.assertTrue(array_equal(cp.contactNormalForce("right-leg")(0.5), fR(0.5)))
         self.assertTrue(array_equal(cp.contactNormalForce("right-leg")(1.5), fR(1.5)))
 
@@ -772,7 +798,7 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertTrue(new)
         self.assertEqual(cp.contactNormalForce("left-leg"), fL)
         self.assertEqual(cp.contactNormalForce("left-leg").min(), 0)
-        self.assertEqual(cp.contactNormalForce("left-leg").max(), 2.)
+        self.assertEqual(cp.contactNormalForce("left-leg").max(), 2.0)
         self.assertTrue(array_equal(cp.contactNormalForce("left-leg")(0.5), fL(0.5)))
         self.assertTrue(array_equal(cp.contactNormalForce("left-leg")(1.5), fL(1.5)))
 
@@ -784,9 +810,9 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertEqual(cp.contactNormalForce("left-leg").max(), 3.5)
 
         pc = cp.contactNormalForce("left-leg")
-        pc.append(np.random.rand(1, 1), 6.)
-        self.assertEqual(cp.contactNormalForce("left-leg").max(), 6.)
-        self.assertTrue(array_equal(cp.contactNormalForce("left-leg")(6.), pc(6.)))
+        pc.append(np.random.rand(1, 1), 6.0)
+        self.assertEqual(cp.contactNormalForce("left-leg").max(), 6.0)
+        self.assertTrue(array_equal(cp.contactNormalForce("left-leg")(6.0), pc(6.0)))
 
         # check errors :
         with self.assertRaises(ValueError):
@@ -814,7 +840,7 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertTrue("right-leg" in dict.keys())
         self.assertEqual(dict["right-leg"], fR)
         self.assertEqual(dict["right-leg"].min(), 0)
-        self.assertEqual(dict["right-leg"].max(), 2.)
+        self.assertEqual(dict["right-leg"].max(), 2.0)
         self.assertTrue(array_equal(dict["right-leg"](0.5), fR(0.5)))
         self.assertTrue(array_equal(dict["right-leg"](1.5), fR(1.5)))
 
@@ -891,10 +917,10 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertFalse(array_equal(cp.c_init, ci))
         # it's a copy (limitation from eigenpy ...) :
         dc_init = cp.dc_init.copy()
-        cp.dc_init += np.array([0.1, 0., -2.])  # this work as += call the setter
+        cp.dc_init += np.array([0.1, 0.0, -2.0])  # this work as += call the setter
         self.assertFalse(array_equal(cp.dc_init, dc_init))
         dc_init = cp.dc_init.copy()
-        cp.dc_init[2] = 0.  # this line have no effect
+        cp.dc_init[2] = 0.0  # this line have no effect
         self.assertTrue(array_equal(cp.dc_init, dc_init))
 
         # check error due to incorrect dimensions :
@@ -975,7 +1001,7 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertEqual(cp.wrench_t, wrench)
         self.assertEqual(cp.zmp_t, zmp)
         self.assertEqual(cp.root_t, root)
-        for t in np.linspace(0., 2., 10):
+        for t in np.linspace(0.0, 2.0, 10):
             self.assertTrue(array_equal(cp.q_t(t), q(t)))
             self.assertTrue(array_equal(cp.dq_t(t), dq(t)))
             self.assertTrue(array_equal(cp.ddq_t(t), ddq(t)))
@@ -995,21 +1021,21 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertIsNotNone(cp.q_t)
         self.assertEqual(cp.q_t.min(), 0)
         self.assertEqual(cp.q_t.max(), 2)
-        self.assertIsNotNone(cp.q_t(1.))
+        self.assertIsNotNone(cp.q_t(1.0))
         c = None
         self.assertIsNotNone(cp.c_t)
         self.assertEqual(cp.c_t.min(), 0)
         self.assertEqual(cp.c_t.max(), 2)
-        self.assertIsNotNone(cp.c_t(1.))
+        self.assertIsNotNone(cp.c_t(1.0))
         # check that curve have not been copied and that it's the same pointer
         dc.append(np.random.rand(3, 1), 3.5)
         self.assertEqual(cp.dc_t.min(), 0)
         self.assertEqual(cp.dc_t.max(), 3.5)
         self.assertEqual(cp.dc_t, dc)
         # check that the return of the getter is not const :
-        cp.dq_t.append(np.random.rand(30, 1), 4.)
+        cp.dq_t.append(np.random.rand(30, 1), 4.0)
         self.assertEqual(cp.dq_t.min(), 0)
-        self.assertEqual(cp.dq_t.max(), 4.)
+        self.assertEqual(cp.dq_t.max(), 4.0)
         self.assertEqual(cp.dq_t, dq)
 
     def test_operator_equal(self):
@@ -1017,9 +1043,9 @@ class ContactPhaseTest(unittest.TestCase):
         cp2 = ContactPhase()
         # check timings
         self.assertTrue(cp1 == cp2)
-        cp1.timeInitial = 1.
+        cp1.timeInitial = 1.0
         self.assertTrue(cp1 != cp2)
-        cp2.timeInitial = 1.
+        cp2.timeInitial = 1.0
         self.assertTrue(cp1 == cp2)
         cp1.timeFinal = 3.5
         self.assertTrue(cp1 != cp2)
@@ -1222,7 +1248,7 @@ class ContactPhaseTest(unittest.TestCase):
         self.assertTrue(cp1 == cp2)
 
     def test_copy_constructor(self):
-        cp1 = buildRandomContactPhase(0., 2.)
+        cp1 = buildRandomContactPhase(0.0, 2.0)
         cp2 = ContactPhase(cp1)
         cp3 = cp1.copy()
         self.assertEqual(cp1, cp2)
@@ -1239,16 +1265,16 @@ class ContactPhaseTest(unittest.TestCase):
         cp_bin = ContactPhase()
         cp_bin.loadFromBinary("cp_test")
         self.assertEqual(cp1, cp_bin)
-        cp1.saveAsXML("cp_test.xml", 'ContactPhase')
+        cp1.saveAsXML("cp_test.xml", "ContactPhase")
         cp_xml = ContactPhase()
-        cp_xml.loadFromXML("cp_test.xml", 'ContactPhase')
+        cp_xml.loadFromXML("cp_test.xml", "ContactPhase")
         self.assertEqual(cp1, cp_xml)
         cp_pickled = pickle.dumps(cp1)
         cp_from_pickle = pickle.loads(cp_pickled)
         self.assertEqual(cp1, cp_from_pickle)
 
     def test_contact_phase_serialization_full(self):
-        cp1 = buildRandomContactPhase(0., 2.)
+        cp1 = buildRandomContactPhase(0.0, 2.0)
         cp1.saveAsText("cp_test_full.txt")
         cp_txt = ContactPhase()
         cp_txt.loadFromText("cp_test_full.txt")
@@ -1257,9 +1283,9 @@ class ContactPhaseTest(unittest.TestCase):
         cp_bin = ContactPhase()
         cp_bin.loadFromBinary("cp_test_full")
         self.assertEqual(cp1, cp_bin)
-        cp1.saveAsXML("cp_test_full.xml", 'ContactPhase')
+        cp1.saveAsXML("cp_test_full.xml", "ContactPhase")
         cp_xml = ContactPhase()
-        cp_xml.loadFromXML("cp_test_full.xml", 'ContactPhase')
+        cp_xml.loadFromXML("cp_test_full.xml", "ContactPhase")
         self.assertEqual(cp1, cp_xml)
         # TODO : check serialization from another file
         cp_pickled = pickle.dumps(cp1)
@@ -1320,25 +1346,43 @@ class ContactPhaseTest(unittest.TestCase):
         time_points = array(random.rand(1, N)).T
         time_points.sort(0)
         cp = ContactPhase()
-        cp.setCOMtrajectoryFromPoints(points, points_derivative, points_second_derivative, time_points)
+        cp.setCOMtrajectoryFromPoints(
+            points, points_derivative, points_second_derivative, time_points
+        )
         self.assertEqual(cp.c_t.min(), time_points[0])
         self.assertEqual(cp.c_t.max(), time_points[-1])
         self.assertEqual(cp.dc_t.dim(), 3)
         for i in range(N):
             self.assertTrue(isclose(cp.c_t(time_points[i, 0]), points[:, i]).all())
-            self.assertTrue(isclose(cp.dc_t(time_points[i, 0]), points_derivative[:, i]).all())
-            self.assertTrue(isclose(cp.ddc_t(time_points[i, 0]), points_second_derivative[:, i]).all())
+            self.assertTrue(
+                isclose(cp.dc_t(time_points[i, 0]), points_derivative[:, i]).all()
+            )
+            self.assertTrue(
+                isclose(
+                    cp.ddc_t(time_points[i, 0]), points_second_derivative[:, i]
+                ).all()
+            )
 
         cp.setAMtrajectoryFromPoints(points, points_derivative, time_points)
         for i in range(N):
             self.assertTrue(isclose(cp.L_t(time_points[i, 0]), points[:, i]).all())
-            self.assertTrue(isclose(cp.dL_t(time_points[i, 0]), points_derivative[:, i]).all())
+            self.assertTrue(
+                isclose(cp.dL_t(time_points[i, 0]), points_derivative[:, i]).all()
+            )
 
-        cp.setJointsTrajectoryFromPoints(points, points_derivative, points_second_derivative, time_points)
+        cp.setJointsTrajectoryFromPoints(
+            points, points_derivative, points_second_derivative, time_points
+        )
         for i in range(N):
             self.assertTrue(isclose(cp.q_t(time_points[i, 0]), points[:, i]).all())
-            self.assertTrue(isclose(cp.dq_t(time_points[i, 0]), points_derivative[:, i]).all())
-            self.assertTrue(isclose(cp.ddq_t(time_points[i, 0]), points_second_derivative[:, i]).all())
+            self.assertTrue(
+                isclose(cp.dq_t(time_points[i, 0]), points_derivative[:, i]).all()
+            )
+            self.assertTrue(
+                isclose(
+                    cp.ddq_t(time_points[i, 0]), points_second_derivative[:, i]
+                ).all()
+            )
 
 
 class ContactSequenceTest(unittest.TestCase):
@@ -1346,7 +1390,7 @@ class ContactSequenceTest(unittest.TestCase):
         cs = ContactSequence(0)
         self.assertTrue(cs.size() == 0)
         cp0 = buildRandomContactPhase(0, 2)
-        cp1 = buildRandomContactPhase(2, 4.)
+        cp1 = buildRandomContactPhase(2, 4.0)
         id = cs.append(cp0)
         self.assertTrue(cs.size() == 1)
         self.assertTrue(id == 0)
@@ -1376,19 +1420,20 @@ class ContactSequenceTest(unittest.TestCase):
     self.assertTrue(len(phases) == 3)
     self.assertTrue(cs.size() == 2 ) # original contact sequence should not be modified
     phases[1].duration = 3.
-    self.assertTrue(cs.contactPhases[1) == cp1) # original contact sequence should not be modified
+    self.assertTrue(cs.contactPhases[1) == cp1)
+    # original contact sequence should not be modified
   """
 
     def test_accessor_phase_reference(self):
         cs = ContactSequence(0)
         cp0 = buildRandomContactPhase(0, 2)
-        cp1 = buildRandomContactPhase(2, 4.)
-        cp2 = buildRandomContactPhase(2, 4.)
+        cp1 = buildRandomContactPhase(2, 4.0)
+        cp2 = buildRandomContactPhase(2, 4.0)
         cs.append(cp0)
         cs.append(cp1)
-        cs.contactPhases[1].timeFinal = 10.
+        cs.contactPhases[1].timeFinal = 10.0
         self.assertTrue(cs.contactPhases[1] != cp1)
-        self.assertTrue(cs.contactPhases[1].timeFinal == 10.)
+        self.assertTrue(cs.contactPhases[1].timeFinal == 10.0)
 
         cs.contactPhases[0] = cp2
         self.assertTrue(cs.contactPhases[0] == cp2)
@@ -1408,7 +1453,8 @@ class ContactSequenceTest(unittest.TestCase):
         for i in range(3):
             self.assertTrue(cs.contactPhases[i] == cp_default)
 
-        # try to modify the uninitialized contact phase inside the sequence from the reference
+        # try to modify the uninitialized contact phase inside the sequence
+        # from the reference
         cp_0 = cs.contactPhases[0]
         c_init = np.random.rand(3)
         cp_0.c_init = c_init
@@ -1417,7 +1463,7 @@ class ContactSequenceTest(unittest.TestCase):
         self.assertTrue(cs.contactPhases[0].duration == 10)
         self.assertTrue(array_equal(cs.contactPhases[0].c_init, c_init))
 
-        cp1 = buildRandomContactPhase(2, 4.)
+        cp1 = buildRandomContactPhase(2, 4.0)
         cs.contactPhases[1] = cp1
         self.assertTrue(cs.contactPhases[1] == cp1)
 
@@ -1428,7 +1474,7 @@ class ContactSequenceTest(unittest.TestCase):
         c_init = np.random.rand(3)
         cp_0.c_init = c_init
         cp_0.duration = 10
-        cp1 = buildRandomContactPhase(2, 4.)
+        cp1 = buildRandomContactPhase(2, 4.0)
         cs.contactPhases[1] = cp1
         # with smaller value than current :
         cs.resize(1)
@@ -1449,13 +1495,13 @@ class ContactSequenceTest(unittest.TestCase):
         cs4 = ContactSequence()
 
         self.assertTrue(cs3 == cs4)
-        cp3_0 = buildRandomContactPhase(0., 2.)
+        cp3_0 = buildRandomContactPhase(0.0, 2.0)
         cs3.append(cp3_0)
         self.assertTrue(cs3 != cs4)
         self.assertFalse(cs3 == cs4)
         cs4.append(cp3_0)
         self.assertTrue(cs3 == cs4)
-        cp3_1 = buildRandomContactPhase(0., 2.)
+        cp3_1 = buildRandomContactPhase(0.0, 2.0)
         cs3.append(cp3_1)
         self.assertTrue(cs3 != cs4)
         cs4.append(cp3_1)
@@ -1472,7 +1518,7 @@ class ContactSequenceTest(unittest.TestCase):
     def test_copy_constructor(self):
         cs = ContactSequence()
         for i in range(10):
-            cp = buildRandomContactPhase(0., 2.)
+            cp = buildRandomContactPhase(0.0, 2.0)
             cs.append(cp)
         self.assertTrue(cs.size() == 10)
 
@@ -1482,14 +1528,14 @@ class ContactSequenceTest(unittest.TestCase):
             self.assertTrue(cs.contactPhases[i] == cs1.contactPhases[i])
 
         # check that it's a copy and not the same object :
-        cs.contactPhases[0].duration = 15.
+        cs.contactPhases[0].duration = 15.0
         self.assertFalse(cs == cs1)
         self.assertFalse(cs.contactPhases[0] == cs1.contactPhases[0])
 
     def test_serialization(self):
         cs = ContactSequence()
         for i in range(10):
-            cp = buildRandomContactPhase(0., 2.)
+            cp = buildRandomContactPhase(0.0, 2.0)
             cs.append(cp)
 
         cs.saveAsText("cs_test_full.txt")
@@ -1500,16 +1546,16 @@ class ContactSequenceTest(unittest.TestCase):
         cs_bin = ContactSequence()
         cs_bin.loadFromBinary("cs_test_full")
         self.assertEqual(cs, cs_bin)
-        cs.saveAsXML("cs_test_full.xml", 'ContactSequence')
+        cs.saveAsXML("cs_test_full.xml", "ContactSequence")
         cs_xml = ContactSequence()
-        cs_xml.loadFromXML("cs_test_full.xml", 'ContactPatch')
+        cs_xml.loadFromXML("cs_test_full.xml", "ContactPatch")
         self.assertEqual(cs, cs_xml)
 
     def test_contact_sequence_helpers(self):
         cs1 = ContactSequence()
         self.assertTrue(cs1.size() == 0)
         cp0 = buildRandomContactPhase(0, 2)
-        cp1 = buildRandomContactPhase(2, 4.)
+        cp1 = buildRandomContactPhase(2, 4.0)
         cs1.append(cp0)
         cs1.append(cp1)
         # # test break contact :
@@ -1517,19 +1563,36 @@ class ContactSequenceTest(unittest.TestCase):
         cs1.breakContact("left-leg")
         self.assertTrue(cs1.size() == 3)
         self.assertFalse(cs1.contactPhases[2].isEffectorInContact("left-leg"))
+        # time final of previous phase should not have been modified
+        self.assertTrue(cs1.contactPhases[1].timeFinal == 4.0)
+        # check that the final value of the previous phase
+        # have been copied in the initial value of the new one
         self.assertTrue(
-            cs1.contactPhases[1].timeFinal == 4.)  # time final of previous phase should not have been modified
-        # check that the final value of the previous phase have been copied in the initial value of the new one
-        self.assertTrue(array_equal(cs1.contactPhases[1].c_final, cs1.contactPhases[2].c_init))
-        self.assertTrue(array_equal(cs1.contactPhases[1].dc_final, cs1.contactPhases[2].dc_init))
-        self.assertTrue(array_equal(cs1.contactPhases[1].ddc_final, cs1.contactPhases[2].ddc_init))
-        self.assertTrue(array_equal(cs1.contactPhases[1].L_final, cs1.contactPhases[2].L_init))
-        self.assertTrue(array_equal(cs1.contactPhases[1].dL_final, cs1.contactPhases[2].dL_init))
-        self.assertTrue(array_equal(cs1.contactPhases[1].q_final, cs1.contactPhases[2].q_init))
-        self.assertTrue(cs1.contactPhases[1].timeFinal == cs1.contactPhases[2].timeInitial)
+            array_equal(cs1.contactPhases[1].c_final, cs1.contactPhases[2].c_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[1].dc_final, cs1.contactPhases[2].dc_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[1].ddc_final, cs1.contactPhases[2].ddc_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[1].L_final, cs1.contactPhases[2].L_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[1].dL_final, cs1.contactPhases[2].dL_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[1].q_final, cs1.contactPhases[2].q_init)
+        )
+        self.assertTrue(
+            cs1.contactPhases[1].timeFinal == cs1.contactPhases[2].timeInitial
+        )
         # check that the other contactPatch have been copied :
         self.assertTrue(
-            cs1.contactPhases[1].contactPatch("right-leg") == cs1.contactPhases[2].contactPatch("right-leg"))
+            cs1.contactPhases[1].contactPatch("right-leg")
+            == cs1.contactPhases[2].contactPatch("right-leg")
+        )
 
         # # test create contact :
         placement_random = SE3.Identity()
@@ -1538,104 +1601,183 @@ class ContactSequenceTest(unittest.TestCase):
         cs1.createContact("left-leg", target, 2.5)
         self.assertTrue(cs1.size() == 4)
         self.assertTrue(
-            cs1.contactPhases[2].timeFinal == 6.5)  # time final of previous phase should have been modified
+            cs1.contactPhases[2].timeFinal == 6.5
+        )  # time final of previous phase should have been modified
         self.assertTrue(cs1.contactPhases[3].contactPatch("left-leg") == target)
-        # check that the final value of the previous phase have been copied in the initial value of the new one
-        self.assertTrue(array_equal(cs1.contactPhases[2].c_final, cs1.contactPhases[3].c_init))
-        self.assertTrue(array_equal(cs1.contactPhases[2].dc_final, cs1.contactPhases[3].dc_init))
-        self.assertTrue(array_equal(cs1.contactPhases[2].ddc_final, cs1.contactPhases[3].ddc_init))
-        self.assertTrue(array_equal(cs1.contactPhases[2].L_final, cs1.contactPhases[3].L_init))
-        self.assertTrue(array_equal(cs1.contactPhases[2].dL_final, cs1.contactPhases[3].dL_init))
-        self.assertTrue(array_equal(cs1.contactPhases[2].q_final, cs1.contactPhases[3].q_init))
-        self.assertTrue(cs1.contactPhases[2].timeFinal == cs1.contactPhases[3].timeInitial)
+        # check that the final value of the previous phase
+        # have been copied in the initial value of the new one
+        self.assertTrue(
+            array_equal(cs1.contactPhases[2].c_final, cs1.contactPhases[3].c_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[2].dc_final, cs1.contactPhases[3].dc_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[2].ddc_final, cs1.contactPhases[3].ddc_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[2].L_final, cs1.contactPhases[3].L_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[2].dL_final, cs1.contactPhases[3].dL_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[2].q_final, cs1.contactPhases[3].q_init)
+        )
+        self.assertTrue(
+            cs1.contactPhases[2].timeFinal == cs1.contactPhases[3].timeInitial
+        )
         # check that the other contactPatch have been copied :
         self.assertTrue(
-            cs1.contactPhases[2].contactPatch("right-leg") == cs1.contactPhases[3].contactPatch("right-leg"))
+            cs1.contactPhases[2].contactPatch("right-leg")
+            == cs1.contactPhases[3].contactPatch("right-leg")
+        )
 
         # # test break with duration :
-        cs1.breakContact("left-leg", 1.)
+        cs1.breakContact("left-leg", 1.0)
         self.assertTrue(cs1.size() == 5)
         self.assertFalse(cs1.contactPhases[4].isEffectorInContact("left-leg"))
         self.assertTrue(
-            cs1.contactPhases[3].timeFinal == 7.5)  # time final of previous phase should have been modified
+            cs1.contactPhases[3].timeFinal == 7.5
+        )  # time final of previous phase should have been modified
 
         # # test  create contact with no duration:
-        cs1.contactPhases[4].duration = 1.
+        cs1.contactPhases[4].duration = 1.0
         self.assertTrue(
-            cs1.contactPhases[4].timeFinal == 8.5)  # time final of previous phase should have been modified
+            cs1.contactPhases[4].timeFinal == 8.5
+        )  # time final of previous phase should have been modified
         placement_random.setRandom()
         target = ContactPatch(placement_random)
         cs1.createContact("left-leg", target)
         self.assertTrue(cs1.size() == 6)
         self.assertTrue(
-            cs1.contactPhases[4].timeFinal == 8.5)  # time final of previous phase should have been modified
+            cs1.contactPhases[4].timeFinal == 8.5
+        )  # time final of previous phase should have been modified
         self.assertTrue(
-            cs1.contactPhases[5].timeInitial == 8.5)  # time final of previous phase should have been modified
+            cs1.contactPhases[5].timeInitial == 8.5
+        )  # time final of previous phase should have been modified
 
         # # test move effector to placement :
         target_placement = SE3.Identity()
         target_placement.setRandom()
         addRandomPointsValues(cs1.contactPhases[5])
-        cs1.contactPhases[5].contactPatch("right-leg").friction = 2.
-        cs1.moveEffectorToPlacement("right-leg", target_placement, 1., 1.5)
+        cs1.contactPhases[5].contactPatch("right-leg").friction = 2.0
+        cs1.moveEffectorToPlacement("right-leg", target_placement, 1.0, 1.5)
         self.assertTrue(cs1.size() == 8)
         self.assertFalse(cs1.contactPhases[6].isEffectorInContact("right-leg"))
         self.assertTrue(cs1.contactPhases[7].isEffectorInContact("right-leg"))
-        self.assertTrue(cs1.contactPhases[7].contactPatch("right-leg").placement == target_placement)
+        self.assertTrue(
+            cs1.contactPhases[7].contactPatch("right-leg").placement == target_placement
+        )
         # check that previous patch have not been modified :
-        self.assertTrue(cs1.contactPhases[5].contactPatch("right-leg").placement != target_placement)
-        self.assertTrue(cs1.contactPhases[7].contactPatch("right-leg").friction == 2.)
+        self.assertTrue(
+            cs1.contactPhases[5].contactPatch("right-leg").placement != target_placement
+        )
+        self.assertTrue(cs1.contactPhases[7].contactPatch("right-leg").friction == 2.0)
         self.assertTrue(cs1.contactPhases[5].timeFinal == 9.5)
         self.assertTrue(cs1.contactPhases[6].timeInitial == 9.5)
-        self.assertTrue(cs1.contactPhases[6].timeFinal == 11.)
-        self.assertTrue(cs1.contactPhases[7].timeInitial == 11.)
-        # check that the final value of the previous phase have been copied in the initial value of the new one
-        self.assertTrue(array_equal(cs1.contactPhases[5].c_final, cs1.contactPhases[6].c_init))
-        self.assertTrue(array_equal(cs1.contactPhases[5].dc_final, cs1.contactPhases[6].dc_init))
-        self.assertTrue(array_equal(cs1.contactPhases[5].ddc_final, cs1.contactPhases[6].ddc_init))
-        self.assertTrue(array_equal(cs1.contactPhases[5].L_final, cs1.contactPhases[6].L_init))
-        self.assertTrue(array_equal(cs1.contactPhases[5].dL_final, cs1.contactPhases[6].dL_init))
-        self.assertTrue(array_equal(cs1.contactPhases[5].q_final, cs1.contactPhases[6].q_init))
-        # with MoveEffector, the middle phase should have the same initial and final point :
-        self.assertTrue(array_equal(cs1.contactPhases[6].c_final, cs1.contactPhases[6].c_init))
-        self.assertTrue(array_equal(cs1.contactPhases[6].dc_final, cs1.contactPhases[6].dc_init))
-        self.assertTrue(array_equal(cs1.contactPhases[6].ddc_final, cs1.contactPhases[6].ddc_init))
-        self.assertTrue(array_equal(cs1.contactPhases[6].L_final, cs1.contactPhases[6].L_init))
-        self.assertTrue(array_equal(cs1.contactPhases[6].dL_final, cs1.contactPhases[6].dL_init))
-        self.assertTrue(array_equal(cs1.contactPhases[6].q_final, cs1.contactPhases[6].q_init))
-        # check that the final value of the previous phase have been copied in the initial value of the new one
-        self.assertTrue(array_equal(cs1.contactPhases[6].c_final, cs1.contactPhases[7].c_init))
-        self.assertTrue(array_equal(cs1.contactPhases[6].dc_final, cs1.contactPhases[7].dc_init))
-        self.assertTrue(array_equal(cs1.contactPhases[6].ddc_final, cs1.contactPhases[7].ddc_init))
-        self.assertTrue(array_equal(cs1.contactPhases[6].L_final, cs1.contactPhases[7].L_init))
-        self.assertTrue(array_equal(cs1.contactPhases[6].dL_final, cs1.contactPhases[7].dL_init))
-        self.assertTrue(array_equal(cs1.contactPhases[6].q_final, cs1.contactPhases[7].q_init))
+        self.assertTrue(cs1.contactPhases[6].timeFinal == 11.0)
+        self.assertTrue(cs1.contactPhases[7].timeInitial == 11.0)
+        # check that the final value of the previous phase
+        # have been copied in the initial value of the new one
+        self.assertTrue(
+            array_equal(cs1.contactPhases[5].c_final, cs1.contactPhases[6].c_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[5].dc_final, cs1.contactPhases[6].dc_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[5].ddc_final, cs1.contactPhases[6].ddc_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[5].L_final, cs1.contactPhases[6].L_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[5].dL_final, cs1.contactPhases[6].dL_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[5].q_final, cs1.contactPhases[6].q_init)
+        )
+        # with MoveEffector, the middle phase should have
+        # the same initial and final point :
+        self.assertTrue(
+            array_equal(cs1.contactPhases[6].c_final, cs1.contactPhases[6].c_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[6].dc_final, cs1.contactPhases[6].dc_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[6].ddc_final, cs1.contactPhases[6].ddc_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[6].L_final, cs1.contactPhases[6].L_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[6].dL_final, cs1.contactPhases[6].dL_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[6].q_final, cs1.contactPhases[6].q_init)
+        )
+        # check that the final value of the previous phase
+        # have been copied in the initial value of the new one
+        self.assertTrue(
+            array_equal(cs1.contactPhases[6].c_final, cs1.contactPhases[7].c_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[6].dc_final, cs1.contactPhases[7].dc_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[6].ddc_final, cs1.contactPhases[7].ddc_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[6].L_final, cs1.contactPhases[7].L_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[6].dL_final, cs1.contactPhases[7].dL_init)
+        )
+        self.assertTrue(
+            array_equal(cs1.contactPhases[6].q_final, cs1.contactPhases[7].q_init)
+        )
         # check that the other contactPatch have been copied :
-        self.assertTrue(cs1.contactPhases[5].contactPatch("left-leg") == cs1.contactPhases[6].contactPatch("left-leg"))
-        self.assertTrue(cs1.contactPhases[6].contactPatch("left-leg") == cs1.contactPhases[7].contactPatch("left-leg"))
+        self.assertTrue(
+            cs1.contactPhases[5].contactPatch("left-leg")
+            == cs1.contactPhases[6].contactPatch("left-leg")
+        )
+        self.assertTrue(
+            cs1.contactPhases[6].contactPatch("left-leg")
+            == cs1.contactPhases[7].contactPatch("left-leg")
+        )
 
         # # test move effector of:
         target_transform = SE3.Identity()
         target_transform.setRandom()
-        cs1.contactPhases[7].contactPatch("left-leg").friction = 10.
-        cs1.moveEffectorOf("left-leg", target_transform, 1., 1.5)
+        cs1.contactPhases[7].contactPatch("left-leg").friction = 10.0
+        cs1.moveEffectorOf("left-leg", target_transform, 1.0, 1.5)
         self.assertTrue(cs1.size() == 10)
         self.assertFalse(cs1.contactPhases[8].isEffectorInContact("left-leg"))
         self.assertTrue(cs1.contactPhases[9].isEffectorInContact("left-leg"))
-        target_placement = target_transform.act(cs1.contactPhases[7].contactPatch("left-leg").placement)
-        self.assertTrue(cs1.contactPhases[9].contactPatch("left-leg").placement == target_placement)
-        self.assertTrue(cs1.contactPhases[9].contactPatch("left-leg").friction == 10.)
+        target_placement = target_transform.act(
+            cs1.contactPhases[7].contactPatch("left-leg").placement
+        )
+        self.assertTrue(
+            cs1.contactPhases[9].contactPatch("left-leg").placement == target_placement
+        )
+        self.assertTrue(cs1.contactPhases[9].contactPatch("left-leg").friction == 10.0)
         # check that the other contactPatch have been copied :
         self.assertTrue(
-            cs1.contactPhases[7].contactPatch("right-leg") == cs1.contactPhases[8].contactPatch("right-leg"))
+            cs1.contactPhases[7].contactPatch("right-leg")
+            == cs1.contactPhases[8].contactPatch("right-leg")
+        )
         self.assertTrue(
-            cs1.contactPhases[8].contactPatch("right-leg") == cs1.contactPhases[9].contactPatch("right-leg"))
+            cs1.contactPhases[8].contactPatch("right-leg")
+            == cs1.contactPhases[9].contactPatch("right-leg")
+        )
 
     def test_contact_sequence_helpers_errors(self):
         cs1 = ContactSequence()
         self.assertTrue(cs1.size() == 0)
         cp0 = buildRandomContactPhase(0, 2)
-        cp1 = buildRandomContactPhase(2, 4.)
+        cp1 = buildRandomContactPhase(2, 4.0)
         cp1.removeContact("left-leg")
         cs1.append(cp0)
         cs1.append(cp1)
@@ -1647,7 +1789,9 @@ class ContactSequenceTest(unittest.TestCase):
         cs1.append(cp2)
         self.assertTrue(cs1.size() == 3)
         with self.assertRaises(ValueError):
-            cs1.breakContact("left-leg", 1.5)  # time interval not defined for last phase
+            cs1.breakContact(
+                "left-leg", 1.5
+            )  # time interval not defined for last phase
         self.assertTrue(cs1.size() == 3)
 
         # # check that create contact correctly throw error when needed :
@@ -1655,18 +1799,22 @@ class ContactSequenceTest(unittest.TestCase):
         placement.setRandom()
 
         with self.assertRaises(ValueError):
-            cs1.createContact("left-leg", ContactPatch(placement))  # contact already exist
+            cs1.createContact(
+                "left-leg", ContactPatch(placement)
+            )  # contact already exist
         self.assertTrue(cs1.size() == 3)
         cs1.breakContact("left-leg")
         self.assertTrue(cs1.size() == 4)
         with self.assertRaises(ValueError):
-            cs1.createContact("left-leg", ContactPatch(placement), 2.)  # time interval not defined
+            cs1.createContact(
+                "left-leg", ContactPatch(placement), 2.0
+            )  # time interval not defined
         self.assertTrue(cs1.size() == 4)
 
     def test_is_consistent(self):
         cs1 = ContactSequence(0)
         cp0 = buildRandomContactPhase(0, 2)
-        cp1 = buildRandomContactPhase(2, 4.)
+        cp1 = buildRandomContactPhase(2, 4.0)
         cs1.append(cp0)
         cs1.append(cp1)
         consistent = cs1.haveTimings()
@@ -1674,7 +1822,7 @@ class ContactSequenceTest(unittest.TestCase):
 
         cs2 = ContactSequence(0)
         cp2 = buildRandomContactPhase(0, 2)
-        cp3 = buildRandomContactPhase(1.5, 4.)
+        cp3 = buildRandomContactPhase(1.5, 4.0)
         cs2.append(cp2)
         cs2.append(cp3)
         consistent = cs2.haveTimings()
@@ -1699,7 +1847,7 @@ class ContactSequenceTest(unittest.TestCase):
     def test_contact_sequence_have_contact_model(self):
         cs1 = ContactSequence(0)
         cp0 = buildRandomContactPhase(0, 2)
-        cp1 = buildRandomContactPhase(2, 4.)
+        cp1 = buildRandomContactPhase(2, 4.0)
         cs1.append(cp0)
         cs1.append(cp1)
         self.assertFalse(cs1.haveContactModelDefined())
@@ -1707,7 +1855,7 @@ class ContactSequenceTest(unittest.TestCase):
         mp1 = ContactModel(0.5, ContactType.CONTACT_PLANAR)
         pos = np.random.rand(3, 5)
         mp1.contact_points_positions = pos
-        mp2 = ContactModel(1., ContactType.CONTACT_POINT)
+        mp2 = ContactModel(1.0, ContactType.CONTACT_POINT)
         pos = np.random.rand(3, 5)
         mp1.contact_points_positions = pos
 
@@ -1717,7 +1865,7 @@ class ContactSequenceTest(unittest.TestCase):
         cs1.contactPhases[1].contactPatch("left-leg").contact_model = mp2
         self.assertTrue(cs1.haveContactModelDefined())
 
-        cp2 = buildRandomContactPhase(6., 8.)
+        cp2 = buildRandomContactPhase(6.0, 8.0)
         cs1.append(cp2)
         self.assertFalse(cs1.haveContactModelDefined())
         mp3 = ContactModel(0.2)
@@ -1725,46 +1873,50 @@ class ContactSequenceTest(unittest.TestCase):
         cs1.contactPhases[2].contactPatch("left-leg").contact_model = mp2
         self.assertFalse(cs1.haveContactModelDefined())
 
-        mp3.contact_type = ContactType.CONTACT_PLANAR  # do not change the contact model already in the seqence
+        mp3.contact_type = (
+            ContactType.CONTACT_PLANAR
+        )  # do not change the contact model already in the seqence
         self.assertFalse(cs1.haveContactModelDefined())
 
-        cs1.contactPhases[2].contactPatch("right-leg").contact_model.contact_type = ContactType.CONTACT_PLANAR
+        cs1.contactPhases[2].contactPatch(
+            "right-leg"
+        ).contact_model.contact_type = ContactType.CONTACT_PLANAR
         self.assertTrue(cs1.haveContactModelDefined())
 
     def test_contact_sequence_concatenate_config_traj(self):
         cs1 = ContactSequence(0)
         cp0 = buildRandomContactPhase(0, 2)
-        cp1 = buildRandomContactPhase(2, 4.)
+        cp1 = buildRandomContactPhase(2, 4.0)
         p0 = np.random.rand(35)
         p1 = np.random.rand(35)
         p2 = np.random.rand(35)
-        t0 = 0.
-        t1 = 2.
-        t2 = 4.
+        t0 = 0.0
+        t1 = 2.0
+        t2 = 4.0
         c1 = polynomial(p0, p1, t0, t1)
         c2 = polynomial(p1, p2, t1, t2)
         cp0.q_t = c1
         cp1.q_t = c2
-        self.assertTrue(cp0.q_t.min() == 0.)
-        self.assertTrue(cp0.q_t.max() == 2.)
-        self.assertTrue(cp1.q_t.min() == 2.)
-        self.assertTrue(cp1.q_t.max() == 4.)
+        self.assertTrue(cp0.q_t.min() == 0.0)
+        self.assertTrue(cp0.q_t.max() == 2.0)
+        self.assertTrue(cp1.q_t.min() == 2.0)
+        self.assertTrue(cp1.q_t.max() == 4.0)
         cs1.append(cp0)
         cs1.append(cp1)
         q_t = cs1.concatenateQtrajectories()
-        self.assertTrue(q_t.min() == 0.)
-        self.assertTrue(q_t.max() == 4.)
+        self.assertTrue(q_t.min() == 0.0)
+        self.assertTrue(q_t.max() == 4.0)
         self.assertTrue(array_equal(q_t(0), cp0.q_t(0)))
         self.assertTrue(array_equal(q_t(0.5), cp0.q_t(0.5)))
-        self.assertTrue(array_equal(q_t(2.), cp0.q_t(2.)))
+        self.assertTrue(array_equal(q_t(2.0), cp0.q_t(2.0)))
         self.assertTrue(array_equal(q_t(3), cp1.q_t(3)))
-        self.assertTrue(array_equal(q_t(4.), cp1.q_t(4.)))
+        self.assertTrue(array_equal(q_t(4.0), cp1.q_t(4.0)))
 
     def test_contact_sequence_concatenate_effector_traj(self):
         cs1 = ContactSequence(0)
         cp0 = ContactPhase(0, 2)
-        cp1 = ContactPhase(2, 4.)
-        cp2 = ContactPhase(4, 8.)
+        cp1 = ContactPhase(2, 4.0)
+        cp2 = ContactPhase(4, 8.0)
         p0 = SE3()
         p0.setRandom()
         p1 = SE3()
@@ -1772,8 +1924,8 @@ class ContactSequenceTest(unittest.TestCase):
         p2 = SE3()
         p2.setRandom()
 
-        traj_0 = SE3Curve(p0, p1, 0., 2.)
-        traj_2 = SE3Curve(p1, p2, 4., 8.)
+        traj_0 = SE3Curve(p0, p1, 0.0, 2.0)
+        traj_2 = SE3Curve(p1, p2, 4.0, 8.0)
         cp0.addEffectorTrajectory("right_leg", traj_0)
         cp2.addEffectorTrajectory("right_leg", traj_2)
         cs1.append(cp0)
@@ -1781,22 +1933,22 @@ class ContactSequenceTest(unittest.TestCase):
         cs1.append(cp2)
 
         traj = cs1.concatenateEffectorTrajectories("right_leg")
-        self.assertTrue(traj.min() == 0.)
-        self.assertTrue(traj.max() == 8.)
-        self.assertTrue(np.isclose(traj(0.), traj_0(0.)).all())
+        self.assertTrue(traj.min() == 0.0)
+        self.assertTrue(traj.max() == 8.0)
+        self.assertTrue(np.isclose(traj(0.0), traj_0(0.0)).all())
         self.assertTrue(np.isclose(traj(1.5), traj_0(1.5)).all())
-        self.assertTrue(np.isclose(traj(2.), traj_0(2.)).all())
-        self.assertTrue(np.isclose(traj(4.), traj_2(4.)).all())
-        self.assertTrue(np.isclose(traj(6.), traj_2(6.)).all())
-        self.assertTrue(np.isclose(traj(8.), traj_2(8.)).all())
-        self.assertTrue(np.isclose(traj(2.5), traj_0(2.)).all())
-        self.assertTrue(np.isclose(traj(3.8), traj_0(2.)).all())
+        self.assertTrue(np.isclose(traj(2.0), traj_0(2.0)).all())
+        self.assertTrue(np.isclose(traj(4.0), traj_2(4.0)).all())
+        self.assertTrue(np.isclose(traj(6.0), traj_2(6.0)).all())
+        self.assertTrue(np.isclose(traj(8.0), traj_2(8.0)).all())
+        self.assertTrue(np.isclose(traj(2.5), traj_0(2.0)).all())
+        self.assertTrue(np.isclose(traj(3.8), traj_0(2.0)).all())
 
     def test_contact_sequence_concatenate_force_traj(self):
         cs1 = ContactSequence(0)
         cp0 = ContactPhase(0, 2)
-        cp1 = ContactPhase(2, 4.)
-        cp2 = ContactPhase(4, 8.)
+        cp1 = ContactPhase(2, 4.0)
+        cp2 = ContactPhase(4, 8.0)
 
         cp0.addContact("right_leg", ContactPatch())
         cp2.addContact("right_leg", ContactPatch())
@@ -1810,26 +1962,26 @@ class ContactSequenceTest(unittest.TestCase):
         cs1.append(cp2)
 
         forces = cs1.concatenateContactForceTrajectories("right_leg")
-        self.assertTrue(forces.min() == 0.)
-        self.assertTrue(forces.max() == 8.)
-        self.assertTrue(array_equal(forces(0.), f_0(0.)))
+        self.assertTrue(forces.min() == 0.0)
+        self.assertTrue(forces.max() == 8.0)
+        self.assertTrue(array_equal(forces(0.0), f_0(0.0)))
         self.assertTrue(array_equal(forces(1.5), f_0(1.5)))
         self.assertTrue(array_equal(forces(1.999), f_0(1.999)))
-        self.assertTrue(array_equal(forces(4.), f_2(4.)))
-        self.assertTrue(array_equal(forces(6.), f_2(6.)))
-        self.assertTrue(array_equal(forces(8.), f_2(8.)))
-        self.assertTrue(array_equal(forces(2.), np.zeros(12)))
+        self.assertTrue(array_equal(forces(4.0), f_2(4.0)))
+        self.assertTrue(array_equal(forces(6.0), f_2(6.0)))
+        self.assertTrue(array_equal(forces(8.0), f_2(8.0)))
+        self.assertTrue(array_equal(forces(2.0), np.zeros(12)))
         self.assertTrue(array_equal(forces(2.5), np.zeros(12)))
         self.assertTrue(array_equal(forces(3.8), np.zeros(12)))
 
     def test_contact_sequence_concatenate_normal_force_traj(self):
         cs1 = ContactSequence(0)
         cp0 = ContactPhase(0, 2)
-        cp1 = ContactPhase(2, 4.)
-        cp2 = ContactPhase(4, 8.)
+        cp1 = ContactPhase(2, 4.0)
+        cp2 = ContactPhase(4, 8.0)
 
         cp1.addContact("right_leg", ContactPatch())
-        f_1 = createRandomPiecewisePolynomial(1, 2., 4.)
+        f_1 = createRandomPiecewisePolynomial(1, 2.0, 4.0)
         cp1.addContactNormalForceTrajectory("right_leg", f_1)
 
         cs1.append(cp0)
@@ -1837,59 +1989,59 @@ class ContactSequenceTest(unittest.TestCase):
         cs1.append(cp2)
 
         forces = cs1.concatenateNormalForceTrajectories("right_leg")
-        self.assertTrue(forces.min() == 0.)
-        self.assertTrue(forces.max() == 8.)
-        self.assertTrue(array_equal(forces(2.), f_1(2.)))
+        self.assertTrue(forces.min() == 0.0)
+        self.assertTrue(forces.max() == 8.0)
+        self.assertTrue(array_equal(forces(2.0), f_1(2.0)))
         self.assertTrue(array_equal(forces(2.5), f_1(2.5)))
         self.assertTrue(array_equal(forces(3.999), f_1(3.999)))
-        self.assertTrue(array_equal(forces(0.), np.zeros(1)))
+        self.assertTrue(array_equal(forces(0.0), np.zeros(1)))
         self.assertTrue(array_equal(forces(1.5), np.zeros(1)))
-        self.assertTrue(array_equal(forces(4.), np.zeros(1)))
+        self.assertTrue(array_equal(forces(4.0), np.zeros(1)))
         self.assertTrue(array_equal(forces(7.5), np.zeros(1)))
 
     def test_contact_sequence_phase_at_time(self):
         cs1 = ContactSequence(0)
         cp0 = ContactPhase(0, 2)
-        cp1 = ContactPhase(2, 4.)
-        cp2 = ContactPhase(4, 8.)
+        cp1 = ContactPhase(2, 4.0)
+        cp2 = ContactPhase(4, 8.0)
 
         cs1.append(cp0)
         cs1.append(cp1)
         cs1.append(cp2)
 
-        self.assertEqual(cs1.phaseIdAtTime(0.), 0)
-        self.assertEqual(cs1.phaseIdAtTime(1.), 0)
+        self.assertEqual(cs1.phaseIdAtTime(0.0), 0)
+        self.assertEqual(cs1.phaseIdAtTime(1.0), 0)
         self.assertEqual(cs1.phaseIdAtTime(1.9), 0)
-        self.assertEqual(cs1.phaseIdAtTime(2.), 1)
+        self.assertEqual(cs1.phaseIdAtTime(2.0), 1)
         self.assertEqual(cs1.phaseIdAtTime(3.5), 1)
-        self.assertEqual(cs1.phaseIdAtTime(4.), 2)
-        self.assertEqual(cs1.phaseIdAtTime(5.), 2)
-        self.assertEqual(cs1.phaseIdAtTime(8.), 2)
+        self.assertEqual(cs1.phaseIdAtTime(4.0), 2)
+        self.assertEqual(cs1.phaseIdAtTime(5.0), 2)
+        self.assertEqual(cs1.phaseIdAtTime(8.0), 2)
         self.assertEqual(cs1.phaseIdAtTime(-0.5), -1)
-        self.assertEqual(cs1.phaseIdAtTime(10.), -1)
+        self.assertEqual(cs1.phaseIdAtTime(10.0), -1)
 
-        self.assertEqual(cs1.phaseAtTime(0.), cp0)
-        self.assertEqual(cs1.phaseAtTime(1.), cp0)
+        self.assertEqual(cs1.phaseAtTime(0.0), cp0)
+        self.assertEqual(cs1.phaseAtTime(1.0), cp0)
         self.assertEqual(cs1.phaseAtTime(1.9), cp0)
-        self.assertEqual(cs1.phaseAtTime(2.), cp1)
+        self.assertEqual(cs1.phaseAtTime(2.0), cp1)
         self.assertEqual(cs1.phaseAtTime(3.5), cp1)
-        self.assertEqual(cs1.phaseAtTime(4.), cp2)
-        self.assertEqual(cs1.phaseAtTime(5.), cp2)
-        self.assertEqual(cs1.phaseAtTime(8.), cp2)
+        self.assertEqual(cs1.phaseAtTime(4.0), cp2)
+        self.assertEqual(cs1.phaseAtTime(5.0), cp2)
+        self.assertEqual(cs1.phaseAtTime(8.0), cp2)
         with self.assertRaises(ValueError):
             cs1.phaseAtTime(-0.5)
         with self.assertRaises(ValueError):
-            cs1.phaseAtTime(10.)
+            cs1.phaseAtTime(10.0)
 
     def test_pickle_contact_sequence(self):
         cs = ContactSequence()
         for i in range(10):
-            cp = buildRandomContactPhase(0., 2.)
+            cp = buildRandomContactPhase(0.0, 2.0)
             cs.append(cp)
         cs_pickled = pickle.dumps(cs)
         cs_from_pickle = pickle.loads(cs_pickled)
         self.assertEqual(cs_from_pickle, cs)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

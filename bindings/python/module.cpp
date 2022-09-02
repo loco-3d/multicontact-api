@@ -1,8 +1,8 @@
 // Copyright (c) 2015-2018, CNRS
 // Authors: Justin Carpentier <jcarpent@laas.fr>
 
-#include <eigenpy/eigenpy.hpp>
 #include <boost/python.hpp>
+#include <eigenpy/eigenpy.hpp>
 
 #include "multicontact-api/bindings/python/geometry/expose-geometry.hpp"
 #include "multicontact-api/bindings/python/scenario/expose-scenario.hpp"

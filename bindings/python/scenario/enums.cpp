@@ -1,10 +1,11 @@
 // Copyright (c) 2015-2018, CNRS
 // Authors: Justin Carpentier <jcarpent@laas.fr>
 //
-#include "multicontact-api/scenario/fwd.hpp"
-#include "multicontact-api/bindings/python/scenario/expose-scenario.hpp"
 #include <boost/python.hpp>
 #include <boost/python/enum.hpp>
+
+#include "multicontact-api/bindings/python/scenario/expose-scenario.hpp"
+#include "multicontact-api/scenario/fwd.hpp"
 
 namespace multicontact_api {
 namespace python {

@@ -4,18 +4,20 @@
 #ifndef __multicontact_api_scenario_contact_model_planar_hpp__
 #define __multicontact_api_scenario_contact_model_planar_hpp__
 
+#include <Eigen/Dense>
+#include <iostream>
+#include <pinocchio/spatial/skew.hpp>
+
 #include "multicontact-api/scenario/fwd.hpp"
 #include "multicontact-api/serialization/archive.hpp"
 #include "multicontact-api/serialization/eigen-matrix.hpp"
-#include <iostream>
-#include <Eigen/Dense>
-#include <pinocchio/spatial/skew.hpp>
 
 namespace multicontact_api {
 namespace scenario {
 
 template <typename _Scalar>
-struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Scalar> > {
+struct ContactModelTpl
+    : public serialization::Serializable<ContactModelTpl<_Scalar> > {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   typedef _Scalar Scalar;
@@ -66,12 +68,14 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
 
   void disp(std::ostream& os) const {
     os << "ContactType: " << m_contact_type << ", mu: " << m_mu << std::endl
-       << "Number of contact points: " << m_num_contact_points << ", positions: " << std::endl
+       << "Number of contact points: " << m_num_contact_points
+       << ", positions: " << std::endl
        << m_contact_points_positions << std::endl;
   }
 
   template <typename S2>
-  friend std::ostream& operator<<(std::ostream& os, const ContactModelTpl<S2>& cp) {
+  friend std::ostream& operator<<(std::ostream& os,
+                                  const ContactModelTpl<S2>& cp) {
     cp.disp(os);
     return os;
   }
@@ -83,7 +87,9 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
     m_contact_points_positions = Matrix3X::Zero(3, num);
   }
 
-  Matrix3X contact_points_positions() const { return m_contact_points_positions; }
+  Matrix3X contact_points_positions() const {
+    return m_contact_points_positions;
+  }
 
   void contact_points_positions(const Matrix3X& positions) {
     m_contact_points_positions = positions;
@@ -99,7 +105,8 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
     Matrix6X gen = Matrix6X::Zero(6, m_num_contact_points * 3);
     for (size_t i = 0; i < m_num_contact_points; i++) {
       gen.block(0, i * 3, 3, 3) = Matrix3::Identity();
-      gen.block(3, i * 3, 3, 3) = pinocchio::skew(m_contact_points_positions.col(i));
+      gen.block(3, i * 3, 3, 3) =
+          pinocchio::skew(m_contact_points_positions.col(i));
     }
     return gen;
   }
@@ -112,7 +119,8 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
  private:
   /// \brief The number of contact points used to model this contact
   size_t m_num_contact_points;
-  /// \brief 3xnum_contact_points matrix defining the contact points positions in the frame of the contact placement
+  /// \brief 3xnum_contact_points matrix defining the contact points positions
+  /// in the frame of the contact placement
   Matrix3X m_contact_points_positions;
 
   // Serialization of the class
@@ -122,16 +130,20 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
   void save(Archive& ar, const unsigned int /*version*/) const {
     ar& boost::serialization::make_nvp("mu", m_mu);
     ar& boost::serialization::make_nvp("contact_type", m_contact_type);
-    ar& boost::serialization::make_nvp("num_contact_points", m_num_contact_points);
-    ar& boost::serialization::make_nvp("contact_points_positions", m_contact_points_positions);
+    ar& boost::serialization::make_nvp("num_contact_points",
+                                       m_num_contact_points);
+    ar& boost::serialization::make_nvp("contact_points_positions",
+                                       m_contact_points_positions);
   }
 
   template <class Archive>
   void load(Archive& ar, const unsigned int /*version*/) {
     ar >> boost::serialization::make_nvp("mu", m_mu);
     ar >> boost::serialization::make_nvp("contact_type", m_contact_type);
-    ar >> boost::serialization::make_nvp("num_contact_points", m_num_contact_points);
-    ar >> boost::serialization::make_nvp("contact_points_positions", m_contact_points_positions);
+    ar >> boost::serialization::make_nvp("num_contact_points",
+                                         m_num_contact_points);
+    ar >> boost::serialization::make_nvp("contact_points_positions",
+                                         m_contact_points_positions);
   }
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -139,6 +151,7 @@ struct ContactModelTpl : public serialization::Serializable<ContactModelTpl<_Sca
 }  // namespace scenario
 }  // namespace multicontact_api
 
-DEFINE_CLASS_TEMPLATE_VERSION(typename Scalar, multicontact_api::scenario::ContactModelTpl<Scalar>)
+DEFINE_CLASS_TEMPLATE_VERSION(
+    typename Scalar, multicontact_api::scenario::ContactModelTpl<Scalar>)
 
 #endif  // ifndef __multicontact_api_scenario_contact_model_planar_hpp__

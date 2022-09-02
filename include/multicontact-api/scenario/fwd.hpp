@@ -4,8 +4,9 @@
 #ifndef __multicontact_api_scenario_fwd_hpp__
 #define __multicontact_api_scenario_fwd_hpp__
 
-#include "multicontact-api/geometry/fwd.hpp"
 #include <pinocchio/spatial/fwd.hpp>
+
+#include "multicontact-api/geometry/fwd.hpp"
 
 namespace multicontact_api {
 namespace scenario {

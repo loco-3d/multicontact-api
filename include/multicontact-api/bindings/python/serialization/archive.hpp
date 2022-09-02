@@ -30,15 +30,22 @@ struct cs_pickle_suite : bp::pickle_suite {
 };
 
 template <typename Derived>
-struct SerializableVisitor : public boost::python::def_visitor<SerializableVisitor<Derived> > {
+struct SerializableVisitor
+    : public boost::python::def_visitor<SerializableVisitor<Derived> > {
   template <class PyClass>
   void visit(PyClass& cl) const {
-    cl.def("saveAsText", &Derived::saveAsText, bp::args("filename"), "Saves *this inside a text file.")
-        .def("loadFromText", &Derived::loadFromText, bp::args("filename"), "Loads *this from a text file.")
-        .def("saveAsXML", &Derived::saveAsXML, bp::args("filename", "tag_name"), "Saves *this inside a XML file.")
-        .def("loadFromXML", &Derived::loadFromXML, bp::args("filename", "tag_name"), "Loads *this from a XML file.")
-        .def("saveAsBinary", &Derived::saveAsBinary, bp::args("filename"), "Saves *this inside a binary file.")
-        .def("loadFromBinary", &Derived::loadFromBinary, bp::args("filename"), "Loads *this from a binary file.")
+    cl.def("saveAsText", &Derived::saveAsText, bp::args("filename"),
+           "Saves *this inside a text file.")
+        .def("loadFromText", &Derived::loadFromText, bp::args("filename"),
+             "Loads *this from a text file.")
+        .def("saveAsXML", &Derived::saveAsXML, bp::args("filename", "tag_name"),
+             "Saves *this inside a XML file.")
+        .def("loadFromXML", &Derived::loadFromXML,
+             bp::args("filename", "tag_name"), "Loads *this from a XML file.")
+        .def("saveAsBinary", &Derived::saveAsBinary, bp::args("filename"),
+             "Saves *this inside a binary file.")
+        .def("loadFromBinary", &Derived::loadFromBinary, bp::args("filename"),
+             "Loads *this from a binary file.")
         .def_pickle(cs_pickle_suite<Derived>());
   }
 };

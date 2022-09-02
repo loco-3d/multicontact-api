@@ -4,6 +4,12 @@
 #include <iostream>
 
 #define BOOST_TEST_MODULE StatsTests
+#include <ndcurves/bezier_curve.h>
+#include <ndcurves/fwd.h>
+#include <ndcurves/piecewise_curve.h>
+#include <ndcurves/polynomial.h>
+#include <ndcurves/se3_curve.h>
+
 #include <boost/test/unit_test.hpp>
 #include <boost/utility/binary.hpp>
 
@@ -11,12 +17,6 @@
 #include "multicontact-api/scenario/contact-patch.hpp"
 #include "multicontact-api/scenario/contact-phase.hpp"
 #include "multicontact-api/scenario/contact-sequence.hpp"
-
-#include <ndcurves/fwd.h>
-#include <ndcurves/se3_curve.h>
-#include <ndcurves/polynomial.h>
-#include <ndcurves/bezier_curve.h>
-#include <ndcurves/piecewise_curve.h>
 
 typedef Eigen::Matrix<double, 1, 1> point1_t;
 using ndcurves::point3_t;
@@ -76,8 +76,10 @@ curve_ptr_t buildPiecewisePolynomialC2() {
   time_points.push_back(t2);
   time_points.push_back(t3);
 
-  ndcurves::piecewise_t ppc_C2 = ndcurves::piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(
-      points, points_derivative, points_second_derivative, time_points);
+  ndcurves::piecewise_t ppc_C2 =
+      ndcurves::piecewise_t::convert_discrete_points_to_polynomial<
+          ndcurves::polynomial_t>(points, points_derivative,
+                                  points_second_derivative, time_points);
   curve_ptr_t res(new ndcurves::piecewise_t(ppc_C2));
   return res;
 }
@@ -135,20 +137,25 @@ curve_SE3_ptr_t buildPiecewiseSE3() {
   params.push_back(d);
   boost::shared_ptr<ndcurves::bezier_t> translation_bezier(
       new ndcurves::bezier_t(params.begin(), params.end(), mid, max));
-  curve_SE3_ptr_t cBezier(new ndcurves::SE3Curve_t(translation_bezier, q0.toRotationMatrix(), q1.toRotationMatrix()));
+  curve_SE3_ptr_t cBezier(new ndcurves::SE3Curve_t(
+      translation_bezier, q0.toRotationMatrix(), q1.toRotationMatrix()));
 
   ndcurves::piecewise_SE3_t piecewiseSE3(cLinear);
   piecewiseSE3.add_curve_ptr(cBezier);
-  curve_SE3_ptr_t res = boost::make_shared<ndcurves::piecewise_SE3_t>(piecewiseSE3);
+  curve_SE3_ptr_t res =
+      boost::make_shared<ndcurves::piecewise_SE3_t>(piecewiseSE3);
   return res;
 }
 
 quaternion_t randomQuaternion() {  // already included in newest eigen release
   const double u1 = Eigen::internal::random<double>(0, 1),
-               u2 = Eigen::internal::random<double>(0, 2 * static_cast<double>(EIGEN_PI)),
-               u3 = Eigen::internal::random<double>(0, 2 * static_cast<double>(EIGEN_PI));
+               u2 = Eigen::internal::random<double>(
+                   0, 2 * static_cast<double>(EIGEN_PI)),
+               u3 = Eigen::internal::random<double>(
+                   0, 2 * static_cast<double>(EIGEN_PI));
   const double a = sqrt(1 - u1), b = sqrt(u1);
-  return quaternion_t(a * sin(u2), a * cos(u2), b * sin(u3), b * cos(u3)).normalized();
+  return quaternion_t(a * sin(u2), a * cos(u2), b * sin(u3), b * cos(u3))
+      .normalized();
 }
 
 curve_SE3_ptr_t buildRandomSE3LinearTraj(const double min, const double max) {
@@ -166,7 +173,8 @@ curve_SE3_ptr_t buildRandomSE3LinearTraj(const double min, const double max) {
 void addRandomPointsValues(ContactPhase& cp) {
   point3_t c_init = point3_t::Random();
   point3_t dc_init = point3_t::Random();
-  pointX_t ddc_init = point3_t::Random();  // test with point X for automatic conversion
+  pointX_t ddc_init =
+      point3_t::Random();  // test with point X for automatic conversion
   pointX_t L_init = point3_t::Random();
   point3_t dL_init = point3_t::Random();
   pointX_t q_init = point12_t::Random();
@@ -288,9 +296,11 @@ void explicitContactPhaseAssertEqual(ContactPhase& cp1, ContactPhase& cp2) {
   BOOST_CHECK((*cp1.m_ddc)(cp2.m_ddc->min()) == (*cp2.m_ddc)(cp2.m_ddc->min()));
   BOOST_CHECK((*cp1.m_L)(cp2.m_L->min()) == (*cp2.m_L)(cp2.m_L->min()));
   BOOST_CHECK((*cp1.m_dL)(cp2.m_dL->min()) == (*cp2.m_dL)(cp2.m_dL->min()));
-  BOOST_CHECK((*cp1.m_wrench)(cp2.m_wrench->min()) == (*cp2.m_wrench)(cp2.m_wrench->min()));
+  BOOST_CHECK((*cp1.m_wrench)(cp2.m_wrench->min()) ==
+              (*cp2.m_wrench)(cp2.m_wrench->min()));
   BOOST_CHECK((*cp1.m_zmp)(cp2.m_zmp->min()) == (*cp2.m_zmp)(cp2.m_zmp->min()));
-  BOOST_CHECK((*cp1.m_root)(cp2.m_root->min()).isApprox((*cp2.m_root)(cp2.m_root->min())));
+  BOOST_CHECK((*cp1.m_root)(cp2.m_root->min())
+                  .isApprox((*cp2.m_root)(cp2.m_root->min())));
   BOOST_CHECK(cp1.m_q->isApprox(cp2.m_q.get()));
   BOOST_CHECK(cp1.m_dq->isApprox(cp2.m_dq.get()));
   BOOST_CHECK(cp1.m_ddq->isApprox(cp2.m_ddq.get()));
@@ -309,12 +319,14 @@ void explicitContactPhaseAssertEqual(ContactPhase& cp1, ContactPhase& cp2) {
   BOOST_CHECK(cp1.effectorsInContact() == cp2.effectorsInContact());
   BOOST_CHECK(cp1.contactPatches() == cp2.contactPatches());
   const ContactPhase::t_strings eeNames = cp2.effectorsInContact();
-  for (ContactPhase::t_strings::const_iterator ee = eeNames.begin(); ee != eeNames.end(); ++ee) {
+  for (ContactPhase::t_strings::const_iterator ee = eeNames.begin();
+       ee != eeNames.end(); ++ee) {
     BOOST_CHECK(cp2.isEffectorInContact(*ee));
     BOOST_CHECK(cp1.contactPatch(*ee) == cp2.contactPatch(*ee));
     if (cp1.contactForces().count(*ee)) {
       BOOST_CHECK(cp2.contactForces().count(*ee));
-      BOOST_CHECK(cp1.contactForces(*ee)->isApprox(cp2.contactForces(*ee).get()));
+      BOOST_CHECK(
+          cp1.contactForces(*ee)->isApprox(cp2.contactForces(*ee).get()));
       BOOST_CHECK((*cp1.contactForces(*ee))(cp1.contactForces(*ee)->min()) ==
                   (*cp2.contactForces(*ee))(cp2.contactForces(*ee)->min()));
       BOOST_CHECK((*cp1.contactForces(*ee))(cp1.contactForces(*ee)->max()) ==
@@ -322,21 +334,32 @@ void explicitContactPhaseAssertEqual(ContactPhase& cp1, ContactPhase& cp2) {
     }
     if (cp1.contactNormalForces().count(*ee)) {
       BOOST_CHECK(cp2.contactNormalForces().count(*ee));
-      BOOST_CHECK(cp1.contactNormalForces(*ee)->isApprox(cp2.contactNormalForces(*ee).get()));
-      BOOST_CHECK((*cp1.contactNormalForces(*ee))(cp1.contactNormalForces(*ee)->min()) ==
-                  (*cp2.contactNormalForces(*ee))(cp2.contactNormalForces(*ee)->min()));
-      BOOST_CHECK((*cp1.contactNormalForces(*ee))(cp1.contactNormalForces(*ee)->max()) ==
-                  (*cp2.contactNormalForces(*ee))(cp2.contactNormalForces(*ee)->max()));
+      BOOST_CHECK(cp1.contactNormalForces(*ee)->isApprox(
+          cp2.contactNormalForces(*ee).get()));
+      BOOST_CHECK(
+          (*cp1.contactNormalForces(*ee))(
+              cp1.contactNormalForces(*ee)->min()) ==
+          (*cp2.contactNormalForces(*ee))(cp2.contactNormalForces(*ee)->min()));
+      BOOST_CHECK(
+          (*cp1.contactNormalForces(*ee))(
+              cp1.contactNormalForces(*ee)->max()) ==
+          (*cp2.contactNormalForces(*ee))(cp2.contactNormalForces(*ee)->max()));
     }
   }
   const ContactPhase::CurveSE3Map_t trajMap = cp2.effectorTrajectories();
-  for (ContactPhase::CurveSE3Map_t::const_iterator mit = trajMap.begin(); mit != trajMap.end(); ++mit) {
+  for (ContactPhase::CurveSE3Map_t::const_iterator mit = trajMap.begin();
+       mit != trajMap.end(); ++mit) {
     BOOST_CHECK(cp2.effectorTrajectories().count(mit->first));
-    BOOST_CHECK(cp1.effectorTrajectories(mit->first)->isApprox(cp2.effectorTrajectories(mit->first).get()));
-    BOOST_CHECK((*cp1.effectorTrajectories(mit->first))(cp1.effectorTrajectories(mit->first)->min())
-                    .isApprox((*cp2.effectorTrajectories(mit->first))(cp2.effectorTrajectories(mit->first)->min())));
-    BOOST_CHECK((*cp1.effectorTrajectories(mit->first))(cp1.effectorTrajectories(mit->first)->max())
-                    .isApprox((*cp2.effectorTrajectories(mit->first))(cp2.effectorTrajectories(mit->first)->max())));
+    BOOST_CHECK(cp1.effectorTrajectories(mit->first)
+                    ->isApprox(cp2.effectorTrajectories(mit->first).get()));
+    BOOST_CHECK((*cp1.effectorTrajectories(mit->first))(
+                    cp1.effectorTrajectories(mit->first)->min())
+                    .isApprox((*cp2.effectorTrajectories(mit->first))(
+                        cp2.effectorTrajectories(mit->first)->min())));
+    BOOST_CHECK((*cp1.effectorTrajectories(mit->first))(
+                    cp1.effectorTrajectories(mit->first)->max())
+                    .isApprox((*cp2.effectorTrajectories(mit->first))(
+                        cp2.effectorTrajectories(mit->first)->max())));
   }
 }
 
@@ -580,14 +603,16 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   BOOST_CHECK(cp2.contactPatches()["left_leg"] == patchL);
   BOOST_CHECK(cp2.contactPatches()["right_leg"] == patchR);
 
-  cp2.contactPatches().insert(
-      std::pair<std::string, ContactPatch>("other", patchR));  // Why does it compile ? there is only const getter
-  BOOST_CHECK(cp2.contactPatches().count("other") == 0);  // previous line should have no effect, only const getter
+  cp2.contactPatches().insert(std::pair<std::string, ContactPatch>(
+      "other", patchR));  // Why does it compile ? there is only const getter
+  BOOST_CHECK(cp2.contactPatches().count("other") ==
+              0);  // previous line should have no effect, only const getter
   BOOST_CHECK(!cp2.isEffectorInContact("other"));
   ContactPatch patchR2(SE3::Identity().setRandom(), 1.5);
   //  cp2.contactPatches
 
-  newContact = cp2.addContact("left_leg", ContactPatch(SE3::Identity().setRandom(), 0.5));
+  newContact = cp2.addContact("left_leg",
+                              ContactPatch(SE3::Identity().setRandom(), 0.5));
   BOOST_CHECK(!newContact);
   BOOST_CHECK(cp2.isEffectorInContact("left_leg"));
   BOOST_CHECK(cp2.isEffectorInContact("right_leg"));
@@ -623,13 +648,15 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   pointX_t f0_1 = point12_t::Random();
   pointX_t f1_1 = point12_t::Random();
   curve_ptr_t force12d_1(new ndcurves::polynomial_t(f0_1, f1_1, min, max));
-  cp2.contactForces().insert(
-      std::pair<std::string, curve_ptr_t>("right_leg", force12d_1));  // should not have any effect only const getter
+  cp2.contactForces().insert(std::pair<std::string, curve_ptr_t>(
+      "right_leg",
+      force12d_1));  // should not have any effect only const getter
   BOOST_CHECK(cp2.contactForces().count("right_leg") == 0);
   cp2.contactForces().erase("left_leg");  // should not have any effect
   BOOST_CHECK((*cp2.contactForces("left_leg"))(min) == f0);
-  BOOST_CHECK_THROW(cp2.addContactForceTrajectory("right_leg", force12d),
-                    std::invalid_argument);  // right leg is not in contact, cannot add force
+  BOOST_CHECK_THROW(
+      cp2.addContactForceTrajectory("right_leg", force12d),
+      std::invalid_argument);  // right leg is not in contact, cannot add force
   BOOST_CHECK_THROW(cp2.contactForces("right_leg"), std::invalid_argument);
 
   // check with piecewise curve :
@@ -659,14 +686,16 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   pointX_t nf1_1(1);
   nf1_1 << 562;
   curve_ptr_t force1d_1(new ndcurves::polynomial_t(nf0_1, nf1_1, min, max));
-  cp2.contactNormalForces().insert(
-      std::pair<std::string, curve_ptr_t>("right_leg", force1d_1));  // should not have any effect only const getter
+  cp2.contactNormalForces().insert(std::pair<std::string, curve_ptr_t>(
+      "right_leg", force1d_1));  // should not have any effect only const getter
   BOOST_CHECK(cp2.contactNormalForces().count("right_leg") == 0);
   cp2.contactNormalForces().erase("left_leg");  // should not have any effect
   BOOST_CHECK((*cp2.contactNormalForces("left_leg"))(min) == nf0);
-  BOOST_CHECK_THROW(cp2.contactNormalForces("right_leg"), std::invalid_argument);
-  BOOST_CHECK_THROW(cp2.addContactNormalForceTrajectory("right_leg", force12d),
-                    std::invalid_argument);  // right leg is not in contact, cannot add force
+  BOOST_CHECK_THROW(cp2.contactNormalForces("right_leg"),
+                    std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp2.addContactNormalForceTrajectory("right_leg", force12d),
+      std::invalid_argument);  // right leg is not in contact, cannot add force
   BOOST_CHECK_THROW(cp2.addContactNormalForceTrajectory("left_leg", force12d),
                     std::invalid_argument);  // should be of dimension 1
 
@@ -676,16 +705,25 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   BOOST_CHECK(newTraj);
   newTraj = cp2.addEffectorTrajectory("right_leg", effR);
   BOOST_CHECK(!newTraj);
-  BOOST_CHECK((*cp2.effectorTrajectories()["right_leg"])(min).isApprox((*effR)(min)));
-  BOOST_CHECK((*cp2.effectorTrajectories()["right_leg"])(max).isApprox((*effR)(max)));
-  BOOST_CHECK((*cp2.effectorTrajectories()["right_leg"])(1.2).isApprox((*effR)(1.2)));
-  BOOST_CHECK((*cp2.effectorTrajectories("right_leg"))(min).isApprox((*effR)(min)));
-  BOOST_CHECK((*cp2.effectorTrajectories("right_leg"))(max).isApprox((*effR)(max)));
-  BOOST_CHECK((*cp2.effectorTrajectories("right_leg"))(1.2).isApprox((*effR)(1.2)));
-  BOOST_CHECK_THROW(cp2.effectorTrajectories("left_leg"), std::invalid_argument);
-  BOOST_CHECK_THROW(cp2.addEffectorTrajectory("left_leg", effR),
-                    std::invalid_argument);  // right leg is not in contact, cannot add force
-  // cp2.addEffectorTrajectory("right_leg",force12d); // should not compile : not the right return type for the curve
+  BOOST_CHECK(
+      (*cp2.effectorTrajectories()["right_leg"])(min).isApprox((*effR)(min)));
+  BOOST_CHECK(
+      (*cp2.effectorTrajectories()["right_leg"])(max).isApprox((*effR)(max)));
+  BOOST_CHECK(
+      (*cp2.effectorTrajectories()["right_leg"])(1.2).isApprox((*effR)(1.2)));
+  BOOST_CHECK(
+      (*cp2.effectorTrajectories("right_leg"))(min).isApprox((*effR)(min)));
+  BOOST_CHECK(
+      (*cp2.effectorTrajectories("right_leg"))(max).isApprox((*effR)(max)));
+  BOOST_CHECK(
+      (*cp2.effectorTrajectories("right_leg"))(1.2).isApprox((*effR)(1.2)));
+  BOOST_CHECK_THROW(cp2.effectorTrajectories("left_leg"),
+                    std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp2.addEffectorTrajectory("left_leg", effR),
+      std::invalid_argument);  // right leg is not in contact, cannot add force
+  // cp2.addEffectorTrajectory("right_leg",force12d); // should not compile :
+  // not the right return type for the curve
 
   // check setting init / final data :
   // public members :
@@ -706,7 +744,8 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
 
   point3_t c_init = point3_t::Random();
   point3_t dc_init = point3_t::Random();
-  pointX_t ddc_init = point3_t::Random();  // test with point X for automatic conversion
+  pointX_t ddc_init =
+      point3_t::Random();  // test with point X for automatic conversion
   pointX_t L_init = point3_t::Random();
   point3_t dL_init = point3_t::Random();
   pointX_t q_init = point12_t::Random();
@@ -808,29 +847,41 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
     BOOST_CHECK((*cp2.m_root)(root->max()).isApprox((*root)(root->max())));
   }
   BOOST_CHECK_NO_THROW(
-      cp2.m_q->operator()(cp2.m_q->min()));  // check that the curves still exist after leaving the scope
+      cp2.m_q->operator()(cp2.m_q->min()));  // check that the curves still
+                                             // exist after leaving the scope
   BOOST_CHECK_NO_THROW(
-      cp2.m_dq->operator()(cp2.m_dq->min()));  // check that the curves still exist after leaving the scope
+      cp2.m_dq->operator()(cp2.m_dq->min()));  // check that the curves still
+                                               // exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_ddq->operator()(
+      cp2.m_ddq->min()));  // check that the curves still exist after leaving
+                           // the scope
+  BOOST_CHECK_NO_THROW(cp2.m_tau->operator()(
+      cp2.m_tau->min()));  // check that the curves still exist after leaving
+                           // the scope
   BOOST_CHECK_NO_THROW(
-      cp2.m_ddq->operator()(cp2.m_ddq->min()));  // check that the curves still exist after leaving the scope
+      cp2.m_c->operator()(cp2.m_c->min()));  // check that the curves still
+                                             // exist after leaving the scope
   BOOST_CHECK_NO_THROW(
-      cp2.m_tau->operator()(cp2.m_tau->min()));  // check that the curves still exist after leaving the scope
+      cp2.m_dc->operator()(cp2.m_dc->min()));  // check that the curves still
+                                               // exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_ddc->operator()(
+      cp2.m_ddc->min()));  // check that the curves still exist after leaving
+                           // the scope
   BOOST_CHECK_NO_THROW(
-      cp2.m_c->operator()(cp2.m_c->min()));  // check that the curves still exist after leaving the scope
+      cp2.m_L->operator()(cp2.m_L->min()));  // check that the curves still
+                                             // exist after leaving the scope
   BOOST_CHECK_NO_THROW(
-      cp2.m_dc->operator()(cp2.m_dc->min()));  // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(
-      cp2.m_ddc->operator()(cp2.m_ddc->min()));  // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(
-      cp2.m_L->operator()(cp2.m_L->min()));  // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(
-      cp2.m_dL->operator()(cp2.m_dL->min()));  // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(
-      cp2.m_wrench->operator()(cp2.m_wrench->min()));  // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(
-      cp2.m_root->operator()(cp2.m_root->min()));  // check that the curves still exist after leaving the scope
-  BOOST_CHECK_NO_THROW(
-      cp2.m_zmp->operator()(cp2.m_zmp->min()));  // check that the curves still exist after leaving the scope
+      cp2.m_dL->operator()(cp2.m_dL->min()));  // check that the curves still
+                                               // exist after leaving the scope
+  BOOST_CHECK_NO_THROW(cp2.m_wrench->operator()(
+      cp2.m_wrench->min()));  // check that the curves still exist after leaving
+                              // the scope
+  BOOST_CHECK_NO_THROW(cp2.m_root->operator()(
+      cp2.m_root->min()));  // check that the curves still exist after leaving
+                            // the scope
+  BOOST_CHECK_NO_THROW(cp2.m_zmp->operator()(
+      cp2.m_zmp->min()));  // check that the curves still exist after leaving
+                           // the scope
 
   // add more contact and trajectories :
   cp2.addContact("right_hand", ContactPatch(SE3::Identity().setRandom()));
@@ -843,20 +894,27 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   }
   BOOST_CHECK(num_ctc == 2);
 
-  curve_SE3_ptr_t eff_knee(buildRandomSE3LinearTraj(cp2.timeInitial(), cp2.timeFinal()));
+  curve_SE3_ptr_t eff_knee(
+      buildRandomSE3LinearTraj(cp2.timeInitial(), cp2.timeFinal()));
   double min_knee = eff_knee->min();
   double max_knee = eff_knee->max();
   newTraj = cp2.addEffectorTrajectory("knee", eff_knee);
   BOOST_CHECK(newTraj);
-  BOOST_CHECK((*cp2.effectorTrajectories()["knee"])(min_knee).isApprox((*eff_knee)(min_knee)));
-  BOOST_CHECK((*cp2.effectorTrajectories()["knee"])(max_knee).isApprox((*eff_knee)(max_knee)));
-  BOOST_CHECK((*cp2.effectorTrajectories()["right_leg"])(min).isApprox((*effR)(min)));
-  BOOST_CHECK((*cp2.effectorTrajectories()["right_leg"])(max).isApprox((*effR)(max)));
-  BOOST_CHECK((*cp2.effectorTrajectories()["right_leg"])(1.2).isApprox((*effR)(1.2)));
+  BOOST_CHECK((*cp2.effectorTrajectories()["knee"])(min_knee).isApprox(
+      (*eff_knee)(min_knee)));
+  BOOST_CHECK((*cp2.effectorTrajectories()["knee"])(max_knee).isApprox(
+      (*eff_knee)(max_knee)));
+  BOOST_CHECK(
+      (*cp2.effectorTrajectories()["right_leg"])(min).isApprox((*effR)(min)));
+  BOOST_CHECK(
+      (*cp2.effectorTrajectories()["right_leg"])(max).isApprox((*effR)(max)));
+  BOOST_CHECK(
+      (*cp2.effectorTrajectories()["right_leg"])(1.2).isApprox((*effR)(1.2)));
   BOOST_CHECK(cp2.effectorTrajectories().size() == 2);
   int num_eff_traj = 0;
   const ContactPhase::CurveSE3Map_t trajMap = cp2.effectorTrajectories();
-  for (ContactPhase::CurveSE3Map_t::const_iterator mit = trajMap.begin(); mit != trajMap.end(); ++mit) {
+  for (ContactPhase::CurveSE3Map_t::const_iterator mit = trajMap.begin();
+       mit != trajMap.end(); ++mit) {
     BOOST_CHECK(mit->first == "knee" || mit->first == "right_leg");
     num_eff_traj++;
   }
@@ -905,20 +963,27 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   BOOST_CHECK((*cp5.m_ddc)(cp2.m_ddc->min()) == (*cp2.m_ddc)(cp2.m_ddc->min()));
   BOOST_CHECK((*cp5.m_L)(cp2.m_L->min()) == (*cp2.m_L)(cp2.m_L->min()));
   BOOST_CHECK((*cp5.m_dL)(cp2.m_dL->min()) == (*cp2.m_dL)(cp2.m_dL->min()));
-  BOOST_CHECK((*cp5.m_wrench)(cp2.m_wrench->min()) == (*cp2.m_wrench)(cp2.m_wrench->min()));
+  BOOST_CHECK((*cp5.m_wrench)(cp2.m_wrench->min()) ==
+              (*cp2.m_wrench)(cp2.m_wrench->min()));
   BOOST_CHECK((*cp5.m_zmp)(cp2.m_zmp->min()) == (*cp2.m_zmp)(cp2.m_zmp->min()));
-  BOOST_CHECK((*cp5.m_root)(cp2.m_root->min()).isApprox((*cp2.m_root)(cp2.m_root->min())));
+  BOOST_CHECK((*cp5.m_root)(cp2.m_root->min())
+                  .isApprox((*cp2.m_root)(cp2.m_root->min())));
   BOOST_CHECK(cp5.contactForces() == cp2.contactForces());
   BOOST_CHECK(cp5.contactNormalForces() == cp2.contactNormalForces());
   BOOST_CHECK(cp5.effectorTrajectories() == cp2.effectorTrajectories());
   BOOST_CHECK(cp5.effectorsInContact() == cp2.effectorsInContact());
   BOOST_CHECK(cp5.contactPatches() == cp2.contactPatches());
   BOOST_CHECK(cp5.contactForces("left_leg") == cp2.contactForces("left_leg"));
-  BOOST_CHECK(cp5.contactNormalForces("left_leg") == cp2.contactNormalForces("left_leg"));
-  BOOST_CHECK(cp5.contactForces("right_hand") == cp2.contactForces("right_hand"));
-  BOOST_CHECK(cp5.contactNormalForces("right_hand") == cp2.contactNormalForces("right_hand"));
-  BOOST_CHECK(cp5.effectorTrajectories("right_leg") == cp2.effectorTrajectories("right_leg"));
-  BOOST_CHECK(cp5.effectorTrajectories("knee") == cp2.effectorTrajectories("knee"));
+  BOOST_CHECK(cp5.contactNormalForces("left_leg") ==
+              cp2.contactNormalForces("left_leg"));
+  BOOST_CHECK(cp5.contactForces("right_hand") ==
+              cp2.contactForces("right_hand"));
+  BOOST_CHECK(cp5.contactNormalForces("right_hand") ==
+              cp2.contactNormalForces("right_hand"));
+  BOOST_CHECK(cp5.effectorTrajectories("right_leg") ==
+              cp2.effectorTrajectories("right_leg"));
+  BOOST_CHECK(cp5.effectorTrajectories("knee") ==
+              cp2.effectorTrajectories("knee"));
   BOOST_CHECK(cp5.contactPatch("left_leg") == cp2.contactPatch("left_leg"));
   BOOST_CHECK(cp5.contactPatch("right_hand") == cp2.contactPatch("right_hand"));
 
@@ -1102,7 +1167,8 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   BOOST_CHECK(cp5 != cp2);
   cp5 = cp2;
   BOOST_CHECK(cp5 == cp2);
-  cp5.addEffectorTrajectory("knee", buildRandomSE3LinearTraj(cp5.timeInitial(), cp5.timeFinal()));
+  cp5.addEffectorTrajectory(
+      "knee", buildRandomSE3LinearTraj(cp5.timeInitial(), cp5.timeFinal()));
   BOOST_CHECK(cp5 != cp2);
   cp5 = cp2;
   BOOST_CHECK(cp5 == cp2);
@@ -1120,7 +1186,8 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   BOOST_CHECK(!cp5.isEffectorInContact("left_leg"));
   BOOST_CHECK(cp5.contactForces().count("left_leg") == 0);
   BOOST_CHECK(cp5.contactNormalForces().count("left_leg") == 0);
-  // check that when adding a contact the effector trajectory is correctly deleted :
+  // check that when adding a contact the effector trajectory is correctly
+  // deleted :
   cp5.addContact("right_leg", patchR);
   BOOST_CHECK(cp5.effectorTrajectories().count("right_leg") == 0);
 
@@ -1132,7 +1199,8 @@ BOOST_AUTO_TEST_CASE(contact_phase) {
   cp2.saveAsText(fileName + ".txt");
   cp_from_txt.loadFromText(fileName + ".txt");
   BOOST_CHECK(cp2 == cp_from_txt);
-  std::cout << "cp2 after deserialization : " << std::endl << cp_from_txt << std::endl;
+  std::cout << "cp2 after deserialization : " << std::endl
+            << cp_from_txt << std::endl;
 
   cp2.saveAsXML(fileName + ".xml", "ContactPhase");
   cp_from_xml.loadFromXML(fileName + ".xml", "ContactPhase");
@@ -1185,7 +1253,8 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
 
   // check COM trajectory :
   ContactPhase cp;
-  cp.setCOMtrajectoryFromPoints(points, points_derivative, points_second_derivative, time_points);
+  cp.setCOMtrajectoryFromPoints(points, points_derivative,
+                                points_second_derivative, time_points);
   BOOST_CHECK_EQUAL(cp.m_c->dim(), 3);
   BOOST_CHECK_EQUAL(cp.m_dc->dim(), 3);
   BOOST_CHECK_EQUAL(cp.m_ddc->dim(), 3);
@@ -1225,7 +1294,8 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
   //  c_final = cp2.m_c_final;
   //  dc_final = cp2.m_dc_final;
   //  ddc_final = cp2.m_ddc_final;
-  //  cp2.setCOMtrajectoryFromPoints(points, points_derivative, points_second_derivative, time_points);
+  //  cp2.setCOMtrajectoryFromPoints(points, points_derivative,
+  //  points_second_derivative, time_points);
   //  BOOST_CHECK(cp2.m_c_init.isApprox(c_init));
   //  BOOST_CHECK(cp2.m_c_final.isApprox(c_final));
   //  BOOST_CHECK(cp2.m_dc_init.isApprox(dc_init));
@@ -1308,7 +1378,8 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
   points_second_derivative_q.push_back(ddq2);
   points_second_derivative_q.push_back(ddq3);
 
-  cp.setJointsTrajectoryFromPoints(points_q, points_derivative_q, points_second_derivative_q, time_points);
+  cp.setJointsTrajectoryFromPoints(points_q, points_derivative_q,
+                                   points_second_derivative_q, time_points);
   BOOST_CHECK_EQUAL(cp.m_q->dim(), 12);
   BOOST_CHECK_EQUAL(cp.m_dq->dim(), 12);
   BOOST_CHECK_EQUAL(cp.m_ddq->dim(), 12);
@@ -1339,7 +1410,8 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
   //  pointX_t q_init, q_final;
   //  q_init = cp2.m_q_init;
   //  q_final = cp2.m_q_final;
-  //  cp2.setJointsTrajectoryFromPoints(points_q, points_derivative_q, points_second_derivative_q, time_points);
+  //  cp2.setJointsTrajectoryFromPoints(points_q, points_derivative_q,
+  //  points_second_derivative_q, time_points);
   //  BOOST_CHECK(cp2.m_q_init.isApprox(q_init));
   //  BOOST_CHECK(cp2.m_q_final.isApprox(q_final));
   //  BOOST_CHECK(!cp2.m_q_init.isApprox(q0));
@@ -1347,18 +1419,31 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
 
   // check that errors are correctly throw when required :
   // not the correct size
-  BOOST_CHECK_THROW(cp.setCOMtrajectoryFromPoints(points_q, points_derivative, points_second_derivative, time_points),
-                    std::invalid_argument);
-  BOOST_CHECK_THROW(cp.setCOMtrajectoryFromPoints(points, points_derivative_q, points_second_derivative, time_points),
-                    std::invalid_argument);
-  BOOST_CHECK_THROW(cp.setCOMtrajectoryFromPoints(points, points_derivative, points_second_derivative_q, time_points),
-                    std::invalid_argument);
   BOOST_CHECK_THROW(
-      cp.setCOMtrajectoryFromPoints(points_q, points_derivative_q, points_second_derivative_q, time_points),
+      cp.setCOMtrajectoryFromPoints(points_q, points_derivative,
+                                    points_second_derivative, time_points),
       std::invalid_argument);
-  BOOST_CHECK_THROW(cp.setAMtrajectoryFromPoints(points_q, points_derivative_q, time_points), std::invalid_argument);
-  BOOST_CHECK_THROW(cp.setAMtrajectoryFromPoints(points, points_derivative_q, time_points), std::invalid_argument);
-  BOOST_CHECK_THROW(cp.setAMtrajectoryFromPoints(points_q, points_derivative, time_points), std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp.setCOMtrajectoryFromPoints(points, points_derivative_q,
+                                    points_second_derivative, time_points),
+      std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp.setCOMtrajectoryFromPoints(points, points_derivative,
+                                    points_second_derivative_q, time_points),
+      std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp.setCOMtrajectoryFromPoints(points_q, points_derivative_q,
+                                    points_second_derivative_q, time_points),
+      std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp.setAMtrajectoryFromPoints(points_q, points_derivative_q, time_points),
+      std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp.setAMtrajectoryFromPoints(points, points_derivative_q, time_points),
+      std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp.setAMtrajectoryFromPoints(points_q, points_derivative, time_points),
+      std::invalid_argument);
   // not the same number of points :
   t_pointX_t points2 = points;
   points2.push_back(d0);
@@ -1368,17 +1453,31 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
   points_second_derivative2.push_back(d0);
   std::vector<double> time_points2 = time_points;
   time_points2.push_back(50.);
-  BOOST_CHECK_THROW(cp.setCOMtrajectoryFromPoints(points2, points_derivative, points_second_derivative, time_points),
-                    std::invalid_argument);
-  BOOST_CHECK_THROW(cp.setCOMtrajectoryFromPoints(points, points_derivative2, points_second_derivative, time_points),
-                    std::invalid_argument);
-  BOOST_CHECK_THROW(cp.setCOMtrajectoryFromPoints(points, points_derivative, points_second_derivative2, time_points),
-                    std::invalid_argument);
-  BOOST_CHECK_THROW(cp.setCOMtrajectoryFromPoints(points, points_derivative, points_second_derivative, time_points2),
-                    std::invalid_argument);
-  BOOST_CHECK_THROW(cp.setAMtrajectoryFromPoints(points2, points_derivative, time_points), std::invalid_argument);
-  BOOST_CHECK_THROW(cp.setAMtrajectoryFromPoints(points, points_derivative2, time_points), std::invalid_argument);
-  BOOST_CHECK_THROW(cp.setAMtrajectoryFromPoints(points, points_derivative, time_points2), std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp.setCOMtrajectoryFromPoints(points2, points_derivative,
+                                    points_second_derivative, time_points),
+      std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp.setCOMtrajectoryFromPoints(points, points_derivative2,
+                                    points_second_derivative, time_points),
+      std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp.setCOMtrajectoryFromPoints(points, points_derivative,
+                                    points_second_derivative2, time_points),
+      std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp.setCOMtrajectoryFromPoints(points, points_derivative,
+                                    points_second_derivative, time_points2),
+      std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp.setAMtrajectoryFromPoints(points2, points_derivative, time_points),
+      std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp.setAMtrajectoryFromPoints(points, points_derivative2, time_points),
+      std::invalid_argument);
+  BOOST_CHECK_THROW(
+      cp.setAMtrajectoryFromPoints(points, points_derivative, time_points2),
+      std::invalid_argument);
   t_pointX_t points_q2 = points_q;
   points_q2.push_back(q0);
   t_pointX_t points_derivative_q2 = points_derivative_q;
@@ -1386,17 +1485,21 @@ BOOST_AUTO_TEST_CASE(contact_phase_helpers_tarjectories) {
   t_pointX_t points_second_derivative_q2 = points_second_derivative_q;
   points_second_derivative_q2.push_back(q0);
   BOOST_CHECK_THROW(
-      cp.setJointsTrajectoryFromPoints(points_q2, points_derivative_q, points_second_derivative_q, time_points),
+      cp.setJointsTrajectoryFromPoints(points_q2, points_derivative_q,
+                                       points_second_derivative_q, time_points),
       std::invalid_argument);
   BOOST_CHECK_THROW(
-      cp.setJointsTrajectoryFromPoints(points_q, points_derivative_q2, points_second_derivative_q, time_points),
+      cp.setJointsTrajectoryFromPoints(points_q, points_derivative_q2,
+                                       points_second_derivative_q, time_points),
       std::invalid_argument);
-  BOOST_CHECK_THROW(
-      cp.setJointsTrajectoryFromPoints(points_q, points_derivative_q, points_second_derivative_q2, time_points),
-      std::invalid_argument);
-  BOOST_CHECK_THROW(
-      cp.setJointsTrajectoryFromPoints(points_q, points_derivative_q, points_second_derivative_q, time_points2),
-      std::invalid_argument);
+  BOOST_CHECK_THROW(cp.setJointsTrajectoryFromPoints(
+                        points_q, points_derivative_q,
+                        points_second_derivative_q2, time_points),
+                    std::invalid_argument);
+  BOOST_CHECK_THROW(cp.setJointsTrajectoryFromPoints(
+                        points_q, points_derivative_q,
+                        points_second_derivative_q, time_points2),
+                    std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_CASE(contact_phase_helper_contact_variation) {
@@ -1467,9 +1570,11 @@ BOOST_AUTO_TEST_CASE(contact_sequence) {
   ContactPhase cp2 = buildRandomContactPhase(0, 2);
   phases.push_back(cp2);
   BOOST_CHECK(phases.size() == 3);
-  BOOST_CHECK(cs1.size() == 2);  // original contact sequence should not be modified
+  BOOST_CHECK(cs1.size() ==
+              2);  // original contact sequence should not be modified
   phases[1].duration(3.);
-  BOOST_CHECK(cs1.contactPhase(1) == cp1);  // original contact sequence should not be modified
+  BOOST_CHECK(cs1.contactPhase(1) ==
+              cp1);  // original contact sequence should not be modified
 
   // check that contactPhase(id) getter return non const reference :
   cs1.contactPhase(1).timeFinal(10.);
@@ -1485,7 +1590,8 @@ BOOST_AUTO_TEST_CASE(contact_sequence) {
   BOOST_CHECK(cs2.size() == 3);
   for (size_t i = 0; i < 3; ++i) BOOST_CHECK(cs2.contactPhase(i) == cp_default);
 
-  // try to modify the uninitialized contact phase inside the sequence from the reference
+  // try to modify the uninitialized contact phase inside the sequence from the
+  // reference
   ContactPhase& cp2_0 = cs2.contactPhase(0);
   point3_t c_init = point3_t::Random();
   cp2_0.m_c_init = c_init;
@@ -1579,49 +1685,64 @@ BOOST_AUTO_TEST_CASE(contact_sequence_helper) {
   cs1.breakContact("left_foot");
   BOOST_CHECK(cs1.size() == 3);
   BOOST_CHECK(!cs1.contactPhase(2).isEffectorInContact("left_foot"));
-  BOOST_CHECK(cs1.contactPhase(1).timeFinal() == 4.);  // time final of previous phase should not have been modified
-  // check that the final value of the previous phase have been copied in the initial value of the new one
+  BOOST_CHECK(
+      cs1.contactPhase(1).timeFinal() ==
+      4.);  // time final of previous phase should not have been modified
+  // check that the final value of the previous phase have been copied in the
+  // initial value of the new one
   BOOST_CHECK(cs1.contactPhase(1).m_c_final == cs1.contactPhase(2).m_c_init);
   BOOST_CHECK(cs1.contactPhase(1).m_dc_final == cs1.contactPhase(2).m_dc_init);
-  BOOST_CHECK(cs1.contactPhase(1).m_ddc_final == cs1.contactPhase(2).m_ddc_init);
+  BOOST_CHECK(cs1.contactPhase(1).m_ddc_final ==
+              cs1.contactPhase(2).m_ddc_init);
   BOOST_CHECK(cs1.contactPhase(1).m_L_final == cs1.contactPhase(2).m_L_init);
   BOOST_CHECK(cs1.contactPhase(1).m_dL_final == cs1.contactPhase(2).m_dL_init);
   BOOST_CHECK(cs1.contactPhase(1).m_q_final == cs1.contactPhase(2).m_q_init);
-  BOOST_CHECK(cs1.contactPhase(1).timeFinal() == cs1.contactPhase(2).timeInitial());
+  BOOST_CHECK(cs1.contactPhase(1).timeFinal() ==
+              cs1.contactPhase(2).timeInitial());
   // check that the other contactPatch have been copied :
-  BOOST_CHECK(cs1.contactPhase(1).contactPatch("right_hand") == cs1.contactPhase(2).contactPatch("right_hand"));
+  BOOST_CHECK(cs1.contactPhase(1).contactPatch("right_hand") ==
+              cs1.contactPhase(2).contactPatch("right_hand"));
 
   // # test create contact :
   ContactPatch target(SE3::Identity().setRandom());
   cs1.createContact("left_foot", target, 2.5);
   BOOST_CHECK(cs1.size() == 4);
-  BOOST_CHECK(cs1.contactPhase(2).timeFinal() == 6.5);  // time final of previous phase should have been modified
+  BOOST_CHECK(cs1.contactPhase(2).timeFinal() ==
+              6.5);  // time final of previous phase should have been modified
   BOOST_CHECK(cs1.contactPhase(3).contactPatch("left_foot") == target);
-  // check that the final value of the previous phase have been copied in the initial value of the new one
+  // check that the final value of the previous phase have been copied in the
+  // initial value of the new one
   BOOST_CHECK(cs1.contactPhase(2).m_c_final == cs1.contactPhase(3).m_c_init);
   BOOST_CHECK(cs1.contactPhase(2).m_dc_final == cs1.contactPhase(3).m_dc_init);
-  BOOST_CHECK(cs1.contactPhase(2).m_ddc_final == cs1.contactPhase(3).m_ddc_init);
+  BOOST_CHECK(cs1.contactPhase(2).m_ddc_final ==
+              cs1.contactPhase(3).m_ddc_init);
   BOOST_CHECK(cs1.contactPhase(2).m_L_final == cs1.contactPhase(3).m_L_init);
   BOOST_CHECK(cs1.contactPhase(2).m_dL_final == cs1.contactPhase(3).m_dL_init);
   BOOST_CHECK(cs1.contactPhase(2).m_q_final == cs1.contactPhase(3).m_q_init);
-  BOOST_CHECK(cs1.contactPhase(2).timeFinal() == cs1.contactPhase(3).timeInitial());
+  BOOST_CHECK(cs1.contactPhase(2).timeFinal() ==
+              cs1.contactPhase(3).timeInitial());
   // check that the other contactPatch have been copied :
-  BOOST_CHECK(cs1.contactPhase(2).contactPatch("right_hand") == cs1.contactPhase(3).contactPatch("right_hand"));
+  BOOST_CHECK(cs1.contactPhase(2).contactPatch("right_hand") ==
+              cs1.contactPhase(3).contactPatch("right_hand"));
 
   // # test break with duration :
   cs1.breakContact("left_foot", 1.);
   BOOST_CHECK(cs1.size() == 5);
   BOOST_CHECK(!cs1.contactPhase(4).isEffectorInContact("left_foot"));
-  BOOST_CHECK(cs1.contactPhase(3).timeFinal() == 7.5);  // time final of previous phase should have been modified
+  BOOST_CHECK(cs1.contactPhase(3).timeFinal() ==
+              7.5);  // time final of previous phase should have been modified
 
   // # test  create contact with no duration:
   cs1.contactPhase(4).duration(1.);
-  BOOST_CHECK(cs1.contactPhase(4).timeFinal() == 8.5);  // time final of previous phase should have been modified
+  BOOST_CHECK(cs1.contactPhase(4).timeFinal() ==
+              8.5);  // time final of previous phase should have been modified
   target = ContactPatch(SE3::Identity().setRandom());
   cs1.createContact("left_foot", target);
   BOOST_CHECK(cs1.size() == 6);
-  BOOST_CHECK(cs1.contactPhase(4).timeFinal() == 8.5);    // time final of previous phase should have been modified
-  BOOST_CHECK(cs1.contactPhase(5).timeInitial() == 8.5);  // time final of previous phase should have been modified
+  BOOST_CHECK(cs1.contactPhase(4).timeFinal() ==
+              8.5);  // time final of previous phase should have been modified
+  BOOST_CHECK(cs1.contactPhase(5).timeInitial() ==
+              8.5);  // time final of previous phase should have been modified
 
   // # test move effector to placement :
   SE3 target_placement = SE3::Identity().setRandom();
@@ -1631,38 +1752,48 @@ BOOST_AUTO_TEST_CASE(contact_sequence_helper) {
   BOOST_CHECK(cs1.size() == 8);
   BOOST_CHECK(!cs1.contactPhase(6).isEffectorInContact("right_hand"));
   BOOST_CHECK(cs1.contactPhase(7).isEffectorInContact("right_hand"));
-  BOOST_CHECK(cs1.contactPhase(7).contactPatch("right_hand").placement() == target_placement);
+  BOOST_CHECK(cs1.contactPhase(7).contactPatch("right_hand").placement() ==
+              target_placement);
   // check that previous patch have not been modified :
-  BOOST_CHECK(cs1.contactPhase(5).contactPatch("right_hand").placement() != target_placement);
+  BOOST_CHECK(cs1.contactPhase(5).contactPatch("right_hand").placement() !=
+              target_placement);
   BOOST_CHECK(cs1.contactPhase(7).contactPatch("right_hand").friction() == 2.);
   BOOST_CHECK(cs1.contactPhase(5).timeFinal() == 9.5);
   BOOST_CHECK(cs1.contactPhase(6).timeInitial() == 9.5);
   BOOST_CHECK(cs1.contactPhase(6).timeFinal() == 11.);
   BOOST_CHECK(cs1.contactPhase(7).timeInitial() == 11.);
-  // check that the final value of the previous phase have been copied in the initial value of the new one
+  // check that the final value of the previous phase have been copied in the
+  // initial value of the new one
   BOOST_CHECK(cs1.contactPhase(5).m_c_final == cs1.contactPhase(6).m_c_init);
   BOOST_CHECK(cs1.contactPhase(5).m_dc_final == cs1.contactPhase(6).m_dc_init);
-  BOOST_CHECK(cs1.contactPhase(5).m_ddc_final == cs1.contactPhase(6).m_ddc_init);
+  BOOST_CHECK(cs1.contactPhase(5).m_ddc_final ==
+              cs1.contactPhase(6).m_ddc_init);
   BOOST_CHECK(cs1.contactPhase(5).m_L_final == cs1.contactPhase(6).m_L_init);
   BOOST_CHECK(cs1.contactPhase(5).m_dL_final == cs1.contactPhase(6).m_dL_init);
   BOOST_CHECK(cs1.contactPhase(5).m_q_final == cs1.contactPhase(6).m_q_init);
-  // with MoveEffector, the middle phase should have the same initial and final point :
+  // with MoveEffector, the middle phase should have the same initial and final
+  // point :
   BOOST_CHECK(cs1.contactPhase(6).m_c_final == cs1.contactPhase(6).m_c_init);
   BOOST_CHECK(cs1.contactPhase(6).m_dc_final == cs1.contactPhase(6).m_dc_init);
-  BOOST_CHECK(cs1.contactPhase(6).m_ddc_final == cs1.contactPhase(6).m_ddc_init);
+  BOOST_CHECK(cs1.contactPhase(6).m_ddc_final ==
+              cs1.contactPhase(6).m_ddc_init);
   BOOST_CHECK(cs1.contactPhase(6).m_L_final == cs1.contactPhase(6).m_L_init);
   BOOST_CHECK(cs1.contactPhase(6).m_dL_final == cs1.contactPhase(6).m_dL_init);
   BOOST_CHECK(cs1.contactPhase(6).m_q_final == cs1.contactPhase(6).m_q_init);
-  // check that the final value of the previous phase have been copied in the initial value of the new one
+  // check that the final value of the previous phase have been copied in the
+  // initial value of the new one
   BOOST_CHECK(cs1.contactPhase(6).m_c_final == cs1.contactPhase(7).m_c_init);
   BOOST_CHECK(cs1.contactPhase(6).m_dc_final == cs1.contactPhase(7).m_dc_init);
-  BOOST_CHECK(cs1.contactPhase(6).m_ddc_final == cs1.contactPhase(7).m_ddc_init);
+  BOOST_CHECK(cs1.contactPhase(6).m_ddc_final ==
+              cs1.contactPhase(7).m_ddc_init);
   BOOST_CHECK(cs1.contactPhase(6).m_L_final == cs1.contactPhase(7).m_L_init);
   BOOST_CHECK(cs1.contactPhase(6).m_dL_final == cs1.contactPhase(7).m_dL_init);
   BOOST_CHECK(cs1.contactPhase(6).m_q_final == cs1.contactPhase(7).m_q_init);
   // check that the other contactPatch have been copied :
-  BOOST_CHECK(cs1.contactPhase(5).contactPatch("left_foot") == cs1.contactPhase(6).contactPatch("left_foot"));
-  BOOST_CHECK(cs1.contactPhase(6).contactPatch("left_foot") == cs1.contactPhase(7).contactPatch("left_foot"));
+  BOOST_CHECK(cs1.contactPhase(5).contactPatch("left_foot") ==
+              cs1.contactPhase(6).contactPatch("left_foot"));
+  BOOST_CHECK(cs1.contactPhase(6).contactPatch("left_foot") ==
+              cs1.contactPhase(7).contactPatch("left_foot"));
 
   // # test move effector of:
   SE3 target_transform = SE3::Identity().setRandom();
@@ -1671,12 +1802,16 @@ BOOST_AUTO_TEST_CASE(contact_sequence_helper) {
   BOOST_CHECK(cs1.size() == 10);
   BOOST_CHECK(!cs1.contactPhase(8).isEffectorInContact("left_foot"));
   BOOST_CHECK(cs1.contactPhase(9).isEffectorInContact("left_foot"));
-  target_placement = target_transform.act(cs1.contactPhase(7).contactPatch("left_foot").placement());
-  BOOST_CHECK(cs1.contactPhase(9).contactPatch("left_foot").placement() == target_placement);
+  target_placement = target_transform.act(
+      cs1.contactPhase(7).contactPatch("left_foot").placement());
+  BOOST_CHECK(cs1.contactPhase(9).contactPatch("left_foot").placement() ==
+              target_placement);
   BOOST_CHECK(cs1.contactPhase(9).contactPatch("left_foot").friction() == 10.);
   // check that the other contactPatch have been copied :
-  BOOST_CHECK(cs1.contactPhase(7).contactPatch("right_hand") == cs1.contactPhase(8).contactPatch("right_hand"));
-  BOOST_CHECK(cs1.contactPhase(8).contactPatch("right_hand") == cs1.contactPhase(9).contactPatch("right_hand"));
+  BOOST_CHECK(cs1.contactPhase(7).contactPatch("right_hand") ==
+              cs1.contactPhase(8).contactPatch("right_hand"));
+  BOOST_CHECK(cs1.contactPhase(8).contactPatch("right_hand") ==
+              cs1.contactPhase(9).contactPatch("right_hand"));
 }
 
 BOOST_AUTO_TEST_CASE(contact_sequence_helper_throw) {
@@ -1690,21 +1825,26 @@ BOOST_AUTO_TEST_CASE(contact_sequence_helper_throw) {
   cs1.append(cp0);
   cs1.append(cp1);
   BOOST_CHECK(cs1.size() == 2);
-  BOOST_CHECK_THROW(cs1.breakContact("left_foot"), invalid_argument);  // contact do not exist
+  BOOST_CHECK_THROW(cs1.breakContact("left_foot"),
+                    invalid_argument);  // contact do not exist
   BOOST_CHECK(cs1.size() == 2);
   ContactPhase cp2 = buildRandomContactPhase();
   cs1.append(cp2);
   BOOST_CHECK(cs1.size() == 3);
-  BOOST_CHECK_THROW(cs1.breakContact("left_foot", 1.5), invalid_argument);  // time interval not defined for last phase
+  BOOST_CHECK_THROW(
+      cs1.breakContact("left_foot", 1.5),
+      invalid_argument);  // time interval not defined for last phase
   BOOST_CHECK(cs1.size() == 3);
 
   // # check that create contact correctly throw error when needed :
   ContactPatch target(SE3::Identity().setRandom());
-  BOOST_CHECK_THROW(cs1.createContact("left_foot", target), invalid_argument);  // contact already exist
+  BOOST_CHECK_THROW(cs1.createContact("left_foot", target),
+                    invalid_argument);  // contact already exist
   BOOST_CHECK(cs1.size() == 3);
   cs1.breakContact("left_foot");
   BOOST_CHECK(cs1.size() == 4);
-  BOOST_CHECK_THROW(cs1.createContact("left_foot", target, 2.), invalid_argument);  // time interval not defined
+  BOOST_CHECK_THROW(cs1.createContact("left_foot", target, 2.),
+                    invalid_argument);  // time interval not defined
   BOOST_CHECK(cs1.size() == 4);
 }
 
@@ -1775,7 +1915,9 @@ BOOST_AUTO_TEST_CASE(contact_sequence_have_contact_model_defined) {
   mp3.m_contact_type = ContactType::CONTACT_PLANAR;  // no effect
   BOOST_CHECK(!cs1.haveContactModelDefined());
 
-  cs1.contactPhase(2).contactPatch("right_hand").m_contact_model.m_contact_type = ContactType::CONTACT_PLANAR;
+  cs1.contactPhase(2)
+      .contactPatch("right_hand")
+      .m_contact_model.m_contact_type = ContactType::CONTACT_PLANAR;
   BOOST_CHECK(cs1.haveContactModelDefined());
 }
 
@@ -1809,10 +1951,12 @@ BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_com_traj) {
   time_points2.push_back(t4);
 
   ndcurves::piecewise_t c1 =
-      ndcurves::piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(points1, time_points1);
+      ndcurves::piecewise_t::convert_discrete_points_to_polynomial<
+          ndcurves::polynomial_t>(points1, time_points1);
   curve_ptr_t c1_ptr(new ndcurves::piecewise_t(c1));
   ndcurves::piecewise_t c2 =
-      ndcurves::piecewise_t::convert_discrete_points_to_polynomial<ndcurves::polynomial_t>(points2, time_points2);
+      ndcurves::piecewise_t::convert_discrete_points_to_polynomial<
+          ndcurves::polynomial_t>(points2, time_points2);
   curve_ptr_t c2_ptr(new ndcurves::piecewise_t(c2));
   cp0.m_c = c1_ptr;
   cp1.m_c = c2_ptr;
@@ -1867,7 +2011,8 @@ BOOST_AUTO_TEST_CASE(contact_sequence_concatenate_effector_traj) {
   BOOST_CHECK(traj(8.).isApprox(traj_2->operator()(8.)));
   BOOST_CHECK(traj(2.5).isApprox(traj_0->operator()(2.)));
   BOOST_CHECK(traj(3.8).isApprox(traj_0->operator()(2.)));
-  BOOST_CHECK_THROW(cs1.concatenateEffectorTrajectories("test"), std::invalid_argument);
+  BOOST_CHECK_THROW(cs1.concatenateEffectorTrajectories("test"),
+                    std::invalid_argument);
 
   ContactPhase cp3 = ContactPhase(8, 12.);
   cs1.append(cp3);
@@ -2042,8 +2187,14 @@ BOOST_AUTO_TEST_CASE(contact_sequence_have_effector_trajectory) {
 
   cp1.addEffectorTrajectory("left_foot", buildRandomSE3LinearTraj(1, 2));
 
-  cp0.addContact("left_foot", ContactPatch(SE3(cp1.effectorTrajectories("left_foot")->operator()(1.).matrix())));
-  cp2.addContact("left_foot", ContactPatch(SE3(cp1.effectorTrajectories("left_foot")->operator()(2.).matrix())));
+  cp0.addContact(
+      "left_foot",
+      ContactPatch(
+          SE3(cp1.effectorTrajectories("left_foot")->operator()(1.).matrix())));
+  cp2.addContact(
+      "left_foot",
+      ContactPatch(
+          SE3(cp1.effectorTrajectories("left_foot")->operator()(2.).matrix())));
 
   cs1.append(cp0);
   cs1.append(cp1);

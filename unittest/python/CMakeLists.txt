@@ -1,9 +1,6 @@
-SET(${PROJECT_NAME}_PYTHON_TESTS
-  trivial
-  geometry
-  scenario
-  )
+set(${PROJECT_NAME}_PYTHON_TESTS trivial geometry scenario)
 
-FOREACH(TEST ${${PROJECT_NAME}_PYTHON_TESTS})
-  ADD_PYTHON_UNIT_TEST("py-${TEST}" "unittest/python/${TEST}.py" "bindings/python")
-ENDFOREACH(TEST ${${PROJECT_NAME}_PYTHON_TESTS})
+foreach(TEST ${${PROJECT_NAME}_PYTHON_TESTS})
+  add_python_unit_test("py-${TEST}" "unittest/python/${TEST}.py"
+                       "bindings/python")
+endforeach(TEST ${${PROJECT_NAME}_PYTHON_TESTS})

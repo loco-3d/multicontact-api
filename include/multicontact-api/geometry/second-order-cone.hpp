@@ -15,7 +15,8 @@ namespace multicontact_api {
 namespace geometry {
 
 template <typename _Scalar, int _dim, int _Options>
-struct SecondOrderCone : public serialization::Serializable<SecondOrderCone<_Scalar, _dim, _Options> > {
+struct SecondOrderCone : public serialization::Serializable<
+                             SecondOrderCone<_Scalar, _dim, _Options> > {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   enum { dim = _dim, Options = _Options };
   typedef _Scalar Scalar;
@@ -24,27 +25,37 @@ struct SecondOrderCone : public serialization::Serializable<SecondOrderCone<_Sca
   typedef Eigen::DenseIndex DenseIndex;
 
   SecondOrderCone()
-      : m_Q(MatrixD::Identity()), m_QPo(_dim, _dim), m_direction(VectorD::Zero()), m_Pd(_dim, _dim), m_Po(_dim, _dim) {
+      : m_Q(MatrixD::Identity()),
+        m_QPo(_dim, _dim),
+        m_direction(VectorD::Zero()),
+        m_Pd(_dim, _dim),
+        m_Po(_dim, _dim) {
     m_direction[_dim - 1] = 1.;
     computeProjectors();
   }
 
   SecondOrderCone(const MatrixD& Q, const VectorD& direction)
-      : m_Q(Q), m_QPo(_dim, _dim), m_direction(direction.normalized()), m_Pd(_dim, _dim), m_Po(_dim, _dim) {
+      : m_Q(Q),
+        m_QPo(_dim, _dim),
+        m_direction(direction.normalized()),
+        m_Pd(_dim, _dim),
+        m_Po(_dim, _dim) {
     assert(direction.norm() >= Eigen::NumTraits<Scalar>::dummy_precision());
     assert((Q - Q.transpose()).isMuchSmallerThan(Q));
     computeProjectors();
   }
 
   ///
-  /// \brief Build a regular cone from a given friction coefficient and a direction.
+  /// \brief Build a regular cone from a given friction coefficient and a
+  /// direction.
   ///
   /// \param mu Friction coefficient.
   /// \param direction Direction of the cone.
   ///
   /// \returns A second order cone.
   ///
-  static SecondOrderCone RegularCone(const Scalar mu, const VectorD& direction) {
+  static SecondOrderCone RegularCone(const Scalar mu,
+                                     const VectorD& direction) {
     assert(mu > 0 && "The friction coefficient must be non-negative");
     MatrixD Q(MatrixD::Zero());
     Q.diagonal().fill(1. / mu);
@@ -74,7 +85,9 @@ struct SecondOrderCone : public serialization::Serializable<SecondOrderCone<_Sca
   /// \returns true if the point is inside the cone
   bool check(const VectorD& point) const { return check(point, 1.); }
 
-  bool check(const VectorD& point, const Scalar factor) const { return lhsValue(point) <= factor * rhsValue(point); }
+  bool check(const VectorD& point, const Scalar factor) const {
+    return lhsValue(point) <= factor * rhsValue(point);
+  }
 
   /// \returns the direction of the cone.
   const VectorD& direction() const { return m_direction; }
@@ -85,9 +98,11 @@ struct SecondOrderCone : public serialization::Serializable<SecondOrderCone<_Sca
   }
 
   template <typename S2, int O2>
-  bool isApprox(const SecondOrderCone<S2, dim, O2>& other,
-                const Scalar& prec = Eigen::NumTraits<Scalar>::dummy_precision()) const {
-    return m_direction.isApprox(other.m_direction, prec) && m_Q.isApprox(other.m_Q, prec);
+  bool isApprox(
+      const SecondOrderCone<S2, dim, O2>& other,
+      const Scalar& prec = Eigen::NumTraits<Scalar>::dummy_precision()) const {
+    return m_direction.isApprox(other.m_direction, prec) &&
+           m_Q.isApprox(other.m_Q, prec);
   }
 
   /// \returns the quadratic term of the lhs norm.
@@ -99,7 +114,9 @@ struct SecondOrderCone : public serialization::Serializable<SecondOrderCone<_Sca
   }
 
   void disp(std::ostream& os) const {
-    os << "Q:\n" << m_Q << std::endl << "direction: " << m_direction.transpose() << std::endl;
+    os << "Q:\n"
+       << m_Q << std::endl
+       << "direction: " << m_direction.transpose() << std::endl;
   }
 
   friend std::ostream& operator<<(std::ostream& os, const SecondOrderCone& C) {

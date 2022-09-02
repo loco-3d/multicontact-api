@@ -4,11 +4,11 @@
 #ifndef __multicontact_api_python_geometry_linear_cone_hpp__
 #define __multicontact_api_python_geometry_linear_cone_hpp__
 
-#include <pinocchio/fwd.hpp>
 #include <eigenpy/eigenpy.hpp>
+#include <pinocchio/fwd.hpp>
 
-#include "multicontact-api/geometry/linear-cone.hpp"
 #include "multicontact-api/bindings/python/serialization/archive.hpp"
+#include "multicontact-api/geometry/linear-cone.hpp"
 
 namespace multicontact_api {
 namespace python {
@@ -16,7 +16,8 @@ namespace python {
 namespace bp = boost::python;
 
 template <typename LC>
-struct LCPythonVisitor : public boost::python::def_visitor<LCPythonVisitor<LC> > {
+struct LCPythonVisitor
+    : public boost::python::def_visitor<LCPythonVisitor<LC> > {
   typedef bp::class_<LC> PyClass;
   typedef LC Type;
 
@@ -35,13 +36,18 @@ struct LCPythonVisitor : public boost::python::def_visitor<LCPythonVisitor<LC> >
         .add_property("size", &LC::size, "Returns the size of the set of rays.")
         .add_static_property("dim", &dim, "Dimension of the linear cone.")
 
-        .add_property("rays", &getRays, &setRays, "Matrix of rays of the linear cone.")
+        .add_property("rays", &getRays, &setRays,
+                      "Matrix of rays of the linear cone.")
         .def("__str__", &toString)
-        .def("isApprox", (bool (LC::*)(const LC &, const Scalar &) const) & LC::isApprox, bp::args("other", "prec"),
-             "Returns true if *this is approximately equal to other, within the precision determined by prec.")
-        .def("stack", &LC::template stack<MatrixDx>, bp::args("rays"), "Stack new rays to the set of rays.")
-        .def("stack", &LC::template stack<Scalar, LC::Options>, bp::args("cone"),
-             "Stack the rays of one to the set of rays.")
+        .def("isApprox",
+             (bool(LC::*)(const LC &, const Scalar &) const) & LC::isApprox,
+             bp::args("other", "prec"),
+             "Returns true if *this is approximately equal to other, within "
+             "the precision determined by prec.")
+        .def("stack", &LC::template stack<MatrixDx>, bp::args("rays"),
+             "Stack new rays to the set of rays.")
+        .def("stack", &LC::template stack<Scalar, LC::Options>,
+             bp::args("cone"), "Stack the rays of one to the set of rays.")
 
         .def(bp::self == bp::self)
         .def(bp::self != bp::self);
@@ -77,7 +83,8 @@ struct LCPythonVisitor : public boost::python::def_visitor<LCPythonVisitor<LC> >
 };
 
 template <typename ForceCone>
-struct ForceConePythonVisitor : public boost::python::def_visitor<ForceConePythonVisitor<ForceCone> > {
+struct ForceConePythonVisitor
+    : public boost::python::def_visitor<ForceConePythonVisitor<ForceCone> > {
   typedef typename ForceCone::Scalar Scalar;
   typedef typename ForceCone::Vector3 Vector3;
   typedef typename ForceCone::VectorD VectorD;
@@ -88,21 +95,29 @@ struct ForceConePythonVisitor : public boost::python::def_visitor<ForceConePytho
   template <class _PyClass>
   void visit(_PyClass &cl) const {
     cl.def(bp::init<>("Default constructor."))
-        .def(bp::init<Matrix3x>((bp::arg("rays"), "Init from a matrix of rays.")))
+        .def(bp::init<Matrix3x>(
+            (bp::arg("rays"), "Init from a matrix of rays.")))
         .def(bp::init<Index>(bp::args("size"), "Init with a given size."))
         .def(bp::init<ForceCone>(bp::args("other"), "Copy constructor."))
 
-        .def("SE3ActOn", &ForceCone::SE3ActOn, bp::args("M"), "Returns the action of SE3 on *this, i.e. a WrenchCone.")
+        .def("SE3ActOn", &ForceCone::SE3ActOn, bp::args("M"),
+             "Returns the action of SE3 on *this, i.e. a WrenchCone.")
         .def("toWrenchCone", &toWrenchCone, "Returns *this as a WrenchCone.")
 
-        .def("RegularCone", (ForceCone(*)(const Scalar, const VectorD &, const int)) & ForceCone::RegularCone,
+        .def("RegularCone",
+             (ForceCone(*)(const Scalar, const VectorD &, const int)) &
+                 ForceCone::RegularCone,
              bp::args("mu", "direction", "num rays"),
-             "Generates a regular linear cone from a given number of rays, a main direction and a friction "
+             "Generates a regular linear cone from a given number of rays, a "
+             "main direction and a friction "
              "coefficient.")
         .def("RegularCone",
-             (ForceCone(*)(const Scalar, const VectorD &, const int, const Scalar)) & ForceCone::RegularCone,
+             (ForceCone(*)(const Scalar, const VectorD &, const int,
+                           const Scalar)) &
+                 ForceCone::RegularCone,
              bp::args("mu", "direction", "num rays", "angle offset"),
-             "Generates a regular linear cone from a given number of rays, a main direction and a friction "
+             "Generates a regular linear cone from a given number of rays, a "
+             "main direction and a friction "
              "coefficient, with an offset on the orientation.")
         .staticmethod("RegularCone");
   }
@@ -113,15 +128,19 @@ struct ForceConePythonVisitor : public boost::python::def_visitor<ForceConePytho
 
     LCPythonVisitor<typename ForceCone::Base>::expose("LinearCone3");
 
-    bp::class_<ForceCone, bp::bases<typename ForceCone::Base> >(class_name.c_str(), doc.c_str(), bp::no_init)
+    bp::class_<ForceCone, bp::bases<typename ForceCone::Base> >(
+        class_name.c_str(), doc.c_str(), bp::no_init)
         .def(ForceConePythonVisitor<ForceCone>());
   }
 
-  static WrenchCone toWrenchCone(const ForceCone &self) { return (WrenchCone)(self); }
+  static WrenchCone toWrenchCone(const ForceCone &self) {
+    return (WrenchCone)(self);
+  }
 };
 
 template <typename WrenchCone>
-struct WrenchConePythonVisitor : public boost::python::def_visitor<WrenchConePythonVisitor<WrenchCone> > {
+struct WrenchConePythonVisitor
+    : public boost::python::def_visitor<WrenchConePythonVisitor<WrenchCone> > {
   typedef typename WrenchCone::Matrix3x Matrix3x;
   typedef typename WrenchCone::Matrix6x Matrix6x;
   typedef typename WrenchCone::Index Index;
@@ -129,7 +148,8 @@ struct WrenchConePythonVisitor : public boost::python::def_visitor<WrenchConePyt
   template <class _PyClass>
   void visit(_PyClass &cl) const {
     cl.def(bp::init<>("Default constructor."))
-        .def(bp::init<Matrix6x>((bp::arg("rays"), "Init from a matrix of rays.")))
+        .def(bp::init<Matrix6x>(
+            (bp::arg("rays"), "Init from a matrix of rays.")))
         .def(bp::init<Index>(bp::args("size"), "Init with a given size."))
         .def(bp::init<WrenchCone>(bp::args("other"), "Copy constructor."))
 
@@ -144,7 +164,8 @@ struct WrenchConePythonVisitor : public boost::python::def_visitor<WrenchConePyt
 
     LCPythonVisitor<typename WrenchCone::Base>::expose("LinearCone6");
 
-    bp::class_<WrenchCone, bp::bases<typename WrenchCone::Base> >(class_name.c_str(), doc.c_str(), bp::no_init)
+    bp::class_<WrenchCone, bp::bases<typename WrenchCone::Base> >(
+        class_name.c_str(), doc.c_str(), bp::no_init)
         .def(WrenchConePythonVisitor<WrenchCone>());
   }
 

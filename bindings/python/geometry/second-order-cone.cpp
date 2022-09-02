@@ -2,6 +2,7 @@
 // Authors: Justin Carpentier <jcarpent@laas.fr>
 
 #include "multicontact-api/bindings/python/geometry/second-order-cone.hpp"
+
 #include "multicontact-api/bindings/python/geometry/expose-geometry.hpp"
 
 namespace multicontact_api {

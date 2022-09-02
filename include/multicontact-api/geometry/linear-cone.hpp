@@ -13,13 +13,15 @@
 #include "multicontact-api/serialization/eigen-matrix.hpp"
 
 #define EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_ROWS_SIZE(TYPE, ROWS) \
-  EIGEN_STATIC_ASSERT(TYPE::RowsAtCompileTime == ROWS, THIS_METHOD_IS_ONLY_FOR_MATRICES_OF_A_SPECIFIC_SIZE)
+  EIGEN_STATIC_ASSERT(TYPE::RowsAtCompileTime == ROWS,            \
+                      THIS_METHOD_IS_ONLY_FOR_MATRICES_OF_A_SPECIFIC_SIZE)
 
 namespace multicontact_api {
 namespace geometry {
 
 template <typename _Scalar, int _dim, int _Options>
-struct LinearCone : public serialization::Serializable<LinearCone<_Scalar, _dim, _Options> > {
+struct LinearCone
+    : public serialization::Serializable<LinearCone<_Scalar, _dim, _Options> > {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   typedef _Scalar Scalar;
   enum { dim = _dim, Options = _Options };
@@ -83,8 +85,9 @@ struct LinearCone : public serialization::Serializable<LinearCone<_Scalar, _dim,
   }
 
   template <typename S2, int O2>
-  bool isApprox(const LinearCone<S2, dim, O2>& other,
-                const Scalar& prec = Eigen::NumTraits<Scalar>::dummy_precision()) const {
+  bool isApprox(
+      const LinearCone<S2, dim, O2>& other,
+      const Scalar& prec = Eigen::NumTraits<Scalar>::dummy_precision()) const {
     return m_rays.isApprox(other.m_rays, prec);
   }
 
@@ -143,16 +146,20 @@ struct ForceConeTpl : public LinearCone<_Scalar, 3, _Options> {
   ForceConeTpl() : Base() {}
 
   template <typename EigenDerived>
-  explicit ForceConeTpl(const Eigen::MatrixBase<EigenDerived>& rays) : Base(rays) {}
+  explicit ForceConeTpl(const Eigen::MatrixBase<EigenDerived>& rays)
+      : Base(rays) {}
 
   explicit ForceConeTpl(const Index size) : Base(size) {}
 
-  /// \returns a linear cone built from a friction coefficient and the number of rays along the Z axis.
-  static ForceConeTpl RegularCone(const Scalar mu, const VectorD& direction, const int num_rays) {
+  /// \returns a linear cone built from a friction coefficient and the number of
+  /// rays along the Z axis.
+  static ForceConeTpl RegularCone(const Scalar mu, const VectorD& direction,
+                                  const int num_rays) {
     return RegularCone(mu, direction, num_rays, 0.);
   }
 
-  static ForceConeTpl RegularCone(const Scalar mu, const VectorD& direction, const int num_rays,
+  static ForceConeTpl RegularCone(const Scalar mu, const VectorD& direction,
+                                  const int num_rays,
                                   const Scalar theta_offset) {
     assert(mu >= 0. && "mu must be positive");
     assert(num_rays >= 1 && "The number of rays must be at least one");
@@ -162,11 +169,15 @@ struct ForceConeTpl : public LinearCone<_Scalar, 3, _Options> {
 
     const Scalar angle = (2. * M_PI) / num_rays;
 
-    const MatrixD Po(MatrixD::Identity() - normalized_direction * normalized_direction.transpose());
+    const MatrixD Po(MatrixD::Identity() -
+                     normalized_direction * normalized_direction.transpose());
 
-    const MatrixD rot_offset(AngleAxis(theta_offset, normalized_direction).toRotationMatrix());
-    const VectorD init_direction(rot_offset * (Po * VectorD::Ones()).normalized());
-    const MatrixD rot(AngleAxis(angle, normalized_direction).toRotationMatrix());
+    const MatrixD rot_offset(
+        AngleAxis(theta_offset, normalized_direction).toRotationMatrix());
+    const VectorD init_direction(rot_offset *
+                                 (Po * VectorD::Ones()).normalized());
+    const MatrixD rot(
+        AngleAxis(angle, normalized_direction).toRotationMatrix());
 
     VectorD ray((direction + mu * init_direction).normalized());
 
@@ -198,8 +209,9 @@ struct ForceConeTpl : public LinearCone<_Scalar, 3, _Options> {
   }
 
   template <typename S2, int O2>
-  bool isApprox(const ForceConeTpl<S2, O2>& other,
-                const Scalar& prec = Eigen::NumTraits<Scalar>::dummy_precision()) const {
+  bool isApprox(
+      const ForceConeTpl<S2, O2>& other,
+      const Scalar& prec = Eigen::NumTraits<Scalar>::dummy_precision()) const {
     return Base::isApprox(other, prec);
   }
 
@@ -235,7 +247,8 @@ struct WrenchConeTpl : public LinearCone<_Scalar, 6, _Options> {
   typedef typename ForceCone::Matrix3x Matrix3x;
 
   typedef typename Matrix6x::template NRowsBlockXpr<3>::Type LinearBlock;
-  typedef typename Matrix6x::template ConstNRowsBlockXpr<3>::Type ConstLinearBlock;
+  typedef
+      typename Matrix6x::template ConstNRowsBlockXpr<3>::Type ConstLinearBlock;
 
   typedef LinearBlock AngularBlock;
   typedef ConstLinearBlock ConstAngularBlock;
@@ -245,14 +258,16 @@ struct WrenchConeTpl : public LinearCone<_Scalar, 6, _Options> {
 
   /// \brief Constructor from a set of rays.
   template <typename EigenDerived>
-  explicit WrenchConeTpl(const Eigen::MatrixBase<EigenDerived>& rays) : Base(rays) {}
+  explicit WrenchConeTpl(const Eigen::MatrixBase<EigenDerived>& rays)
+      : Base(rays) {}
 
   /// \brief Constructs a WrenchCone of a given size.
   explicit WrenchConeTpl(const Index size) : Base(size) {}
 
   /// \brief Constructs a WrenchCone of a given size.
   template <typename S2, int O2>
-  explicit WrenchConeTpl(const ForceConeTpl<S2, O2>& force_cone) : Base(force_cone.size()) {
+  explicit WrenchConeTpl(const ForceConeTpl<S2, O2>& force_cone)
+      : Base(force_cone.size()) {
     rays().template topRows<3>() = force_cone.rays();
     rays().template bottomRows<3>().setZero();
   }
@@ -274,15 +289,17 @@ struct WrenchConeTpl : public LinearCone<_Scalar, 6, _Options> {
       Col6Xpr out_col = res.rays().col(k);
 
       out_col.template head<3>() = R * in_col.template head<3>();
-      out_col.template tail<3>() = t.cross(out_col.template head<3>()) + R * in_col.template tail<3>();
+      out_col.template tail<3>() =
+          t.cross(out_col.template head<3>()) + R * in_col.template tail<3>();
     }
 
     return res;
   }
 
   template <typename S2, int O2>
-  bool isApprox(const WrenchConeTpl<S2, O2>& other,
-                const Scalar& prec = Eigen::NumTraits<Scalar>::dummy_precision()) const {
+  bool isApprox(
+      const WrenchConeTpl<S2, O2>& other,
+      const Scalar& prec = Eigen::NumTraits<Scalar>::dummy_precision()) const {
     return Base::isApprox(other, prec);
   }
 
