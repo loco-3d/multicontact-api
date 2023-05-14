@@ -1,13 +1,11 @@
 # Copyright (c) 2019, CNRS
 # Authors: Pierre Fernbach <pfernbac@laas.fr>
+import pickle
 import unittest
 from math import cos, sin, sqrt
 from random import uniform
 
 import numpy as np
-from ndcurves import SE3Curve, bezier, piecewise, piecewise_SE3, polynomial
-from numpy import array, array_equal, isclose, random
-
 import pinocchio as pin
 from multicontact_api import (
     ContactModel,
@@ -16,8 +14,9 @@ from multicontact_api import (
     ContactSequence,
     ContactType,
 )
+from ndcurves import SE3Curve, bezier, piecewise, piecewise_SE3, polynomial
+from numpy import array, array_equal, isclose, random
 from pinocchio import SE3, Quaternion
-import pickle
 
 pin.switchToNumpyArray()
 

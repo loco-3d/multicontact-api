@@ -2,9 +2,8 @@
 # Authors: Justin Carpentier <jcarpent@laas.fr>, Pierre Fernbach <pfernbac@laas.fr>
 import unittest
 
-import numpy as np
-
 import multicontact_api
+import numpy as np
 
 multicontact_api.switchToNumpyArray()
 
