@@ -6,7 +6,6 @@ from math import cos, sin, sqrt
 from random import uniform
 
 import numpy as np
-import pinocchio as pin
 from multicontact_api import (
     ContactModel,
     ContactPatch,
@@ -17,8 +16,6 @@ from multicontact_api import (
 from ndcurves import SE3Curve, bezier, piecewise, piecewise_SE3, polynomial
 from numpy import array, array_equal, isclose, random
 from pinocchio import SE3, Quaternion
-
-pin.switchToNumpyArray()
 
 
 def randomQuaternion():

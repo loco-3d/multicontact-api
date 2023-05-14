@@ -5,8 +5,6 @@ import unittest
 import multicontact_api
 import numpy as np
 
-multicontact_api.switchToNumpyArray()
-
 
 class GeometryTest(unittest.TestCase):
     def test_geom_soc6(self):
