@@ -182,7 +182,7 @@ struct ContactSequencePythonVisitor
              "defined in each phase.")
         .def("haveEffectorsTrajectories", &CS::haveEffectorsTrajectories,
              cs_haveEffectorTrajectories_overloads(
-                 (bp::args("precision_treshold") =
+                 (bp::args("precision_threshold") =
                       Eigen::NumTraits<typename CS::Scalar>::dummy_precision(),
                   bp::args("use_rotation") = true),
                  "check that for each phase preceeding a contact creation,"
