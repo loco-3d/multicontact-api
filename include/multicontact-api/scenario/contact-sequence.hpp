@@ -783,8 +783,10 @@ struct ContactSequenceTpl
         ContactPatch::SE3 pPhaseMax =
             m_contact_phases.at(i + 1).contactPatches().at(eeName).placement();
         if ((use_rotation &&
-             !(pTrajMax.toHomogeneousMatrix() - pPhaseMax.toHomogeneousMatrix()).isMuchSmallerThan(1.0, prec)) ||
-            !(pTrajMax.translation() - pPhaseMax.translation()).isMuchSmallerThan(1.0, prec)) {
+             !(pTrajMax.toHomogeneousMatrix() - pPhaseMax.toHomogeneousMatrix())
+                  .isMuchSmallerThan(1.0, prec)) ||
+            !(pTrajMax.translation() - pPhaseMax.translation())
+                 .isMuchSmallerThan(1.0, prec)) {
           std::cout << "Effector trajectory for " << eeName
                     << " do not end at it's contact placement in the next "
                        "phase, for phase "
@@ -792,18 +794,21 @@ struct ContactSequenceTpl
           std::cout << "Last point : " << std::endl
                     << pTrajMax << std::endl
                     << "Next contact : " << std::endl
-                    << pPhaseMax
-                    << std::endl;
+                    << pPhaseMax << std::endl;
           return false;
         }
         if (i > 0 && m_contact_phases.at(i - 1).isEffectorInContact(eeName)) {
           ContactPatch::SE3 pTrajMin =
-            ContactPatch::SE3((*traj)(traj->min()).matrix());
-          ContactPatch::SE3 pPhaseMin =
-              m_contact_phases.at(i -1).contactPatches().at(eeName).placement();
-          if ((use_rotation &&
-              !(pTrajMin.toHomogeneousMatrix() - pPhaseMin.toHomogeneousMatrix()).isMuchSmallerThan(1.0, prec)) ||
-              !(pTrajMin.translation() - pPhaseMin.translation()).isMuchSmallerThan(1.0, prec)) {
+              ContactPatch::SE3((*traj)(traj->min()).matrix());
+          ContactPatch::SE3 pPhaseMin = m_contact_phases.at(i - 1)
+                                            .contactPatches()
+                                            .at(eeName)
+                                            .placement();
+          if ((use_rotation && !(pTrajMin.toHomogeneousMatrix() -
+                                 pPhaseMin.toHomogeneousMatrix())
+                                    .isMuchSmallerThan(1.0, prec)) ||
+              !(pTrajMin.translation() - pPhaseMin.translation())
+                   .isMuchSmallerThan(1.0, prec)) {
             std::cout << "Effector trajectory for " << eeName
                       << " do not start at it's contact placement in the "
                          "previous phase, for phase "
@@ -811,8 +816,7 @@ struct ContactSequenceTpl
             std::cout << "First point : " << std::endl
                       << pTrajMin << std::endl
                       << "Previous contact : " << std::endl
-                      << pPhaseMin
-                      << std::endl;
+                      << pPhaseMin << std::endl;
             return false;
           }
         }
