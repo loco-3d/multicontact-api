@@ -2,8 +2,9 @@
   description = "Library for creating smooth cubic splines";
 
   inputs = {
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    ndcurves.url = "github:loco-3d/ndcurves/std-ptr";
+    flake-parts.follows = "ndcurves/flake-parts";
+    nixpkgs.follows = "ndcurves/nixpkgs";
   };
 
   outputs =
@@ -11,7 +12,7 @@
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       systems = inputs.nixpkgs.lib.systems.flakeExposed;
       perSystem =
-        { pkgs, self', ... }:
+        { pkgs, self', system, ... }:
         {
           apps.default = {
             type = "app";
@@ -20,7 +21,7 @@
           devShells.default = pkgs.mkShell { inputsFrom = [ self'.packages.default ]; };
           packages = {
             default = self'.packages.multicontact-api;
-            multicontact-api = pkgs.callPackage ./. { pythonSupport = true; };
+            multicontact-api = pkgs.callPackage ./. { inherit (inputs.ndcurves.packages.${system}) ndcurves; };
           };
         };
     };

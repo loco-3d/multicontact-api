@@ -2,6 +2,7 @@
 // Authors: Justin Carpentier <jcarpent@laas.fr>
 
 #include <pinocchio/fwd.hpp>
+#include "multicontact-api/bindings/python/fwd.hpp"
 
 // required because of the serialization of the curves pointer :
 #include <ndcurves/bezier_curve.h>

@@ -18,6 +18,26 @@
         "type": "github"
       }
     },
+    "ndcurves": {
+      "inputs": {
+        "flake-parts": "flake-parts",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1733391448,
+        "narHash": "sha256-h+BlmWyOcii42NZ+EaDXzUvPFP1w1ytBs6nCyvajpX8=",
+        "owner": "loco-3d",
+        "repo": "ndcurves",
+        "rev": "ef610a94bbf138215244743a681738f1d890cf5c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "loco-3d",
+        "ref": "std-ptr",
+        "repo": "ndcurves",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1733380312,
@@ -48,8 +68,15 @@
     },
     "root": {
       "inputs": {
-        "flake-parts": "flake-parts",
-        "nixpkgs": "nixpkgs"
+        "flake-parts": [
+          "ndcurves",
+          "flake-parts"
+        ],
+        "ndcurves": "ndcurves",
+        "nixpkgs": [
+          "ndcurves",
+          "nixpkgs"
+        ]
       }
     }
   },

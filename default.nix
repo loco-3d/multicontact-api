@@ -1,14 +1,11 @@
 {
   lib,
   stdenv,
-  fetchFromGitHub,
   cmake,
   ndcurves,
-  python3Packages,
-  pythonSupport ? false,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation {
   pname = "multicontact-api";
   version = "3.0.3";
 
@@ -35,15 +32,15 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
   ];
 
-  propagatedBuildInputs = lib.optional pythonSupport python3Packages.ndcurves
-  ++ lib.optional (!pythonSupport) ndcurves;
+  propagatedBuildInputs = [
+    ndcurves
+  ];
 
   meta = {
     description = "define, store and use ContactSequence objects";
     homepage = "https://github.com/loco-3d/multicontact-api";
     license = lib.licenses.bsd2;
     maintainers = with lib.maintainers; [ nim65s ];
-    mainProgram = "multicontact-api";
     platforms = lib.platforms.unix;
   };
-})
+}

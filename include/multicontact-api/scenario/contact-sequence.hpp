@@ -31,8 +31,8 @@ struct ContactSequenceTpl
   typedef ndcurves::transform_t transform_t;
   typedef ndcurves::curve_abc_t curve_t;
   typedef ndcurves::curve_SE3_t curve_SE3_t;
-  typedef boost::shared_ptr<curve_t> curve_ptr;
-  typedef boost::shared_ptr<curve_SE3_t> curve_SE3_ptr;
+  typedef std::shared_ptr<curve_t> curve_ptr;
+  typedef std::shared_ptr<curve_SE3_t> curve_SE3_ptr;
   typedef ndcurves::piecewise_t piecewise_t;
   typedef ndcurves::piecewise_SE3_t piecewise_SE3_t;
   typedef ndcurves::SE3Curve_t SE3Curve_t;
