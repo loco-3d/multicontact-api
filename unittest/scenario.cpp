@@ -125,7 +125,8 @@ curve_SE3_ptr_t buildPiecewiseSE3() {
   quaternion_t q1(0., 1., 0, 0);
   pointX_t p0 = point3_t(1., 1.5, -2.);
   pointX_t p1 = point3_t(3., 0, 1.);
-  curve_SE3_ptr_t cLinear = std::make_shared<ndcurves::SE3Curve_t>(p0, p1, q0, q1, min, mid);
+  curve_SE3_ptr_t cLinear =
+      std::make_shared<ndcurves::SE3Curve_t>(p0, p1, q0, q1, min, mid);
   point3_t a(1, 2, 3);
   point3_t b(2, 3, 4);
   point3_t c(3, 4, 5);
@@ -135,8 +136,11 @@ curve_SE3_ptr_t buildPiecewiseSE3() {
   params.push_back(b);
   params.push_back(c);
   params.push_back(d);
-  std::shared_ptr<ndcurves::bezier3_t> translation_bezier = std::make_shared<ndcurves::bezier3_t>(params.begin(), params.end(), mid, max);
-  curve_SE3_ptr_t cBezier = std::make_shared<ndcurves::SE3Curve_t>(translation_bezier, q0, q1);
+  std::shared_ptr<ndcurves::bezier3_t> translation_bezier =
+      std::make_shared<ndcurves::bezier3_t>(params.begin(), params.end(), mid,
+                                            max);
+  curve_SE3_ptr_t cBezier =
+      std::make_shared<ndcurves::SE3Curve_t>(translation_bezier, q0, q1);
 
   ndcurves::piecewise_SE3_t piecewiseSE3(cLinear);
   piecewiseSE3.add_curve_ptr(cBezier);
