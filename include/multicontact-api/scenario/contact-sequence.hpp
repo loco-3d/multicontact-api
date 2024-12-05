@@ -1481,7 +1481,7 @@ struct ContactSequenceTpl
 }  // namespace scenario
 }  // namespace multicontact_api
 
-DEFINE_CLASS_TEMPLATE_VERSION(
+MULTICONTACT_API_DEFINE_CLASS_TEMPLATE_VERSION(
     typename Scalar, multicontact_api::scenario::ContactSequenceTpl<Scalar>)
 
 #endif  // __multicontact_api_scenario_contact_sequence_hpp__
