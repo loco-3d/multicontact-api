@@ -24,16 +24,15 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1733391448,
-        "narHash": "sha256-h+BlmWyOcii42NZ+EaDXzUvPFP1w1ytBs6nCyvajpX8=",
+        "lastModified": 1733425700,
+        "narHash": "sha256-dDH2XpnlBlhG5Q8N9Aljxvf/K9jFuiAx0lyBIcXNOZE=",
         "owner": "loco-3d",
         "repo": "ndcurves",
-        "rev": "ef610a94bbf138215244743a681738f1d890cf5c",
+        "rev": "b787d93dd176e6e99a83ceb23bc7ce9a1fdc3ded",
         "type": "github"
       },
       "original": {
         "owner": "loco-3d",
-        "ref": "std-ptr",
         "repo": "ndcurves",
         "type": "github"
       }

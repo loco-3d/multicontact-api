@@ -73,7 +73,7 @@ if(BUILD_PYTHON_INTERFACE)
 endif(BUILD_PYTHON_INTERFACE)
 
 add_project_dependency(pinocchio REQUIRED)
-add_project_dependency(ndcurves 1.0.0 REQUIRED)
+add_project_dependency(ndcurves REQUIRED)
 if(NOT CURVES_WITH_PINOCCHIO_SUPPORT)
   message(
     FATAL_ERROR

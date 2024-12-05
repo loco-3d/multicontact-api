@@ -2,7 +2,7 @@
   description = "Library for creating smooth cubic splines";
 
   inputs = {
-    ndcurves.url = "github:loco-3d/ndcurves/std-ptr";
+    ndcurves.url = "github:loco-3d/ndcurves";
     flake-parts.follows = "ndcurves/flake-parts";
     nixpkgs.follows = "ndcurves/nixpkgs";
   };
