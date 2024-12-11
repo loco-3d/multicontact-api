@@ -3,6 +3,8 @@
 
 #include <pinocchio/fwd.hpp>
 
+#include "multicontact-api/bindings/python/fwd.hpp"
+
 // required because of the serialization of the curves pointer :
 #include <ndcurves/bezier_curve.h>
 #include <ndcurves/cubic_hermite_spline.h>

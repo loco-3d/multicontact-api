@@ -19,16 +19,16 @@ const unsigned int API_VERSION =
     2;  // must be increased everytime the save() method of a class is modified
 
 // Macro used to define the serialization version of a templated class
-#define DEFINE_CLASS_TEMPLATE_VERSION(Template, Type)  \
-  namespace boost {                                    \
-  namespace serialization {                            \
-  template <Template>                                  \
-  struct version<Type> {                               \
-    static constexpr unsigned int value = API_VERSION; \
-  };                                                   \
-  template <Template>                                  \
-  constexpr unsigned int version<Type>::value;         \
-  }                                                    \
+#define MULTICONTACT_API_DEFINE_CLASS_TEMPLATE_VERSION(Template, Type) \
+  namespace boost {                                                    \
+  namespace serialization {                                            \
+  template <Template>                                                  \
+  struct version<Type> {                                               \
+    static constexpr unsigned int value = API_VERSION;                 \
+  };                                                                   \
+  template <Template>                                                  \
+  constexpr unsigned int version<Type>::value;                         \
+  }                                                                    \
   }
 
 namespace multicontact_api {

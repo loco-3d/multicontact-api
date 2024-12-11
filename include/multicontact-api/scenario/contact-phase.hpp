@@ -44,7 +44,7 @@ struct ContactPhaseTpl
   // typedef ndcurves::curve_abc<Scalar, Scalar, true, point3_t> curve_3_t;
   typedef ndcurves::curve_SE3_t curve_SE3_t;
   typedef ndcurves::curve_ptr_t curve_ptr;
-  // typedef boost::shared_ptr<curve_3_t> curve_3_ptr;
+  // typedef std::shared_ptr<curve_3_t> curve_3_ptr;
   typedef ndcurves::curve_SE3_ptr_t curve_SE3_ptr;
   typedef ndcurves::piecewise3_t piecewise3_t;
   typedef ndcurves::piecewise_t piecewise_t;
@@ -806,7 +806,7 @@ struct ContactPhaseTpl
 }  // namespace scenario
 }  // namespace multicontact_api
 
-DEFINE_CLASS_TEMPLATE_VERSION(
+MULTICONTACT_API_DEFINE_CLASS_TEMPLATE_VERSION(
     typename Scalar, multicontact_api::scenario::ContactPhaseTpl<Scalar>)
 
 #endif  // CONTACTPHASE_HPP
