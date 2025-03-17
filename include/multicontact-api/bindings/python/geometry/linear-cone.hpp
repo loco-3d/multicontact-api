@@ -40,7 +40,7 @@ struct LCPythonVisitor
                       "Matrix of rays of the linear cone.")
         .def("__str__", &toString)
         .def("isApprox",
-             (bool(LC::*)(const LC &, const Scalar &) const) & LC::isApprox,
+             (bool (LC::*)(const LC &, const Scalar &) const) & LC::isApprox,
              bp::args("other", "prec"),
              "Returns true if *this is approximately equal to other, within "
              "the precision determined by prec.")
@@ -105,15 +105,15 @@ struct ForceConePythonVisitor
         .def("toWrenchCone", &toWrenchCone, "Returns *this as a WrenchCone.")
 
         .def("RegularCone",
-             (ForceCone(*)(const Scalar, const VectorD &,
-                           const int))&ForceCone::RegularCone,
+             (ForceCone (*)(const Scalar, const VectorD &,
+                            const int))&ForceCone::RegularCone,
              bp::args("mu", "direction", "num rays"),
              "Generates a regular linear cone from a given number of rays, a "
              "main direction and a friction "
              "coefficient.")
         .def("RegularCone",
-             (ForceCone(*)(const Scalar, const VectorD &, const int,
-                           const Scalar))&ForceCone::RegularCone,
+             (ForceCone (*)(const Scalar, const VectorD &, const int,
+                            const Scalar))&ForceCone::RegularCone,
              bp::args("mu", "direction", "num rays", "angle offset"),
              "Generates a regular linear cone from a given number of rays, a "
              "main direction and a friction "

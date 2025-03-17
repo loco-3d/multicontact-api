@@ -30,12 +30,12 @@ struct SOCPythonVisitor
              "Returns the lhs value of the conic inequality.")
         .def("rhsValue", &SOC::rhsValue, bp::arg("vector"),
              "Returns the rhs value of the conic inequality.")
-        .def("check", (bool(SOC::*)(const VectorD &) const) & SOC::check,
+        .def("check", (bool (SOC::*)(const VectorD &) const) & SOC::check,
              bp::arg("vector"),
              "Checks if the vector given in argument belongs to the conic "
              "constraint.")
         .def("check",
-             (bool(SOC::*)(const VectorD &, const Scalar) const) & SOC::check,
+             (bool (SOC::*)(const VectorD &, const Scalar) const) & SOC::check,
              bp::args("vector", "factor"),
              "Checks if the vector given in argument belongs to the conic "
              "constraint with a given reduction factor.")
@@ -43,7 +43,7 @@ struct SOCPythonVisitor
                       "Accessor to the direction property.")
         .add_property("Q", &get_Q, &SOC::setQ, "Accessor to the Q property.")
         .def("isApprox",
-             (bool(SOC::*)(const SOC &, const Scalar &) const) & SOC::isApprox,
+             (bool (SOC::*)(const SOC &, const Scalar &) const) & SOC::isApprox,
              bp::args("other", "prec"),
              "Returns true if *this is approximately equal to other, within "
              "the precision determined by prec.")
