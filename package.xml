@@ -26,6 +26,7 @@
   <depend>graphviz</depend>
   <depend>pinocchio</depend>
   <depend>ndcurves</depend>
+  <depend>jrl_cmakemodules</depend>
 
   <export>
     <build_type>cmake</build_type>
