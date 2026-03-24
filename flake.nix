@@ -3,6 +3,7 @@
 
   inputs = {
     gepetto.url = "github:gepetto/nix";
+    flakoboros.follows = "gepetto/flakoboros";
     gazebros2nix.follows = "gepetto/gazebros2nix";
     flake-parts.follows = "gepetto/flake-parts";
     nixpkgs.follows = "gepetto/nixpkgs";
@@ -14,36 +15,30 @@
   outputs =
     inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } (
-      { lib, self, ... }:
+      { lib, ... }:
       {
         systems = import inputs.systems;
         imports = [
           inputs.gepetto.flakeModule
-          { gepetto-pkgs.overlays = [ self.overlays.default ]; }
-        ];
-        flake.overlays.default = _final: prev: {
-          multicontact-api = prev.multicontact-api.overrideAttrs {
-            src = lib.fileset.toSource {
-              root = ./.;
-              fileset = lib.fileset.unions [
-                ./bindings
-                ./include
-                ./notebooks
-                ./unittest
-                ./CMakeLists.txt
-                ./package.xml
-              ];
-            };
-          };
-        };
-        perSystem =
-          { pkgs, self', ... }:
           {
-            packages = {
-              default = self'.packages.multicontact-api;
-              multicontact-api = pkgs.python3Packages.multicontact-api.override { buildStandalone = false; };
+            flakoboros = {
+              pyOverrideAttrs.multicontact-api = _: _: { };
+              overrideAttrs.multicontact-api = _: {
+                src = lib.fileset.toSource {
+                  root = ./.;
+                  fileset = lib.fileset.unions [
+                    ./bindings
+                    ./include
+                    ./notebooks
+                    ./unittest
+                    ./CMakeLists.txt
+                    ./package.xml
+                  ];
+                };
+              };
             };
-          };
+          }
+        ];
       }
     );
 }
