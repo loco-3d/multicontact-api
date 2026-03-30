@@ -5,7 +5,6 @@
 #define __multicontact_api_python_scenario_contact_sequence_hpp__
 
 #include <eigenpy/eigenpy.hpp>
-#include <pinocchio/bindings/python/utils/std-aligned-vector.hpp>
 #include <pinocchio/fwd.hpp>
 
 #include "multicontact-api/bindings/python/serialization/archive.hpp"
