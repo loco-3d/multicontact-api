@@ -28,6 +28,12 @@
 #ifndef EIGEN_BOOST_SERIALIZATION
 #define EIGEN_BOOST_SERIALIZATION
 
+#include <pinocchio/config.hpp>
+
+#if PINOCCHIO_VERSION_AT_LEAST(3, 90, 0)
+#include <pinocchio/serialization.hpp>
+#else
+
 #include <Eigen/Dense>
 #include <boost/serialization/split_free.hpp>
 #include <boost/serialization/vector.hpp>
@@ -77,4 +83,5 @@ void serialize(
 }  // namespace serialization
 }  // namespace boost
 
+#endif
 #endif  // ifndef __multicontact_api_serialization_eigen_matrix_hpp__

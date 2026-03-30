@@ -4,6 +4,12 @@
 #ifndef __multicontact_api_serialization_aligned_vector_hpp__
 #define __multicontact_api_serialization_aligned_vector_hpp__
 
+#include <pinocchio/config.hpp>
+
+#if PINOCCHIO_VERSION_AT_LEAST(3, 90, 0)
+#include <pinocchio/serialization.hpp>
+#else
+
 #include <boost/serialization/split_free.hpp>
 #include <boost/serialization/vector.hpp>
 #include <pinocchio/container/aligned-vector.hpp>
@@ -38,4 +44,5 @@ void serialize(Archive& ar, pinocchio::container::aligned_vector<T>& v,
 
 }  // namespace boost
 
+#endif
 #endif  // ifndef __multicontact_api_serialization_aligned_vector_hpp__
