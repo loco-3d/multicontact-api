@@ -4,6 +4,7 @@
 #ifndef __multicontact_api_python_scenario_contact_sequence_hpp__
 #define __multicontact_api_python_scenario_contact_sequence_hpp__
 
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <eigenpy/eigenpy.hpp>
 #include <pinocchio/fwd.hpp>
 
@@ -17,7 +18,7 @@ namespace bp = boost::python;
 
 template <typename CS>
 struct ContactSequencePythonVisitor
-    : public bp::def_visitor<ContactSequencePythonVisitor<CS> > {
+    : public bp::def_visitor<ContactSequencePythonVisitor<CS>> {
   typedef typename CS::ContactPhaseVector ContactPhaseVector;
 
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(cs_breakContact_overloads,
