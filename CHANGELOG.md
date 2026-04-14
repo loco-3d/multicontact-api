@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.0] - 2026-04-14
+
 - Fix use of pinocchio 3 to get compatibility with pinocchio 4
 - CMake: drop git submodule
 - Nix: switch to flakoboros
@@ -127,7 +129,8 @@ Changes since v1.0.0:
 
 - Initial release
 
-[Unreleased]: https://github.com/loco-3d/multicontact-api/compare/v4.1.1...HEAD
+[Unreleased]: https://github.com/loco-3d/multicontact-api/compare/v4.2.0...HEAD
+[4.2.0]: https://github.com/loco-3d/multicontact-api/compare/v4.1.1...v4.2.0
 [4.1.1]: https://github.com/loco-3d/multicontact-api/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/loco-3d/multicontact-api/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/loco-3d/multicontact-api/compare/v3.0.3...v4.0.0
