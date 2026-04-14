@@ -10,24 +10,33 @@ set(${PROJECT_NAME}_PYTHON_SOURCES
     scenario/contact-patch.cpp
     scenario/contact-phase.cpp
     scenario/contact-sequence.cpp
-    scenario/enums.cpp)
+    scenario/enums.cpp
+)
 
-add_library(${PY_NAME} SHARED ${${PROJECT_NAME}_PYTHON_SOURCES}
-                              ${${PROJECT_NAME}_PYTHON_HEADERS})
+add_library(
+    ${PY_NAME}
+    SHARED
+    ${${PROJECT_NAME}_PYTHON_SOURCES}
+    ${${PROJECT_NAME}_PYTHON_HEADERS}
+)
 
 add_source_group(${PROJECT_NAME}_PYTHON_SOURCES)
 
 target_link_libraries(${PY_NAME} ${PROJECT_NAME} eigenpy::eigenpy)
 
-set_target_properties(${PY_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PY_NAME}
-                                            SUFFIX "${PYTHON_EXT_SUFFIX}")
+set_target_properties(
+    ${PY_NAME}
+    PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PY_NAME} SUFFIX "${PYTHON_EXT_SUFFIX}"
+)
 target_compile_options(${PY_NAME} PRIVATE "-Wno-conversion")
 target_compile_options(${PY_NAME} PRIVATE "-Wno-enum-compare")
 
 if(UNIX)
-  get_relative_rpath(${${PY_NAME}_INSTALL_DIR} ${PY_NAME}_INSTALL_RPATH)
-  set_target_properties(${PY_NAME} PROPERTIES INSTALL_RPATH
-                                              "${${PY_NAME}_INSTALL_RPATH}")
+    get_relative_rpath(${${PY_NAME}_INSTALL_DIR} ${PY_NAME}_INSTALL_RPATH)
+    set_target_properties(
+        ${PY_NAME}
+        PROPERTIES INSTALL_RPATH "${${PY_NAME}_INSTALL_RPATH}"
+    )
 endif()
 
 install(TARGETS ${PY_NAME} DESTINATION ${${PY_NAME}_INSTALL_DIR})
@@ -35,5 +44,5 @@ install(TARGETS ${PY_NAME} DESTINATION ${${PY_NAME}_INSTALL_DIR})
 set(${PROJECT_NAME}_PYTHON_FILES __init__.py)
 
 foreach(file ${${PROJECT_NAME}_PYTHON_FILES})
-  python_install_on_site(${PY_NAME} ${file})
+    python_install_on_site(${PY_NAME} ${file})
 endforeach(file ${${PROJECT_NAME}_PYTHON_FILES})
