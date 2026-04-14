@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fix use of pinocchio 3 to get compatibility with pinocchio 4
 - CMake: drop git submodule
 - Nix: switch to flakoboros
 
