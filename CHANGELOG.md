@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- fix include order
+
 ## [4.2.0] - 2026-04-14
 
 - Fix use of pinocchio 3 to get compatibility with pinocchio 4

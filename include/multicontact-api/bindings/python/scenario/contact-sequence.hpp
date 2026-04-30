@@ -4,12 +4,14 @@
 #ifndef __multicontact_api_python_scenario_contact_sequence_hpp__
 #define __multicontact_api_python_scenario_contact_sequence_hpp__
 
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <eigenpy/eigenpy.hpp>
 #include <pinocchio/fwd.hpp>
 
 #include "multicontact-api/bindings/python/serialization/archive.hpp"
 #include "multicontact-api/scenario/contact-sequence.hpp"
+
+// no idea why this must be last
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 namespace multicontact_api {
 namespace python {

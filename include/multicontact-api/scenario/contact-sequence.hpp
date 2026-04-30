@@ -19,7 +19,7 @@ namespace scenario {
 
 template <class _ContactPhase>
 struct ContactSequenceTpl
-    : public serialization::Serializable<ContactSequenceTpl<_ContactPhase> > {
+    : public serialization::Serializable<ContactSequenceTpl<_ContactPhase>> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   typedef _ContactPhase ContactPhase;
   typedef typename ContactPhase::Scalar Scalar;
