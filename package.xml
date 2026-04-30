@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>multicontact_api</name>
-  <version>4.2.0</version>
+  <version>4.2.1</version>
   <description>
     API to define and store Contact phases and Contact Sequences.
   </description>
