@@ -63,8 +63,10 @@ It store the set of active contacts as a map<String, ContactPatch> with the effe
 cp = ContactPhase()
 p = SE3()
 p.setRandom()
-patchRF = ContactPatch(p,0.5) # create a new contact patch at the placement p with a friction coefficient of 0.5
-cp.addContact("right-feet",patchRF)
+patchRF = ContactPatch(
+    p, 0.5
+)  # create a new contact patch at the placement p with a friction coefficient of 0.5
+cp.addContact("right-feet", patchRF)
 # check if an effector is in contact:
 cp.isEffectorInContact("right-feet")
 # access to the contact patch from the effector name:
@@ -75,8 +77,8 @@ A contact phase can be defined in a specific time interval:
 
 ```python
 cp = ContactPhase()
-cp.timeInitial = 1.
-cp.timeFinal =3.5
+cp.timeInitial = 1.0
+cp.timeFinal = 3.5
 ```
 
 **Centroidal dynamic data**
@@ -157,12 +159,12 @@ It can also store the contact forces and contact normal forces, in a map<String,
 
 ```python
 fR = createRandomPiecewisePolynomial(12)
-cp.addContactForceTrajectory("right-feet",fR)
+cp.addContactForceTrajectory("right-feet", fR)
 # access the trajectory :
 cp.contactForce("right-feet")
 # contact normal force :
 fnR = createRandomPiecewisePolynomial(1)
-cp.addContactNormalForceTrajectory("right-feet",fnR)
+cp.addContactNormalForceTrajectory("right-feet", fnR)
 # access the trajectory :
 cp.contactNormalForce("right-feet")
 ```
@@ -176,10 +178,12 @@ end_pose = SE3.Identity()
 init_pose.translation = array([0.2, -0.7, 0.6])
 end_pose.translation = array([3.6, -2.2, -0.9])
 init_pose.rotation = Quaternion.Identity().matrix()
-end_pose.rotation = Quaternion(sqrt(2.) / 2., sqrt(2.) / 2., 0, 0).normalized().matrix()
-effL = SE3Curve(init_pose, end_pose, cp.timeInitial,cp.timeFinal)
+end_pose.rotation = (
+    Quaternion(sqrt(2.0) / 2.0, sqrt(2.0) / 2.0, 0, 0).normalized().matrix()
+)
+effL = SE3Curve(init_pose, end_pose, cp.timeInitial, cp.timeFinal)
 # add it to the contact phase:
-cp.addEffectorTrajectory("left-feet",effL)
+cp.addEffectorTrajectory("left-feet", effL)
 # access the trajectory :
 cp.effectorTrajectory("left-feet")
 ```
